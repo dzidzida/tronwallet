@@ -161,6 +161,31 @@ const menuData = [
     name: 'dashboard',
     icon: 'dashboard',
     path: 'dashboard',
+    children: [],
+  },
+  {
+    name: 'account',
+    icon: 'user',
+    path: 'account',
+    children: [],
+  },
+  {
+    name: 'send',
+    icon: 'form',
+    path: 'send',
+    children: [],
+  },
+  {
+    name: 'receive',
+    icon: 'form',
+    path: 'receive',
+    children: [],
+  },
+  {
+    name: 'tokens',
+    icon: 'form',
+    path: 'tokens',
+    children: [],
   },
 ];
 

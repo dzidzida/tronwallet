@@ -2,12 +2,12 @@ import '@babel/polyfill';
 import 'url-polyfill';
 import dva from 'dva';
 import Amplify from 'aws-amplify';
-import awsmobile from './aws-exports';
-
 import createHistory from 'history/createHashHistory';
+import createLoading from 'dva-loading';
+import awsmobile from './aws-export';
+
 // user BrowserHistory
 // import createHistory from 'history/createBrowserHistory';
-import createLoading from 'dva-loading';
 import './rollbar';
 
 import './index.less';
