@@ -1,6 +1,8 @@
 import '@babel/polyfill';
 import 'url-polyfill';
 import dva from 'dva';
+import Amplify from 'aws-amplify';
+import awsmobile from './aws-exports';
 
 import createHistory from 'history/createHashHistory';
 // user BrowserHistory
@@ -9,6 +11,9 @@ import createLoading from 'dva-loading';
 import './rollbar';
 
 import './index.less';
+
+Amplify.configure(awsmobile);
+
 // 1. Initialize
 const app = dva({
   history: createHistory(),

@@ -19,6 +19,6 @@ export default {
     template: './src/index.ejs',
   },
   disableDynamicImport: true,
-  publicPath: '/',
+  publicPath: 'https://d1lzt070f86yrq.cloudfront.net/',
   hash: true,
 };
