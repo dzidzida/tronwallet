@@ -177,7 +177,7 @@ const menuData = [
   },
   {
     name: 'receive',
-    icon: 'form',
+    icon: 'qrcode',
     path: 'receive',
     children: [],
   },
@@ -185,6 +185,12 @@ const menuData = [
     name: 'tokens',
     icon: 'form',
     path: 'tokens',
+    children: [],
+  },
+  {
+    name: 'Vote',
+    icon: 'like-o',
+    path: 'vote',
     children: [],
   },
 ];

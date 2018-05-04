@@ -82,10 +82,13 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Analysis')),
     },
     '/receive': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Workplace')),
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Receive/Receive')),
     },
     '/tokens': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
+    },
+    '/vote': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Vote/Vote')),
     },
   };
   // Get name from ./menu.js or just set it in the router data.
