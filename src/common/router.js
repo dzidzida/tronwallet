@@ -79,7 +79,7 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
     },
     '/send': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Analysis')),
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Send/Send')),
     },
     '/receive': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Workplace')),
