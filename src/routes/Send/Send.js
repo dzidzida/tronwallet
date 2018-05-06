@@ -8,7 +8,7 @@ class Send extends Component {
   state = {
     to: null,
     amount: '0.0000',
-    token: null,
+    token: 'TRX',
     transaction: {
       loading: false,
       status: false,
@@ -40,8 +40,9 @@ class Send extends Component {
   };
 
   handleSend = async () => {
-    const { amount, transaction, from, to, token } = this.state;
-
+    const { amount, transaction, to, token } = this.state;
+    const from = '27jbj4qgTM1hvReST6hEa8Ep8RDo2AM8TJo';
+    
     this.setState({ transaction: { ...transaction, loading: true } });
     const TransactionData = await Client.send({ from, to, token, amount: amount * ONE_TRX });
     const updatedTransaction = { ...transaction };
