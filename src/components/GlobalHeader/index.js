@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
-import { Menu, Icon, Spin, Tag, Dropdown, Avatar, Divider, Tooltip } from 'antd';
+// import { Menu, Icon, Spin, Tag, Dropdown, Avatar, Divider, Tooltip } from 'antd';
+import { Menu, Icon, Tag, Divider } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
-import NoticeIcon from '../NoticeIcon';
-import HeaderSearch from '../HeaderSearch';
+// import NoticeIcon from '../NoticeIcon';
+// import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
 
 export default class GlobalHeader extends PureComponent {
@@ -97,8 +98,8 @@ export default class GlobalHeader extends PureComponent {
           type={collapsed ? 'menu-unfold' : 'menu-fold'}
           onClick={this.toggle}
         />
-        <div className={styles.right}>
-          <HeaderSearch
+        {/* <div className={styles.right}> */}
+          {/* <HeaderSearch
             className={`${styles.action} ${styles.search}`}
             placeholder="站内搜索"
             dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}
@@ -158,8 +159,8 @@ export default class GlobalHeader extends PureComponent {
             </Dropdown>
           ) : (
             <Spin size="small" style={{ marginLeft: 8 }} />
-          )}
-        </div>
+          )} */}
+        {/* </div> */}
       </div>
     );
   }
