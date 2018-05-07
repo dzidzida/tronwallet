@@ -57,7 +57,7 @@ class Receive extends Component {
           </div>
           <Divider />
           <span>Or scan this QR code on a mobile device</span>
-          <img src={this.state.qrcode} alt="QRCode" />
+          <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />
         </div>
       </div>
     );

@@ -26,7 +26,7 @@ class Vote extends Component {
         <div className={styles.content}>
           <div className={styles.tableCol}>
             <div className={styles.divTitle}>Candidates</div>
-            <table>
+            <table className={styles.votes}>
               <thead>
                 <tr>
                   <th>#</th>
@@ -47,7 +47,7 @@ class Vote extends Component {
                     TRX
                   </td>
                   <td>
-                    <input defaultValue={0} type="number" />
+                    <input defaultValue={0} type="number" className={styles.vote} />
                   </td>
                 </tr>
                 <tr>
@@ -61,7 +61,7 @@ class Vote extends Component {
                     TRX
                   </td>
                   <td>
-                    <input defaultValue={0} type="number" />
+                    <input defaultValue={0} type="number" className={styles.vote} />
                   </td>
                 </tr>
               </tbody>
@@ -72,7 +72,7 @@ class Vote extends Component {
             <div className={styles.voteCard}>
               <p>993762.999998 TRX Remaining</p>
               <span className={styles.progress} />
-              <button>Submit Votes</button>
+              <button className={styles.btSubmit}>Submit Votes</button>
               <p>
                 Use your TRX to vote for Super Representatives. For every TRX you hold in your
                 account you have one vote to spend. TRX will not be consumed. You can vote as many
