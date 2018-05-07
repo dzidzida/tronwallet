@@ -79,13 +79,19 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
     },
     '/send': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Analysis')),
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Send/Send')),
     },
     '/receive': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Workplace')),
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Receive/Receive')),
     },
-    '/tokens': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
+    '/tokens/view': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Tokens/View')),
+    },
+    '/tokens/create': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Tokens/Create')),
+    },
+    '/vote': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Vote/Vote')),
     },
     '/user/login': {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../routes/User/Login')),
