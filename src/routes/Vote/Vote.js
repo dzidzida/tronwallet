@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Affix, AutoComplete } from 'antd';
+import * as QRCode from 'qrcode';
+import QRCodeCard from '../QRCode/QRCode';
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import { Client } from '../../utils/wallet-service/client';
@@ -10,6 +12,12 @@ class Vote extends Component {
     totalTrx: 1000000,
     totalRemaining: 0,
     list: [],
+    transaction: {
+      loading: false,
+      status: false,
+      qrcode: null,
+      error: null,
+    },
   };
 
   componentWillMount() {
@@ -23,19 +31,26 @@ class Vote extends Component {
   };
 
   submit = async () => {
-    const { voteList } = this.state;
+    const { voteList, transaction } = this.state;
     const votesPrepared = [];
+    this.setState({ transaction: { ...transaction, loading: true } });
     voteList.forEach(vote => {
       votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
     });
-    console.log('>>>>> ', votesPrepared);
+
     const TransactionData = await Client.voteForWitnesses(votesPrepared);
+    const updatedTransaction = { ...transaction };
 
     if (TransactionData) {
-      console.log('TransactionData::::: ', TransactionData);
+      const qrcode = await QRCode.toDataURL(TransactionData);
+      updatedTransaction.status = true;
+      updatedTransaction.qrcode = qrcode;
     } else {
-      console.log('DEU RUIM');
+      updatedTransaction.status = false;
+      updatedTransaction.error = 'Something wrong with the Transaction';
     }
+    updatedTransaction.loading = false;
+    this.setState({ transaction: updatedTransaction });
   };
 
   change = (e, id) => {
@@ -49,6 +64,11 @@ class Vote extends Component {
       }, 0);
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
+  };
+
+  handleBack = () => {
+    const { transaction } = this.state;
+    this.setState({ transaction: { ...transaction, status: false, qrcode: '' } });
   };
 
   renderTrxRemaining = () => {
@@ -80,7 +100,16 @@ class Vote extends Component {
   };
 
   render() {
-    const { voteList, list } = this.state;
+    const { voteList, list, transaction } = this.state;
+    if (transaction.status) {
+      return (
+        <QRCodeCard title="Vote TRX" message="Succesfully vote!" qrcode={transaction.qrcode}>
+          <button onClick={this.handleBack} className={styles.default}>
+            Make another vote
+          </button>
+        </QRCodeCard>
+      );
+    }
     return (
       <div className={styles.container}>
         <AutoComplete

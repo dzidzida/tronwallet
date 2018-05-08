@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as QRCode from 'qrcode';
+import QRCodeCard from '../QRCode/QRCode';
 import styles from './Send.less';
 import { Client, ONE_TRX } from '../../utils/wallet-service/client';
 import isAddressValid from '../../utils/wallet-service/utils/address';
@@ -72,21 +73,11 @@ class Send extends Component {
 
     if (transaction.status) {
       return (
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardHeaderTitle}>Send TRX</h2>
-          </div>
-          <div className={styles.transaction}>
-            <div className={styles.messageContentSuccess}>
-              <h2 className={styles.messageSuccess}>Succesfully sent!</h2>
-            </div>
-            <h4>You can check with this QRCode</h4>
-            <img className={styles.qrcode} src={transaction.qrcode} alt="Transaction QRCode" />
-            <button onClick={this.handleBack} className={styles.button}>
-              Make another transaction
-            </button>
-          </div>
-        </div>
+        <QRCodeCard title="Send TRX" message="Succesfully sent!" qrcode={transaction.qrcode}>
+          <button onClick={this.handleBack} className={styles.button}>
+            Make another transaction
+          </button>
+        </QRCodeCard>
       );
     }
     return (
