@@ -62,7 +62,7 @@ class Send extends Component {
 
   handleBack = () => {
     const { transaction } = this.state;
-    this.setState({ transaction: { ...transaction, status: false, qrcode: '' } });
+    this.setState({ transaction: { ...transaction, status: false, qrcode: '', error: null } });
   };
 
   render() {
@@ -123,6 +123,7 @@ class Send extends Component {
                 Only enter valid TRON wallet address. Incorrect addresses can lead to TRX loss.
               </h2>
             </div>
+            <h3 className={styles.messageError}>{transaction.error}</h3>
             <button
               disabled={transaction.loading || !canSend}
               onClick={this.handleSend}

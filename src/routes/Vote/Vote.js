@@ -47,7 +47,7 @@ class Vote extends Component {
       updatedTransaction.qrcode = qrcode;
     } else {
       updatedTransaction.status = false;
-      updatedTransaction.error = 'Something wrong with the Transaction';
+      updatedTransaction.error = 'Something wrong with the Vote';
     }
     updatedTransaction.loading = false;
     this.setState({ transaction: updatedTransaction });
@@ -97,6 +97,17 @@ class Vote extends Component {
         Submit Votes
       </button>
     );
+  };
+
+  renderProgressBar = () => {
+    const { totalRemaining, totalTrx } = this.state;
+    const percent = (totalTrx - totalRemaining) / totalTrx * 100;
+    if (totalRemaining < 0) {
+      return <div className={styles.progressBarDanger} style={{ width: '100%' }} />;
+    } else if (totalRemaining === 0) {
+      return <div className={styles.progressBarSuccess} style={{ width: '100%' }} />;
+    }
+    return <div className={styles.progressBar} style={{ width: `${percent}%` }} />;
   };
 
   render() {
@@ -167,7 +178,7 @@ class Vote extends Component {
             <div className={styles.divTitle}>Vote</div>
             <div className={styles.voteCard}>
               {this.renderTrxRemaining()}
-              <div className={styles.progress} />
+              <div className={styles.progress}>{this.renderProgressBar()}</div>
               {this.renderSubmitButton()}
               <p>
                 Use your TRX to vote for Super Representatives. For every TRX you hold in your
