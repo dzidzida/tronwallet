@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "address": "27cLJRHL9mb9fvAi4e7vUrArqGXSyafn4eN",
+    "site": "http://Mercury.org",
+    "votes": "1057886793",
+    "amount": 0
+  },
+  {
+    "id": "2",
+    "address": "27cLJRHL9mb9fvAi4e7vUrArqGXSyafn4eN",
+    "site": "http://google.com",
+    "votes": "1057886792",
+    "amount": 0    
+  }
+]
