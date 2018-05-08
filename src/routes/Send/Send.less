@@ -57,7 +57,8 @@
 }
 
 .invalidInput {
-  outline: 1px solid #f26751;
+  border: 1px solid #f26751 !important;
+  border-radius: 0.25rem;
 }
 
 .selectWrapper {
@@ -89,10 +90,11 @@
   font-size: 1.1rem;
   border-radius: 0.25rem;
   width: 100%;
+  cursor: pointer;
 }
+
 .disabled {
-  background-color: #b9bafd;
-  border-color: #b9bafd;
+  opacity: 0.65;
 }
 
 .messageContent {
@@ -105,13 +107,18 @@
   background-color: #fff3cd;
   border-color: #ffeeba;
   border: 1px solid transparent;
+}
 
-  &Success {
-    background-color: #d1f1da;
-    border-color: #d1f1da;
-    padding: 10px;
-    color: #459731;
-  }
+.messageContentSuccess {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 10px;
+  border-radius: 0.25rem;
+  background-color: #d1f1da;
+  border-color: #d1f1da;
+  border: 1px solid transparent;
 }
 
 .message {
@@ -119,11 +126,21 @@
   font-weight: 500;
   text-align: left;
   color: #856404;
+}
 
-  &Success {
-    color: #459731;
-    font-size: 1.2rem;
-  }
+.messageSuccess {
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: left;
+  color: #459731;
+  margin-bottom: 0;
+}
+
+.messageError {
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  color: #f26751;
 }
 
 .transaction {
@@ -135,7 +152,7 @@
   padding: 20px;
   border-radius: 0.25rem;
 }
-img {
+img.qrcode {
   width: 100%;
   align-self: center;
 }

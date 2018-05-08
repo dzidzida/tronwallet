@@ -36,6 +36,36 @@ class ClientWallet {
       return data;
     }
   }
+
+  async createToken(form) {
+    const from = '27ScurNWwCY39AmJSv4ymGk9qhzv88oLDr3';
+    const { data } = await axios.post(
+      `${this.url}/createAssetIssueToView`,
+      qs.stringify({
+        name: form.name,
+        totalSupply: form.totalSupply,
+        num: form.num,
+        trxNum: form.trxNum,
+        startTime: Date.parse(form.startTime),
+        endTime: Date.parse(form.endTime),
+        description: form.description,
+        url: form.url,
+        ownerAddress: from,
+      })
+    );
+
+    return data;
+  }
+
+  async voteForWitnesses(votes) {
+    const from = '27ScurNWwCY39AmJSv4ymGk9qhzv88oLDr3';
+    const { data } = await axios.post(`${this.url}/createVoteWitnessToView`, {
+      owner: from,
+      list: votes,
+    });
+
+    return data;
+  }
 }
 
 export const Client = new ClientWallet();
