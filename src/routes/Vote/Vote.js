@@ -1,23 +1,90 @@
 import React, { Component } from 'react';
 import { Affix, AutoComplete } from 'antd';
 import styles from './Vote.less';
+import votes from '../../utils/wallet-service/votes.json';
+import { Client } from '../../utils/wallet-service/client';
 
 class Vote extends Component {
   state = {
-    votelist: [],
+    voteList: [],
+    totalTrx: 1000000,
+    totalRemaining: 0,
+    list: [],
   };
+
+  componentWillMount() {
+    const { totalTrx } = this.state;
+    this.setState({ voteList: votes, totalRemaining: totalTrx });
+  }
 
   handleSearch = value => {
     // console.log('Value searched', value);
     return value;
   };
 
+  submit = async () => {
+    const { voteList } = this.state;
+    const votesPrepared = [];
+    voteList.forEach(vote => {
+      votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+    });
+    console.log('>>>>> ', votesPrepared);
+    const TransactionData = await Client.voteForWitnesses(votesPrepared);
+
+    if (TransactionData) {
+      console.log('TransactionData::::: ', TransactionData);
+    } else {
+      console.log('DEU RUIM');
+    }
+  };
+
+  change = (e, id) => {
+    const { voteList, totalTrx } = this.state;
+    const { value } = e.target;
+    voteList.find(v => v.id === id).amount = value;
+
+    this.setState({ voteList }, () => {
+      const totalVotes = this.state.voteList.reduce((prev, vote) => {
+        return Number(prev) + Number(vote.amount);
+      }, 0);
+      this.setState({ totalRemaining: totalTrx - totalVotes });
+    });
+  };
+
+  renderTrxRemaining = () => {
+    const { totalRemaining } = this.state;
+    if (totalRemaining <= 0) {
+      return <p>No TRX remaining</p>;
+    }
+    return <p>{totalRemaining} TRX remaining</p>;
+  };
+
+  renderSubmitButton = () => {
+    const { totalRemaining, totalTrx } = this.state;
+    if (totalRemaining < 0) {
+      return (
+        <button className={styles.btDanger} disabled>
+          Submit Votes
+        </button>
+      );
+    }
+    return (
+      <button
+        className={styles.btSubmit}
+        onClick={this.submit}
+        disabled={totalTrx === totalRemaining}
+      >
+        Submit Votes
+      </button>
+    );
+  };
+
   render() {
-    const { votelist } = this.state;
+    const { voteList, list } = this.state;
     return (
       <div className={styles.container}>
         <AutoComplete
-          dataSource={votelist}
+          dataSource={list}
           size="large"
           style={{ width: '100%' }}
           onSearch={this.handleSearch}
@@ -36,43 +103,43 @@ class Vote extends Component {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>
-                    27cLJRHL9mb9fvAi4e7vUrArqGXSyafn4eN<br />
-                    http://Mercury.org
-                  </td>
-                  <td>
-                    1057886793<br />
-                    TRX
-                  </td>
-                  <td>
-                    <input defaultValue={0} type="number" className={styles.vote} />
-                  </td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>
-                    27cEZa99jVaDkujPwzZuHYgk... <br />
-                    http://Mercury.org
-                  </td>
-                  <td>
-                    1057886793<br />
-                    TRX
-                  </td>
-                  <td>
-                    <input defaultValue={0} type="number" className={styles.vote} />
-                  </td>
-                </tr>
+                {voteList.map(vote => {
+                  return (
+                    <tr key={vote.id}>
+                      <td>
+                        <b>{vote.id}</b>
+                      </td>
+                      <td>
+                        {vote.address}
+                        <br />
+                        <small>{vote.site}</small>
+                      </td>
+                      <td>
+                        {vote.votes}
+                        <br />
+                        TRX
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className={styles.vote}
+                          min="0"
+                          onChange={e => this.change(e, vote.id)}
+                          value={Number(vote.amount)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
           <Affix offsetTop={10} className={styles.voteCol}>
             <div className={styles.divTitle}>Vote</div>
             <div className={styles.voteCard}>
-              <p>993762.999998 TRX Remaining</p>
-              <span className={styles.progress} />
-              <button className={styles.btSubmit}>Submit Votes</button>
+              {this.renderTrxRemaining()}
+              <div className={styles.progress} />
+              {this.renderSubmitButton()}
               <p>
                 Use your TRX to vote for Super Representatives. For every TRX you hold in your
                 account you have one vote to spend. TRX will not be consumed. You can vote as many

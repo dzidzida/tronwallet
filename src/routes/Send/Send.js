@@ -42,7 +42,7 @@ class Send extends Component {
   handleSend = async () => {
     const { amount, transaction, to, token } = this.state;
     const from = '27jbj4qgTM1hvReST6hEa8Ep8RDo2AM8TJo';
-    
+
     this.setState({ transaction: { ...transaction, loading: true } });
     const TransactionData = await Client.send({ from, to, token, amount: amount * ONE_TRX });
     const updatedTransaction = { ...transaction };
@@ -81,7 +81,7 @@ class Send extends Component {
               <h2 className={styles.messageSuccess}>Succesfully sent!</h2>
             </div>
             <h4>You can check with this QRCode</h4>
-            <img src={transaction.qrcode} alt="Transaction QRCode" />
+            <img className={styles.qrcode} src={transaction.qrcode} alt="Transaction QRCode" />
             <button onClick={this.handleBack} className={styles.button}>
               Make another transaction
             </button>
