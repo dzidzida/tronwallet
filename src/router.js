@@ -7,6 +7,7 @@ import { getRouterData } from './common/router';
 import Authorized from './utils/Authorized';
 import styles from './index.less';
 import LoginPage from './routes/User/Login';
+import ConfirmLogin from './routes/User/ConfirmLogin';
 import UserRegister from './routes/User/Register';
 
 const { ConnectedRouter } = routerRedux;
@@ -25,6 +26,7 @@ function RouterConfig({ history, app }) {
       <ConnectedRouter history={history}>
         <Switch>
           <Route path="/user/login" component={LoginPage} />
+          <Route path="/user/confirmlogin" component={ConfirmLogin} />
           <Route path="/user/register" component={UserRegister} />
           <AuthorizedRoute
             path="/"

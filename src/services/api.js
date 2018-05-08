@@ -1,6 +1,46 @@
 import { stringify } from 'qs';
+import { Auth } from 'aws-amplify';
 import request from '../utils/request';
 
+// our APIS
+export const signIn = async params => {
+  const { username, password } = params;
+  try {
+    const user = await Auth.signIn(username, password);
+    return { status: 'ok', user };
+  } catch (err) {
+    return {
+      status: 'error',
+      currentAuthority: 'guest',
+      type: 'account',
+      message: err.message,
+    };
+  }
+};
+
+// export const confirmSignIn = async params => {
+//   const { user, code } = params;
+//   const mfaType = 'test';
+//   try {
+//     const response = Auth.confirmSignIn(user, code, mfaType);
+//   } catch (error) {
+//     console.log('asudhasuid', error);
+//   }
+// };
+
+export const signOut = async () => Auth.signOut();
+
+export async function changePassword() {
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    const response = await Auth.changePassword(user, 'oldPassword', 'newPassword');
+    return response;
+  } catch (error) {
+    console.log('ChangePassword ERror', error);
+  }
+}
+
+// framework default apis
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
