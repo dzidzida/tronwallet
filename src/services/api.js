@@ -43,20 +43,21 @@ export const confirmSignIn = async params => {
   }
 };
 
-export const confirmSignUp = async params => {
-  const { username, code } = params;
-  try {
-    await Auth.confirmSignUp(username, code);
-
-    return { status: 'ok' };
-  } catch (error) {
-    console.log('Error no confirmSign In', error);
-  }
-};
-
 export const signOut = async () => Auth.signOut();
 
-export async function changePassword() {
+// framework default apis
+export const signUp = async ({ password, email }) => {
+  return Auth.signUp({
+    username: email,
+    password,
+    attributes: {
+      email,
+    },
+    validationData: [],
+  });
+};
+
+export const changePassword = async () => {
   try {
     const user = await Auth.currentAuthenticatedUser();
     const response = await Auth.changePassword(user, 'oldPassword', 'newPassword');
@@ -64,9 +65,12 @@ export async function changePassword() {
   } catch (error) {
     console.log('ChangePassword ERror', error);
   }
-}
+};
 
-// framework default apis
+export const confirmSignup = async ({ email, code }) => {
+  return Auth.confirmSignUp(email, code);
+};
+
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }

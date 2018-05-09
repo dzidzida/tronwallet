@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Affix, AutoComplete } from 'antd';
+import { Affix } from 'antd';
 import * as QRCode from 'qrcode';
 import QRCodeCard from '../QRCode/QRCode';
 import styles from './Vote.less';
@@ -11,7 +11,6 @@ class Vote extends Component {
     voteList: [],
     totalTrx: 1000000,
     totalRemaining: 0,
-    list: [],
     transaction: {
       loading: false,
       status: false,
@@ -25,9 +24,18 @@ class Vote extends Component {
     this.setState({ voteList: votes, totalRemaining: totalTrx });
   }
 
-  handleSearch = value => {
-    // console.log('Value searched', value);
-    return value;
+  handleSearch = e => {
+    const { value } = e.target;
+    const { voteList } = this.state;
+    if (value) {
+      const regex = new RegExp(value, 'i');
+      const votesFilter = voteList.filter(vote => {
+        return vote.address.match(regex) || vote.url.match(regex);
+      });
+      this.setState({ voteList: votesFilter });
+    } else {
+      this.setState({ voteList: votes });
+    }
   };
 
   submit = async () => {
@@ -111,24 +119,26 @@ class Vote extends Component {
   };
 
   render() {
-    const { voteList, list, transaction } = this.state;
+    const { voteList, transaction } = this.state;
     if (transaction.status) {
       return (
-        <QRCodeCard title="Vote TRX" message="Succesfully vote!" qrcode={transaction.qrcode}>
+        <QRCodeCard
+          title="Vote TRX"
+          message="Thanks for submitting your vote!"
+          qrcode={transaction.qrcode}
+        >
           <button onClick={this.handleBack} className={styles.default}>
-            Make another vote
+            Return the Votes
           </button>
         </QRCodeCard>
       );
     }
     return (
       <div className={styles.container}>
-        <AutoComplete
-          dataSource={list}
-          size="large"
-          style={{ width: '100%' }}
-          onSearch={this.handleSearch}
+        <input
+          className={styles.search}
           placeholder="Search for address or URL"
+          onChange={this.handleSearch}
         />
         <div className={styles.content}>
           <div className={styles.tableCol}>
@@ -152,7 +162,7 @@ class Vote extends Component {
                       <td>
                         {vote.address}
                         <br />
-                        <small>{vote.site}</small>
+                        <small>{vote.url}</small>
                       </td>
                       <td>
                         {vote.votes}
