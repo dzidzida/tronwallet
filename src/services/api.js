@@ -1,5 +1,21 @@
 import { stringify } from 'qs';
+import { Auth } from 'aws-amplify';
 import request from '../utils/request';
+
+export const signUp = async ({ password, email }) => {
+  return Auth.signUp({
+    username: email,
+    password,
+    attributes: {
+      email,
+    },
+    validationData: [],
+  });
+};
+
+export const confirmSignup = async ({ email, code }) => {
+  return Auth.confirmSignUp(email, code);
+}
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');

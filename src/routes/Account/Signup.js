@@ -1,16 +1,39 @@
 import React, { PureComponent } from 'react';
+import { Modal } from 'antd';
 import styles from './Signup.less';
+import { signUp, confirmSignup } from '../../services/api';
 
 class Signup extends PureComponent {
   state = {
-    userName: '',
     password: '',
     email: '',
     phoneNumber: '',
+    modalVisible: false,
   };
 
-  submit = () => {
+  submit = async () => {
     console.log('SUBMIT: ', this.state);
+    try {
+      const response = await signUp(this.state);
+      console.log('RESPONSE SIGNUP:::: ', response);
+      this.setState({ email: response.user.username, modalVisible: true });
+    } catch (error) {
+      console.log('ERROR SIGNUP:::: ', error);
+      // TODO: FAZER CENÁRIO DE FALHA DE SIGNUP
+    }
+  };
+
+  confirmSignup = async () => {
+    console.log('COMFIRM');
+    try {
+      const response = await confirmSignup(this.state);
+      console.log('RESPONSE CONFIRM:::: ', response);
+      // TODO: FAZER CENÁRIO DE SUCESSO
+    } catch (error) {
+      console.log('ERROR CONFIRM:::: ', error);
+      // TODO: FAZER CENÁRIO DE FALHA DE CONFIMAÇÃO
+    }
+    this.setState({ modalVisible: false });
   };
 
   change = e => {
@@ -20,8 +43,38 @@ class Signup extends PureComponent {
     });
   };
 
+  renderConfirmModal = () => {
+    const { modalVisible, email } = this.state;
+    return (
+      <Modal
+        title="Confirm signup"
+        visible={modalVisible}
+        onOk={this.confirmSignup}
+        onCancel={() => this.setState({ modalVisible: false })}
+      >
+        <h3>Email</h3>
+        <input
+          className={styles.formControl}
+          value={email}
+          onChange={this.change}
+          type="email"
+          name="email"
+          id="email"
+        />
+        <h3>Code</h3>
+        <input
+          className={styles.formControl}
+          onChange={this.change}
+          type="text"
+          name="code"
+          id="code"
+        />
+      </Modal>
+    );
+  };
+
   render() {
-    const { userName, password, email, phoneNumber } = this.state;
+    const { password, email, phoneNumber } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -29,15 +82,6 @@ class Signup extends PureComponent {
         </div>
         <div className={styles.formContent}>
           <div className={styles.form}>
-            <h3>Username</h3>
-            <input
-              className={styles.formControl}
-              value={userName}
-              onChange={this.change}
-              type="text"
-              name="userName"
-              id="userName"
-            />
             <h3>Email</h3>
             <input
               className={styles.formControl}
@@ -70,6 +114,7 @@ class Signup extends PureComponent {
             </button>
           </div>
         </div>
+        {this.renderConfirmModal()}
       </div>
     );
   }
