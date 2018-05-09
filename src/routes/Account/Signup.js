@@ -8,32 +8,29 @@ class Signup extends PureComponent {
     password: '',
     email: '',
     phoneNumber: '',
-    modalVisible: false,
+    modalVisible: true,
+    signupError: '',
+    confirmSignupError: '',
   };
 
   submit = async () => {
-    console.log('SUBMIT: ', this.state);
     try {
       const response = await signUp(this.state);
-      console.log('RESPONSE SIGNUP:::: ', response);
-      this.setState({ email: response.user.username, modalVisible: true });
+      this.setState({ email: response.user.username, modalVisible: true, signupError: '' });
     } catch (error) {
-      console.log('ERROR SIGNUP:::: ', error);
-      // TODO: FAZER CENÁRIO DE FALHA DE SIGNUP
+      this.setState({ signupError: error.message });
     }
   };
 
   confirmSignup = async () => {
-    console.log('COMFIRM');
     try {
       const response = await confirmSignup(this.state);
       console.log('RESPONSE CONFIRM:::: ', response);
       // TODO: FAZER CENÁRIO DE SUCESSO
+      this.setState({ modalVisible: false });
     } catch (error) {
-      console.log('ERROR CONFIRM:::: ', error);
-      // TODO: FAZER CENÁRIO DE FALHA DE CONFIMAÇÃO
+      this.setState({ confirmSignupError: error.message });
     }
-    this.setState({ modalVisible: false });
   };
 
   change = e => {
@@ -44,7 +41,7 @@ class Signup extends PureComponent {
   };
 
   renderConfirmModal = () => {
-    const { modalVisible, email } = this.state;
+    const { modalVisible, email, confirmSignupError } = this.state;
     return (
       <Modal
         title="Confirm signup"
@@ -69,12 +66,13 @@ class Signup extends PureComponent {
           name="code"
           id="code"
         />
+        <h3 className={styles.error}>{confirmSignupError}</h3>
       </Modal>
     );
   };
 
   render() {
-    const { password, email, phoneNumber } = this.state;
+    const { password, email, phoneNumber, signupError } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -109,6 +107,7 @@ class Signup extends PureComponent {
               name="password"
               id="password"
             />
+            <h3 className={styles.error}>{signupError}</h3>
             <button className={styles.button} onClick={this.submit}>
               Register
             </button>
