@@ -2,13 +2,18 @@ import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
 
+// window.LOG_LEVEL = 'DEBUG'
 // our APIS
 export const signIn = async params => {
   const { username, password } = params;
   try {
     const user = await Auth.signIn(username, password);
-    return { status: 'ok', user };
+    // const user = await Auth.signIn('bertao@getty.io', '200194Pedr@');
+    // const confirm = await Auth.confirmSignIn(user, '828140','SOFTWARE_TOKEN_MFA');
+    const totpCode = await Auth.setupTOTP(user);
+    return { status: 'ok', user, totpCode };
   } catch (err) {
+    console.log('Error', err);
     return {
       status: 'error',
       currentAuthority: 'guest',
@@ -18,15 +23,36 @@ export const signIn = async params => {
   }
 };
 
-// export const confirmSignIn = async params => {
-//   const { user, code } = params;
-//   const mfaType = 'test';
-//   try {
-//     const response = Auth.confirmSignIn(user, code, mfaType);
-//   } catch (error) {
-//     console.log('asudhasuid', error);
-//   }
-// };
+export const confirmSignIn = async params => {
+  const { user, code } = params;
+  try {
+    // const verifyTotp = await Auth.verifyTotpToken(user, code, '');
+    // console.log("Foi verificado", verifyTotp);
+    // const confirming = await Auth.confirmSignIn(user);
+    const verifying = await Auth.verifyTotpToken(user, code);
+    console.log('Eu acho que foi verificado corretamente! ', verifying);
+    return { status: 'ok' };
+  } catch (error) {
+    console.log('Error no confirmSign In', error);
+    return {
+      status: 'error',
+      currentAuthority: 'guest',
+      type: 'account',
+      message: error.message,
+    };
+  }
+};
+
+export const confirmSignUp = async params => {
+  const { username, code } = params;
+  try {
+    await Auth.confirmSignUp(username, code);
+
+    return { status: 'ok' };
+  } catch (error) {
+    console.log('Error no confirmSign In', error);
+  }
+};
 
 export const signOut = async () => Auth.signOut();
 

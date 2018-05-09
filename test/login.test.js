@@ -5,7 +5,7 @@ describe('Login', function () {
     let browser;
     let page;
     let test;
-    this.timeout(20000);
+    this.timeout(60000);
     before(async function () {
         browser = await puppeteer.launch({ headless: false });
     });
@@ -29,26 +29,26 @@ describe('Login', function () {
     //     expect(true).to.be.true;
     // });
 
-    it('should login with failure', async function () {
-        await page.type('#username', 'mockuser');
-        await page.type('#password', 'wrong_password');
-        await page.click('button[type="submit"]');
-        const alert = await page.waitForSelector('.ant-alert-error', { timeout: 10000 }); // should display error
-        expect(alert).to.not.be.null;
-    });
+    // it('should login with failure', async function () {
+    //     await page.type('#username', 'mockuser');
+    //     await page.type('#password', 'wrong_password');
+    //     await page.click('button[type="submit"]');
+    //     const alert = await page.waitForSelector('.ant-alert-error', { timeout: 10000 }); // should display error
+    //     expect(alert).to.not.be.null;
+    // });
 
-    it('should login succesfully', async function () {
-        await page.type('#username', 'diob1');
-        await page.type('#password', 'J6t2hybt26!');
-        await page.click('button[type="submit"]');
-        await page.waitForSelector('h3');
-        const confirmText = await page.$eval('h3', h3 => h3.innerHTML)
-        expect(confirmText).to.be.equal('Confirm Sign-In');
-    })
+    // it('should login succesfully', async function () {
+    //     await page.type('#username', 'diob1');
+    //     await page.type('#password', 'J6t2hybt26!');
+    //     await page.click('button[type="submit"]');
+    //     await page.waitForSelector('h3');
+    //     const confirmText = await page.$eval('h3', h3 => h3.innerHTML)
+    //     expect(confirmText).to.be.equal('Confirm Sign-In');
+    // })
 
     it('should complete all the login steps', async function () {
-        await page.type('#username', 'diob1');
-        await page.type('#password', 'J6t2hybt26!');
+        await page.type('#username', 'bertao');
+        await page.type('#password', '200194Pedr@');
         await page.click('button[type="submit"]');
         await page.waitForSelector('h3');
         const confirmText = await page.$eval('h3', h3 => h3.innerHTML)

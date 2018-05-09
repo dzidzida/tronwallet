@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
+import * as QRCode from 'qrcode';
 import { Form, Input, Button, Progress } from 'antd';
 import styles from './ConfirmLogin.less';
 
@@ -19,35 +19,51 @@ const passwordProgressMap = {
 }))
 @Form.create()
 export default class ConfirmLogin extends Component {
-  state = {};
+  state = {
+    qrcode: null,
+  };
 
-  componentWillReceiveProps(nextProps) {
-    const account = this.props.form.getFieldValue('mail');
-    if (nextProps.register.status === 'ok') {
-      this.props.dispatch(
-        routerRedux.push({
-          pathname: '/user/register-result',
-          state: {
-            account,
-          },
-        })
-      );
-    }
+  // componentWillReceiveProps(nextProps) {
+  //   const account = this.props.form.getFieldValue('mail');
+  //   if (nextProps.login.status === 'ok') {
+  //     this.props.dispatch(
+  //       routerRedux.push({
+  //         pathname: '/user/register-result',
+  //         state: {
+  //           account,
+  //         },
+  //       })
+  //     );
+  //   }
+  // }
+  componentDidMount() {
+    this.renderTOTPcode();
   }
-
   componentWillUnmount() {
     clearInterval(this.interval);
   }
 
   handleSubmit = e => {
     e.preventDefault();
+    const { code } = this.state;
     const { user } = this.props.login;
     this.props.dispatch({
       type: 'login/confirmlogin',
       payload: {
+        code,
         user,
       },
     });
+  };
+
+  renderTOTPcode = async () => {
+    const { user, totpCode } = this.props.login;
+    const toQrcode = `otpauth://totp/AWSCognito:${
+      user.username
+    }?secret=${totpCode}&issuer=AWSCognito`;
+    // const str = `otpauth://totp/AWSCognito:${user.username}?secret=${totpCode}&issuer=AWSCognito`;
+    const qrcode = await QRCode.toDataURL(toQrcode);
+    this.setState({ qrcode });
   };
 
   renderPasswordProgress = () => {
@@ -70,13 +86,17 @@ export default class ConfirmLogin extends Component {
   render() {
     const { submitting } = this.props;
     // const { login } = this.props;
-
     return (
       <div className={styles.main}>
         <h3>Confirm Sign-In</h3>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
-            <Input size="large" placeholder="Confirmation code" />
+            <Input
+              size="large"
+              onChange={e => this.setState({ code: e.target.value })}
+              value={this.state.code}
+              placeholder="Confirmation code"
+            />
           </FormItem>
           <FormItem>
             <Button
@@ -91,6 +111,7 @@ export default class ConfirmLogin extends Component {
             </Button>
           </FormItem>
         </Form>
+        <img src={this.state.qrcode} alt="qrcode" />
       </div>
     );
   }
