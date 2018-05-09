@@ -11,25 +11,29 @@ class Signup extends PureComponent {
     modalVisible: false,
     signupError: '',
     confirmSignupError: '',
+    signupSuccess: false,
   };
 
   submit = async () => {
     try {
       const response = await signUp(this.state);
-      this.setState({ email: response.user.username, modalVisible: true, signupError: '' });
+      this.setState({
+        email: response.user.username,
+        modalVisible: true,
+        signupError: '',
+        signupSuccess: false,
+      });
     } catch (error) {
-      this.setState({ signupError: error.message });
+      this.setState({ signupError: error.message, signupSuccess: false });
     }
   };
 
   confirmSignup = async () => {
     try {
-      const response = await confirmSignup(this.state);
-      console.log('RESPONSE CONFIRM:::: ', response);
-      // TODO: FAZER CENÁRIO DE SUCESSO
-      this.setState({ modalVisible: false });
+      await confirmSignup(this.state);
+      this.setState({ modalVisible: false, signupSuccess: true });
     } catch (error) {
-      this.setState({ confirmSignupError: error.message });
+      this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
   };
 
@@ -38,6 +42,19 @@ class Signup extends PureComponent {
     this.setState({
       [name]: value,
     });
+  };
+
+  renderSuccessMessage = () => {
+    const { signupSuccess } = this.state;
+    if (signupSuccess) {
+      return (
+        <div className={styles.messageContent}>
+          <h2 className={styles.messageSuccess}>Registred successfully!</h2>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   renderConfirmModal = () => {
@@ -80,6 +97,7 @@ class Signup extends PureComponent {
         </div>
         <div className={styles.formContent}>
           <div className={styles.form}>
+            {this.renderSuccessMessage()}
             <h3>Email</h3>
             <input
               className={styles.formControl}
