@@ -56,7 +56,7 @@ class Signup extends PureComponent {
           onChange={this.change}
           type="email"
           name="email"
-          id="email"
+          id="emailConfirmed"
         />
         <h3>Code</h3>
         <input
