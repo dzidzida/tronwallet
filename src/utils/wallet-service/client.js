@@ -10,6 +10,7 @@ class ClientWallet {
     this.url = opt || TRON_URL;
   }
 
+  // SEND TRANSACTION
   async send({ from, token, to, amount }) {
     if (token.toUpperCase() === 'TRX') {
       const { data } = await axios.post(
@@ -37,6 +38,7 @@ class ClientWallet {
     }
   }
 
+  // CREATE TOKEN
   async createToken(form) {
     const from = '27ScurNWwCY39AmJSv4ymGk9qhzv88oLDr3';
     const { data } = await axios.post(
@@ -57,6 +59,7 @@ class ClientWallet {
     return data;
   }
 
+  // SUBMIT A VOTE
   async voteForWitnesses(votes) {
     const from = '27ScurNWwCY39AmJSv4ymGk9qhzv88oLDr3';
     const { data } = await axios.post(`${this.url}/createVoteWitnessToView`, {
