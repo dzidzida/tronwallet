@@ -36,7 +36,7 @@ class Login extends PureComponent {
               name="userName"
               id="userName"
             />
-            <h3>Email</h3>
+            <h3>Password</h3>
             <input
               className={styles.formControl}
               value={password}
