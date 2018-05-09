@@ -8,7 +8,7 @@ class Signup extends PureComponent {
     password: '',
     email: '',
     phoneNumber: '',
-    modalVisible: true,
+    modalVisible: false,
     signupError: '',
     confirmSignupError: '',
   };
