@@ -75,8 +75,11 @@ export const getRouterData = app => {
     '/dashboard': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
     },
-    '/account': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
+    '/account/signup': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Account/Signup')),
+    },
+    '/account/login': {
+      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Account/Login')),
     },
     '/send': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Send/Send')),
@@ -92,6 +95,15 @@ export const getRouterData = app => {
     },
     '/vote': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Vote/Vote')),
+    },
+    '/user': {
+      component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
+    },
+    '/user/login': {
+      component: dynamicWrapper(app, ['login'], () => import('../routes/Account/Login')),
+    },
+    '/user/signup': {
+      component: dynamicWrapper(app, ['register'], () => import('../routes/Account/Signup')),
     },
   };
   // Get name from ./menu.js or just set it in the router data.

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Divider, Button, Icon } from 'antd';
 import * as QRCode from 'qrcode';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import styles from './Receive.less';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 class Receive extends Component {
   state = {
@@ -41,23 +41,10 @@ class Receive extends Component {
         </div>
         <div className={styles.cardContent}>
           <p>Send TRX to the following address</p>
-          <div className={styles.inputGroup}>
-            <input
-              className={styles.formControl}
-              name="address"
-              id="address"
-              readOnly
-              value={this.state.address}
-            />
-            <CopyToClipboard text={this.state.address}>
-              <button className={styles.copyButton}>
-                <Icon type="copy" />
-              </button>
-            </CopyToClipboard>
-          </div>
+          <CopyToClipboard text={this.state.address} />
           <Divider />
           <span>Or scan this QR code on a mobile device</span>
-          <img src={this.state.qrcode} alt="QRCode" />
+          <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />
         </div>
       </div>
     );
