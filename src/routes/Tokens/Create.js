@@ -1,38 +1,56 @@
 import React, { PureComponent } from 'react';
 import styles from './Create.less';
-import { ONE_TRX } from '../../utils/wallet-service/client';
+import Client from '../../utils/wallet-service/client';
+import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 class Create extends PureComponent {
   state = {
-    tokenName: '',
+    modalVisible: false,
+    tokenName: 'GettyTest',
     totalSupply: 100000,
-    description: '',
-    url: '',
+    description: 'Test for getty',
+    url: 'https//getty.io',
     trxAmount: 1,
     tokenAmount: 1,
-    startDate: '',
-    endDate: null,
+    // startDate: '', //Eslint reclamando
+    // endDate: '',
     acceptTerms: false,
+    createError: null,
+    transaction: {
+      data: null,
+    },
   };
 
+  onCloseModal = () => {
+    this.setState({ modalVisible: false });
+  };
   change = e => {
     const { name, value, checked } = e.target;
-
+    console.log('erae', e.target);
     this.setState({
       [name]: name === 'acceptTerms' ? checked : value,
     });
   };
 
-  submit = e => {
+  submit = async e => {
     e.preventDefault();
-    console.log('click');
-    const { trxAmount } = this.state;
-    console.log('#######: ', { ...this.state, trxAmount: trxAmount * ONE_TRX });
-    // this.setState({
-    //   trxAmount: trxAmount * ONE_TRX,
-    // }, () => console.log('hererererere:::: ', this.state));
-    // const from = '27ScurNWwCY39AmJSv4ymGk9qhzv88oLDr3';
-    // const TransactionData = await Client.createToken(this.state, from);
+    const form = this.state;
+    const { transaction } = this.state;
+    try {
+      const TransactionData = await Client.createToken(form);
+      if (!TransactionData) {
+        throw Error();
+      } else {
+        this.setState({
+          modalVisible: true,
+          transaction: { ...transaction, data: TransactionData },
+        });
+      }
+      // TODO
+      // Now do something
+    } catch (error) {
+      this.setState({ createError: 'Something wrong while creating Token' });
+    }
   };
 
   render() {
@@ -44,6 +62,7 @@ class Create extends PureComponent {
       trxAmount,
       tokenAmount,
       acceptTerms,
+      createError,
     } = this.state;
 
     return (
@@ -216,6 +235,7 @@ class Create extends PureComponent {
                   Issue Token
                 </button>
               </div>
+              <h3 className={styles.error}>{createError}</h3>
             </form>
           </div>
         </div>
@@ -237,6 +257,13 @@ class Create extends PureComponent {
             </p>
           </div>
         </div>
+        <ModalTransaction
+          title="Create Token"
+          message="Token created successfully!"
+          data={this.state.transaction.data}
+          visible={this.state.modalVisible}
+          onClose={this.onCloseModal}
+        />
       </div>
     );
   }
