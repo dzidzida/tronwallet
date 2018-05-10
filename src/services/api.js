@@ -17,6 +17,10 @@ export const confirmSignup = async ({ email, code }) => {
   return Auth.confirmSignUp(email, code);
 }
 
+export const forgotPassword = async ({ email }) => {
+  return Auth.forgotPassword(email);
+}
+
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }

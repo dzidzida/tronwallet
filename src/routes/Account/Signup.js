@@ -31,7 +31,13 @@ class Signup extends PureComponent {
   confirmSignup = async () => {
     try {
       await confirmSignup(this.state);
-      this.setState({ modalVisible: false, signupSuccess: true });
+      this.setState({
+        modalVisible: false,
+        signupSuccess: true,
+        password: '',
+        email: '',
+        phoneNumber: '',
+      });
     } catch (error) {
       this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
