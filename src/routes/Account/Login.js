@@ -24,7 +24,7 @@ class Login extends PureComponent {
     forgotPasswordVisible: false,
     forgotPasswordEmail: '',
     newPassword: '',
-    newPasswordVisible: '',
+    newPasswordVisible: false,
   };
 
   onCancel = () => {
@@ -49,11 +49,9 @@ class Login extends PureComponent {
     try {
       const { user, totpCode } = await signIn(email, password);
       if (totpCode) this.renderQRCode(totpCode, email);
-      this.setState({ totpCode, user });
+      this.setState({ totpCode, user, modalVisible: true });
     } catch (error) {
       this.setState({ loginError: error.message });
-    } finally {
-      this.setState({ modalVisible: true });
     }
   };
 
@@ -91,7 +89,7 @@ class Login extends PureComponent {
   };
 
   renderQRCode = async (code, username) => {
-    const totpUrl = `otpauth://totp/AWSCognito:${username}?secret=${code}&issuer=AWSCognito`;
+    const totpUrl = `otpauth://totp/${username}?secret=${code}&issuer=TronWallet`;
     const qrcode = await QRCode.toDataURL(totpUrl);
     this.setState({ qrcode });
   };

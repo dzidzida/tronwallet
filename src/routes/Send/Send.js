@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import * as QRCode from 'qrcode';
-import QRCodeCard from '../QRCode/QRCode';
+import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
-import { Client, ONE_TRX } from '../../utils/wallet-service/client';
+import Client from '../../utils/wallet-service/client';
 import isAddressValid from '../../utils/wallet-service/utils/address';
 
 class Send extends Component {
   state = {
-    to: null,
+    to: '',
     amount: '0.0000',
     token: 'TRX',
+    modalVisible: false,
     transaction: {
       loading: false,
       status: false,
@@ -18,15 +18,19 @@ class Send extends Component {
     },
   };
 
+  onCloseModal = () => {
+    this.setState({ modalVisible: false });
+  };
+
+  change = e => {
+    const { name, value } = e.target;
+    this.setState({
+      [name]: value,
+    });
+  };
   isToValid = () => {
     const { to } = this.state;
     return to === null ? true : isAddressValid(to);
-  };
-
-  handleAmountChange = e => {
-    const amount = e.target.value;
-    if (amount < 0) return;
-    this.setState({ amount });
   };
 
   isAmountValid = () => {
@@ -42,22 +46,18 @@ class Send extends Component {
 
   handleSend = async () => {
     const { amount, transaction, to, token } = this.state;
-    const from = '27jbj4qgTM1hvReST6hEa8Ep8RDo2AM8TJo';
-
     this.setState({ transaction: { ...transaction, loading: true } });
-    const TransactionData = await Client.send({ from, to, token, amount: amount * ONE_TRX });
+    const TransactionData = await Client.send({ to, token, amount });
     const updatedTransaction = { ...transaction };
 
     if (TransactionData) {
-      const qrcode = await QRCode.toDataURL(TransactionData);
-      updatedTransaction.status = true;
-      updatedTransaction.qrcode = qrcode;
+      updatedTransaction.data = TransactionData;
     } else {
-      updatedTransaction.status = false;
       updatedTransaction.error = 'Something wrong with the Transaction';
     }
+
     updatedTransaction.loading = false;
-    this.setState({ transaction: updatedTransaction });
+    this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
   handleBack = () => {
@@ -66,20 +66,10 @@ class Send extends Component {
   };
 
   render() {
-    const { transaction, to, amount } = this.state;
+    const { transaction, to, amount, modalVisible } = this.state;
     const amountValid = this.isAmountValid();
     const toValid = this.isToValid();
     const canSend = toValid && amountValid && to !== null && amount > 0;
-
-    if (transaction.status) {
-      return (
-        <QRCodeCard title="Send TRX" message="Succesfully sent!" qrcode={transaction.qrcode}>
-          <button onClick={this.handleBack} className={styles.button}>
-            Make another transaction
-          </button>
-        </QRCodeCard>
-      );
-    }
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -90,7 +80,7 @@ class Send extends Component {
             <h3>To</h3>
             <input
               className={[styles.formControl, toValid ? null : styles.invalidInput].join(' ')}
-              onChange={e => this.setState({ to: e.target.value })}
+              onChange={this.change}
               type="text"
               name="to"
               id="to"
@@ -98,17 +88,14 @@ class Send extends Component {
             <div className={styles.invalid}>{!toValid && 'Put a valid address'}</div>
             <h3>Token</h3>
             <div className={styles.selectWrapper}>
-              <select
-                onChange={e => this.setState({ token: e.target.value })}
-                className={styles.selectBox}
-              >
+              <select onChange={this.change} className={styles.selectBox}>
                 <option value="TRX">TRX (10000 available)</option>
               </select>
             </div>
             <h3>Amount</h3>
             <input
               className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
-              onChange={this.handleAmountChange}
+              onChange={this.change}
               value={this.state.amount}
               type="number"
               name="amount"
@@ -135,6 +122,13 @@ class Send extends Component {
               {transaction.loading ? 'Processing transaction' : 'Send'}
             </button>
           </div>
+          <ModalTransaction
+            title="Send TRX"
+            message="Succesfully sent!"
+            data={transaction.data}
+            visible={modalVisible}
+            onClose={this.onCloseModal}
+          />
         </div>
       </div>
     );
