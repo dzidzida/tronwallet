@@ -185,16 +185,7 @@ const menuData = [
     name: 'tokens',
     icon: 'form',
     path: 'tokens',
-    children: [
-      {
-        name: 'view',
-        path: 'view',
-      },
-      {
-        name: 'create',
-        path: 'create',
-      },
-    ],
+    children: [],
   },
   {
     name: 'Vote',

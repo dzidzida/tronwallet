@@ -1,8 +1,23 @@
 @import '~antd/lib/style/themes/default.less';
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 0 auto;
+  width: 70%;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 table {
   min-width: 0;
-  width: 70%;
+  width: 100%;  
   margin: 0 auto;
 }
 
@@ -43,7 +58,7 @@ td.center {
   text-align: center;
 }
 
-button {
+button.participate {
   color: #fff;
   background-color: #007bff;
   border-color: #007bff;
@@ -51,4 +66,15 @@ button {
   font-size: 0.875rem;
   padding: 4px 8px 4px 8px;
   cursor: pointer;
+}
+
+a.create {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  text-align: left;
+}
+
+a.create:hover {
+  color: #007bff;
 }
