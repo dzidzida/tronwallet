@@ -167,16 +167,7 @@ const menuData = [
     name: 'account',
     icon: 'user',
     path: 'account',
-    children: [
-      {
-        name: 'signup',
-        path: 'signup',
-      },
-      {
-        name: 'login',
-        path: 'login',
-      },
-    ],
+    children: [],
   },
   {
     name: 'send',
