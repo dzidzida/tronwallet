@@ -21,6 +21,10 @@ class Login extends PureComponent {
     loginError: '',
     confirmLoginError: '',
     signInsuccess: false,
+    forgotPasswordVisible: false,
+    forgotPasswordEmail: '',
+    newPassword: '',
+    newPasswordVisible: '',
   };
 
   onCancel = () => {
@@ -33,6 +37,10 @@ class Login extends PureComponent {
       signInsuccess: false,
       loginError: '',
       confirmLoginError: '',
+      forgotPasswordVisible: false,
+      forgotPasswordEmail: '',
+      newPassword: '',
+      newPasswordVisible: '',
     });
   };
 
@@ -68,6 +76,17 @@ class Login extends PureComponent {
       dispatch(routerRedux.push('/'));
     } catch (error) {
       this.setState({ confirmLoginError: error.message });
+    }
+  };
+
+  confirmForgotPassword = async () => {
+    // const { forgotPasswordEmail } = this.state;
+    try {
+      this.onCancel();
+      // await forgotPassword(forgotPasswordEmail)
+      // TODO: FAZER CASO DE SUCESSO
+    } catch (error) {
+      // TODO: FAZER CASO DE FALHA
     }
   };
 
@@ -142,6 +161,66 @@ class Login extends PureComponent {
     );
   };
 
+  renderForgotPasswordModal = () => {
+    const { forgotPasswordVisible, forgotPasswordEmail } = this.state;
+    return (
+      <Modal
+        title="Forgot password"
+        visible={forgotPasswordVisible}
+        onOk={this.confirmForgotPassword}
+        onCancel={this.onCancel}
+      >
+        <h3>Email</h3>
+        <input
+          className={styles.formControl}
+          value={forgotPasswordEmail}
+          onChange={this.change}
+          type="email"
+          name="forgotPasswordEmail"
+          id="forgotPasswordEmail"
+        />
+      </Modal>
+    );
+  };
+
+  renderConfirmForgotPasswordModal = () => {
+    const { newPasswordVisible, newPassword } = this.state;
+    return (
+      <Modal
+        title="Forgot password"
+        visible={newPasswordVisible}
+        onOk={() => {}}
+        onCancel={this.onCancel}
+      >
+        <h3>Email</h3>
+        <input
+          className={styles.formControl}
+          onChange={this.change}
+          type="email"
+          name="forgotPasswordEmail"
+          id="forgotPasswordEmail"
+        />
+        <h3>Code</h3>
+        <input
+          className={styles.formControl}
+          onChange={this.change}
+          type="text"
+          name="forgotPasswordCode"
+          id="forgotPasswordCode"
+        />
+        <h3>New password</h3>
+        <input
+          className={styles.formControl}
+          value={newPassword}
+          onChange={this.change}
+          type="password"
+          name="newPassword"
+          id="newPassword"
+        />
+      </Modal>
+    );
+  };
+
   render() {
     const { email, password, loginError } = this.state;
     return (
@@ -174,14 +253,24 @@ class Login extends PureComponent {
             <button className={styles.button} onClick={this.submit}>
               Login
             </button>
-            <h3
-              onClick={() => this.props.dispatch(routerRedux.push('/user/signup'))}
-              className={styles.createAccount}
-            >
-              Create account
-            </h3>
+            <div className={styles.linksContainer}>
+              <h3
+                onClick={() => this.props.dispatch(routerRedux.push('/user/signup'))}
+                className={styles.createAccount}
+              >
+                Create account
+              </h3>
+              <h3
+                onClick={() => this.setState({ forgotPasswordVisible: true })}
+                className={styles.createAccount}
+              >
+                Forgot password?
+              </h3>
+            </div>
           </div>
           {this.renderConfirmModal()}
+          {this.renderForgotPasswordModal()}
+          {this.renderConfirmForgotPasswordModal()}
         </div>
       </div>
     );
