@@ -2,6 +2,27 @@ import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
 
+export const signIn = async (email, password) => {
+  try {
+    const user = await Auth.signIn(email, password);
+    let totpCode = null;
+    if (user.challengeParam.MFAS_CAN_SETUP) {
+      totpCode = await Auth.setupTOTP(user);
+    }
+    return { user, totpCode };
+  } catch (err) {
+    throw new Error(err.message || err);
+  }
+};
+
+export const confirmSignIn = async (user, totpCode, code) =>
+  totpCode
+    ? Auth.verifyTotpToken(user, code)
+    : Auth.confirmSignIn(user, code, 'SOFTWARE_TOKEN_MFA');
+
+export const signOut = async () => Auth.signOut();
+
+// framework default apis
 export const signUp = async ({ password, email }) => {
   return Auth.signUp({
     username: email,
@@ -15,11 +36,25 @@ export const signUp = async ({ password, email }) => {
 
 export const confirmSignup = async ({ email, code }) => {
   return Auth.confirmSignUp(email, code);
-}
+};
 
-export const forgotPassword = async ({ email }) => {
+export const changePassword = async () => {
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    const response = await Auth.changePassword(user, 'oldPassword', 'newPassword');
+    return response;
+  } catch (error) {
+    console.log('ChangePassword Error', error);
+  }
+};
+
+export const forgotPassword = async email => {
   return Auth.forgotPassword(email);
-}
+};
+
+export const confirmForgotPassword = async ({ email, code, newPassword }) => {
+  return Auth.forgotPasswordSubmit(email, code, newPassword);
+};
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
