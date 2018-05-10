@@ -1,7 +1,11 @@
 import React, { PureComponent } from 'react';
 import { Modal } from 'antd';
+import { routerRedux } from 'dva/router';
+import { connect } from 'dva';
 import styles from './Signup.less';
 import { signUp, confirmSignup } from '../../services/api';
+import { reloadAuthorized } from '../../utils/Authorized';
+import { setAuthority } from '../../utils/authority';
 
 class Signup extends PureComponent {
   state = {
@@ -32,6 +36,9 @@ class Signup extends PureComponent {
     try {
       await confirmSignup(this.state);
       this.setState({ modalVisible: false, signupSuccess: true });
+      setAuthority('user');
+      reloadAuthorized();
+      this.props.dispatch(routerRedux.push('/user/login'));
     } catch (error) {
       this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
@@ -129,6 +136,12 @@ class Signup extends PureComponent {
             <button className={styles.button} onClick={this.submit}>
               Register
             </button>
+            <h3
+              onClick={() => this.props.dispatch(routerRedux.push('/user/login'))}
+              className={styles.backLogin}
+            >
+              Back
+            </h3>
           </div>
         </div>
         {this.renderConfirmModal()}
@@ -137,4 +150,4 @@ class Signup extends PureComponent {
   }
 }
 
-export default Signup;
+export default connect()(Signup);

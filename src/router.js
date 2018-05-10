@@ -6,9 +6,6 @@ import dynamic from 'dva/dynamic';
 import { getRouterData } from './common/router';
 import Authorized from './utils/Authorized';
 import styles from './index.less';
-import LoginPage from './routes/User/Login';
-import ConfirmLogin from './routes/User/ConfirmLogin';
-import UserRegister from './routes/User/Register';
 
 const { ConnectedRouter } = routerRedux;
 const { AuthorizedRoute } = Authorized;
@@ -20,14 +17,16 @@ dynamic.setDefaultLoadingComponent(() => {
 function RouterConfig({ history, app }) {
   const routerData = getRouterData(app);
 
+  if (!localStorage.getItem('antd-pro-authority')) {
+    localStorage.setItem('antd-pro-authority', 'guest');
+  }
+  const UserLayout = routerData['/user'].component;
   const BasicLayout = routerData['/'].component;
   return (
     <LocaleProvider locale={enUS}>
       <ConnectedRouter history={history}>
         <Switch>
-          <Route path="/user/login" component={LoginPage} />
-          <Route path="/user/confirmlogin" component={ConfirmLogin} />
-          <Route path="/user/register" component={UserRegister} />
+          <Route path="/user" component={UserLayout} />
           <AuthorizedRoute
             path="/"
             render={props => <BasicLayout {...props} />}

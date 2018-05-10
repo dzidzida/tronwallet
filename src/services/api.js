@@ -2,46 +2,24 @@ import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
 
-// window.LOG_LEVEL = 'DEBUG'
-// our APIS
-export const signIn = async params => {
-  const { username, password } = params;
+export const signIn = async (email, password) => {
   try {
-    const user = await Auth.signIn(username, password);
-    // const user = await Auth.signIn('bertao@getty.io', '200194Pedr@');
-    // const confirm = await Auth.confirmSignIn(user, '828140','SOFTWARE_TOKEN_MFA');
-    const totpCode = await Auth.setupTOTP(user);
-    return { status: 'ok', user, totpCode };
-  } catch (err) {
-    console.log('Error', err);
-    return {
-      status: 'error',
-      currentAuthority: 'guest',
-      type: 'account',
-      message: err.message,
-    };
-  }
-};
+    const user = await Auth.signIn(email, password);
+    let totpCode = null;
+    if (user.challengeParam.MFAS_CAN_SETUP) {
+      totpCode = await Auth.setupTOTP(user);
+    }
+    return { user, totpCode };
 
-export const confirmSignIn = async params => {
-  const { user, code } = params;
-  try {
-    // const verifyTotp = await Auth.verifyTotpToken(user, code, '');
-    // console.log("Foi verificado", verifyTotp);
-    // const confirming = await Auth.confirmSignIn(user);
-    const verifying = await Auth.verifyTotpToken(user, code);
-    console.log('Eu acho que foi verificado corretamente! ', verifying);
-    return { status: 'ok' };
-  } catch (error) {
-    console.log('Error no confirmSign In', error);
-    return {
-      status: 'error',
-      currentAuthority: 'guest',
-      type: 'account',
-      message: error.message,
-    };
+  } catch (err) {
+    throw new Error(err.message || err);
   }
-};
+}
+
+export const confirmSignIn = async (user, totpCode, code) => (
+  totpCode ? Auth.verifyTotpToken(user, code) : Auth.confirmSignIn(user, code, 'SOFTWARE_TOKEN_MFA')
+) ;
+
 
 export const signOut = async () => Auth.signOut();
 
