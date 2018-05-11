@@ -9,7 +9,7 @@ class Vote extends Component {
   state = {
     voteList: [],
     totalTrx: 1000000,
-    totalRemaining: 0,
+    totalRemaining: 1000000,
     transaction: {
       loading: false,
       status: false,
@@ -18,10 +18,15 @@ class Vote extends Component {
     },
   };
 
-  componentWillMount() {
-    const { totalTrx } = this.state;
-    this.setState({ voteList: votes, totalRemaining: totalTrx });
+  componentDidMount() {
+    this.onLoadWitness();
   }
+
+  onLoadWitness = async () => {
+    const voteList = await Client.getWitnesses();
+    this.setState({ voteList });
+  };
+
   onCloseModal = () => {
     this.setState({ modalVisible: false });
   };
@@ -45,9 +50,10 @@ class Vote extends Component {
     const votesPrepared = [];
     this.setState({ transaction: { ...transaction, loading: true } });
     voteList.forEach(vote => {
-      votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+      if (vote.amount && vote.amount > 0) {
+        votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+      }
     });
-
     try {
       const TransactionData = await Client.voteForWitnesses(votesPrepared);
       if (!TransactionData) {
@@ -72,7 +78,7 @@ class Vote extends Component {
 
     this.setState({ voteList }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount);
+        return Number(prev) + Number(vote.amount || 0);
       }, 0);
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
@@ -144,11 +150,11 @@ class Vote extends Component {
                 </tr>
               </thead>
               <tbody>
-                {voteList.map(vote => {
+                {voteList.map((vote, index) => {
                   return (
-                    <tr key={vote.id}>
+                    <tr key={vote.address}>
                       <td>
-                        <b>{vote.id}</b>
+                        <b>{index + 1}</b>
                       </td>
                       <td>
                         {vote.address}
@@ -166,7 +172,6 @@ class Vote extends Component {
                           className={styles.vote}
                           min="0"
                           onChange={e => this.change(e, vote.id)}
-                          value={Number(vote.amount)}
                         />
                       </td>
                     </tr>

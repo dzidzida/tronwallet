@@ -6,9 +6,10 @@ import isAddressValid from '../../utils/wallet-service/utils/address';
 
 class Send extends Component {
   state = {
-    to: '',
+    to: null,
     amount: '0.0000',
-    token: 'TRX',
+    token: '',
+    balances: [],
     modalVisible: false,
     transaction: {
       loading: false,
@@ -18,8 +19,17 @@ class Send extends Component {
     },
   };
 
+  componentDidMount() {
+    this.loadBalances();
+  }
+
   onCloseModal = () => {
     this.setState({ modalVisible: false });
+  };
+
+  loadBalances = async () => {
+    const balances = await Client.getBalances();
+    this.setState({ balances, token: balances[0].name || '' });
   };
 
   change = e => {
@@ -28,6 +38,7 @@ class Send extends Component {
       [name]: value,
     });
   };
+
   isToValid = () => {
     const { to } = this.state;
     return to === null ? true : isAddressValid(to);
@@ -65,6 +76,14 @@ class Send extends Component {
     this.setState({ transaction: { ...transaction, status: false, qrcode: '', error: null } });
   };
 
+  renderOptions = () => {
+    const { balances } = this.state;
+    return balances.map(bl => (
+      <option key={bl.name + bl.balance} value={bl.name}>
+        {bl.name} ({Number(bl.balance).toFixed(2)} available)
+      </option>
+    ));
+  };
   render() {
     const { transaction, to, amount, modalVisible } = this.state;
     const amountValid = this.isAmountValid();
@@ -88,8 +107,8 @@ class Send extends Component {
             <div className={styles.invalid}>{!toValid && 'Put a valid address'}</div>
             <h3>Token</h3>
             <div className={styles.selectWrapper}>
-              <select onChange={this.change} className={styles.selectBox}>
-                <option value="TRX">TRX (10000 available)</option>
+              <select name="token" onChange={this.change} className={styles.selectBox}>
+                {this.renderOptions()}
               </select>
             </div>
             <h3>Amount</h3>

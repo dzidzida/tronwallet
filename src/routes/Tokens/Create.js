@@ -26,7 +26,6 @@ class Create extends PureComponent {
   };
   change = e => {
     const { name, value, checked } = e.target;
-    console.log('erae', e.target);
     this.setState({
       [name]: name === 'acceptTerms' ? checked : value,
     });
@@ -195,8 +194,8 @@ class Create extends PureComponent {
                     onChange={this.change}
                     className={styles.formControl}
                     type="date"
-                    name="startDate"
-                    id="startDate"
+                    name="startTime"
+                    id="startTime"
                     required
                   />
                 </div>
@@ -206,8 +205,8 @@ class Create extends PureComponent {
                     onChange={this.change}
                     className={styles.formControl}
                     type="date"
-                    name="endDate"
-                    id="endDate"
+                    name="endTime"
+                    id="endTime"
                     required
                   />
                 </div>
