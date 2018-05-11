@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Affix } from 'antd';
-import * as QRCode from 'qrcode';
-import QRCodeCard from '../QRCode/QRCode';
+import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
-import { Client } from '../../utils/wallet-service/client';
+import Client from '../../utils/wallet-service/client';
 
 class Vote extends Component {
   state = {
     voteList: [],
-    totalTrx: 1000000,
+    totalTrx: 0,
     totalRemaining: 0,
     transaction: {
       loading: false,
@@ -19,10 +18,27 @@ class Vote extends Component {
     },
   };
 
-  componentWillMount() {
-    const { totalTrx } = this.state;
-    this.setState({ voteList: votes, totalRemaining: totalTrx });
+  componentDidMount() {
+    this.onLoadWitness();
+    this.onLoadAvailable();
   }
+
+  onLoadWitness = async () => {
+    const voteList = await Client.getWitnesses();
+    this.setState({ voteList });
+  };
+
+  onLoadAvailable = async () => {
+    const balances = await Client.getBalances();
+    const trxBalance = balances.find(bl => bl.name === 'TRX');
+    let totalTrx = 0;
+    if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
+    this.setState({ totalTrx, totalRemaining: totalTrx });
+  };
+
+  onCloseModal = () => {
+    this.setState({ modalVisible: false });
+  };
 
   handleSearch = e => {
     const { value } = e.target;
@@ -43,32 +59,34 @@ class Vote extends Component {
     const votesPrepared = [];
     this.setState({ transaction: { ...transaction, loading: true } });
     voteList.forEach(vote => {
-      votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+      if (vote.amount && Number(vote.amount) > 0) {
+        votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+      }
     });
-
-    const TransactionData = await Client.voteForWitnesses(votesPrepared);
-    const updatedTransaction = { ...transaction };
-
-    if (TransactionData) {
-      const qrcode = await QRCode.toDataURL(TransactionData);
-      updatedTransaction.status = true;
-      updatedTransaction.qrcode = qrcode;
-    } else {
-      updatedTransaction.status = false;
-      updatedTransaction.error = 'Something wrong with the Vote';
+    try {
+      const TransactionData = await Client.voteForWitnesses(votesPrepared);
+      if (!TransactionData) {
+        throw Error();
+      } else {
+        this.setState({
+          modalVisible: true,
+          transaction: { ...transaction, data: TransactionData },
+        });
+      }
+      // TODO
+      // Now do something
+    } catch (error) {
+      this.setState({ voteError: 'Something wrong voting' });
     }
-    updatedTransaction.loading = false;
-    this.setState({ transaction: updatedTransaction });
   };
 
-  change = (e, id) => {
+  change = (e, address) => {
     const { voteList, totalTrx } = this.state;
     const { value } = e.target;
-    voteList.find(v => v.id === id).amount = value;
-
+    voteList.find(v => v.address === address).amount = value;
     this.setState({ voteList }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount);
+        return Number(prev) + Number(vote.amount || 0);
       }, 0);
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
@@ -119,20 +137,7 @@ class Vote extends Component {
   };
 
   render() {
-    const { voteList, transaction } = this.state;
-    if (transaction.status) {
-      return (
-        <QRCodeCard
-          title="Vote TRX"
-          message="Thanks for submitting your vote!"
-          qrcode={transaction.qrcode}
-        >
-          <button onClick={this.handleBack} className={styles.default}>
-            Return the Votes
-          </button>
-        </QRCodeCard>
-      );
-    }
+    const { voteList, transaction, voteError, modalVisible } = this.state;
     return (
       <div className={styles.container}>
         <input
@@ -153,11 +158,11 @@ class Vote extends Component {
                 </tr>
               </thead>
               <tbody>
-                {voteList.map(vote => {
+                {voteList.map((vote, index) => {
                   return (
-                    <tr key={vote.id}>
+                    <tr key={vote.address}>
                       <td>
-                        <b>{vote.id}</b>
+                        <b>{index + 1}</b>
                       </td>
                       <td>
                         {vote.address}
@@ -174,8 +179,7 @@ class Vote extends Component {
                           type="number"
                           className={styles.vote}
                           min="0"
-                          onChange={e => this.change(e, vote.id)}
-                          value={Number(vote.amount)}
+                          onChange={e => this.change(e, vote.address)}
                         />
                       </td>
                     </tr>
@@ -199,8 +203,16 @@ class Vote extends Component {
                 SuperRepresentatives will be updated.
               </p>
             </div>
+            <h3 className={styles.error}>{voteError}</h3>
           </Affix>
         </div>
+        <ModalTransaction
+          title="Vote"
+          message="Please, validate your transaction"
+          data={transaction.data}
+          visible={modalVisible}
+          onClose={this.onCloseModal}
+        />
       </div>
     );
   }

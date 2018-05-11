@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
-
+// framework default apis
 export const signIn = async (email, password) => {
   try {
     const user = await Auth.signIn(email, password);
@@ -22,7 +22,6 @@ export const confirmSignIn = async (user, totpCode, code) =>
 
 export const signOut = async () => Auth.signOut();
 
-// framework default apis
 export const signUp = async ({ password, email }) => {
   return Auth.signUp({
     username: email,
@@ -56,6 +55,25 @@ export const confirmForgotPassword = async ({ email, code, newPassword }) => {
   return Auth.forgotPasswordSubmit(email, code, newPassword);
 };
 
+export const setUserPk = async publickey => {
+  const user = await Auth.currentAuthenticatedUser();
+  return Auth.updateUserAttributes(user, {
+    'custom:publickey': publickey,
+  });
+};
+
+export const getUserAttributes = async () => {
+  const authenticatedUser = await Auth.currentAuthenticatedUser();
+  const userAttributes = await Auth.userAttributes(authenticatedUser);
+  const user = {};
+
+  for (const attribute of userAttributes) {
+    user[attribute.Name] = attribute.Value;
+  }
+  return user;
+};
+
+//= ============================================
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }

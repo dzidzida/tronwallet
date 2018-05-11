@@ -17,7 +17,7 @@
 
 table {
   min-width: 0;
-  width: 100%;  
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -44,13 +44,14 @@ td {
   padding: 12px;
   vertical-align: top;
   border-top: 1px solid #dee2e6;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 400;
   color: #212529;
   text-align: left;
 }
 
-td.right, th.right {
+td.right,
+th.right {
   text-align: right;
 }
 
@@ -70,14 +71,13 @@ button.participate {
 }
 
 button.close {
-  color: #fff;
-  background-color: #6c757d;
+  color: #6c757d;
+  background-color: #fff;
   border-color: #6c757d;
   border-radius: 0.2rem;
   font-size: 0.875rem;
   padding: 4px 8px 4px 8px;
   width: 100%;
-  cursor: pointer;
 }
 
 button.transaction {
@@ -93,7 +93,7 @@ button.transaction {
   cursor: pointer;
 }
 
-button.disabled {
+button.transaction:disabled {
   color: #fff;
   background-color: #28a745;
   border-color: #28a745;
@@ -105,7 +105,6 @@ button.disabled {
   padding: 6px 12px;
   opacity: 0.65;
 }
-
 
 a.create {
   font-size: 1rem;
@@ -134,8 +133,7 @@ h3.item {
   font-size: 1rem;
 }
 
-
-h3.item > b{
+h3.item > b {
   padding-right: 8px;
 }
 
@@ -151,4 +149,8 @@ span.checkboxText {
   margin-left: 5px;
   font-size: 1rem;
   color: #212529;
+}
+.error {
+  color: #f26751;
+  text-align: center;
 }
