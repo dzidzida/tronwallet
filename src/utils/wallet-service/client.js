@@ -96,8 +96,6 @@ class ClientWallet {
       ownerAddress: from,
     });
     const { data } = await axios.post(`${this.url}/createAssetIssueToView`, body);
-    await this.getTransactionDetails(data);
-
     return data;
   }
 
@@ -190,7 +188,6 @@ class ClientWallet {
       amount: config.amount * config.trxNum,
     });
     const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
-    await this.getTransactionDetails(data);
     return data;
   }
 }

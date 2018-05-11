@@ -1,19 +1,24 @@
 import React, { Component } from 'react';
 import styles from './Account.less';
 import Client from '../../utils/wallet-service/client';
+import { getUserAttributes } from '../../services/api';
 
 class Account extends Component {
   state = {
     balances: [],
+    user: {},
+    showPk: false,
   };
 
   componentDidMount() {
-    this.loadBalances();
+    this.loadData();
   }
 
-  loadBalances = async () => {
-    const balances = await Client.getBalances();
-    this.setState({ balances });
+  togglePk = () => this.setState({ showPk: true });
+
+  loadData = async () => {
+    const data = await Promise.all([Client.getBalances(), getUserAttributes()]);
+    this.setState({ balances: data[0], user: data[1] });
   };
 
   renderBalanceTokens = () => {
@@ -26,7 +31,7 @@ class Account extends Component {
   };
 
   render() {
-    const { balances } = this.state;
+    const { balances, user, showPk } = this.state;
     let trxAmount = '0.00000';
     if (balances.length) trxAmount = balances.find(el => el.name === 'TRX').balance;
 
@@ -47,7 +52,7 @@ class Account extends Component {
                 </h3>
               </div>
               <div className={styles.column}>
-                <h3 className={styles.simpleText}>27TpkW7nWVLtCmGW3dr32m3XbFofsqLWZom</h3>
+                <h3 className={styles.simpleText}>{user['custom:publickey']}</h3>
                 <h3 className={styles.danger}>
                   (Do not send TRX from your own wallet or exchange to the above account address of
                   testnet!)
@@ -60,7 +65,15 @@ class Account extends Component {
                   <b>Private Key</b>
                 </h3>
               </div>
-              <button className={styles.default}>Show Private Key</button>
+              {!showPk ? (
+                <button onClick={this.togglePk} className={styles.default}>
+                  Show Private Key
+                </button>
+              ) : (
+                <div className={styles.column}>
+                  <h3 className={styles.privatekey}>{user['custom:privatekey']}</h3>
+                </div>
+              )}
             </div>
           </div>
         </div>

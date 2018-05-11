@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 import * as QRCode from 'qrcode';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
-import { Modal } from 'antd';
+import { Modal, Divider } from 'antd';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
-import { signIn, confirmSignIn } from '../../services/api';
+import { signIn, confirmSignIn, setUserPk } from '../../services/api';
 import { reloadAuthorized } from '../../utils/Authorized';
 import { setAuthority } from '../../utils/authority';
 
@@ -18,6 +18,7 @@ class Login extends PureComponent {
     totpCode: null,
     qrcode: null,
     modalVisible: false,
+    pk: '',
     loginError: '',
     confirmLoginError: '',
     signInsuccess: false,
@@ -55,6 +56,10 @@ class Login extends PureComponent {
     }
   };
 
+  isFormValid = () => {
+    const { pk } = this.state;
+    if (pk.length !== 64) return false;
+  };
   change = e => {
     const { name, value } = e.target;
     this.setState({
@@ -63,12 +68,13 @@ class Login extends PureComponent {
   };
 
   confirmSignIn = async () => {
-    const { totpCode, user, code } = this.state;
+    const { totpCode, user, code, pk } = this.state;
     const { dispatch } = this.props;
     try {
       await confirmSignIn(user, totpCode, code);
-      this.setState({ signInsuccess: true, modalVisible: false });
       // Confirmed sign successfully
+      await setUserPk(pk);
+      this.setState({ signInsuccess: true, modalVisible: false });
       setAuthority('user');
       reloadAuthorized();
       dispatch(routerRedux.push('/'));
@@ -114,6 +120,20 @@ class Login extends PureComponent {
       body = (
         <>
           <p>
+            Since this is your first time we need to configure the app. We will need your Private
+            key. Wrong private keys can lead to a irreversible
+          </p>
+          <h3>First provide your Private Key</h3>
+          <input
+            className={styles.formControl}
+            onChange={this.change}
+            type="text"
+            name="pk"
+            id="pk"
+            placeholder="Insert your Private Key"
+          />
+          <Divider />
+          <p>
             Please, link your account with some TOTP authenticator using this QRCode (We recommend
             Google Authenticator). You wont be able to log into your account without a six digit
             code from some authenticator.
@@ -148,10 +168,11 @@ class Login extends PureComponent {
     }
     return (
       <Modal
-        title="Confirm Sign In"
+        title={totpCode ? 'First Sign In' : 'Confirm Sign In'}
         visible={modalVisible}
         onOk={this.confirmSignIn}
         onCancel={this.onCancel}
+        okText={totpCode ? 'Confirm Configuration' : 'Sign In'}
       >
         <div className={styles.modalBody}>{body}</div>
         <h3 className={styles.error}>{confirmLoginError}</h3>

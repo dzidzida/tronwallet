@@ -16,6 +16,7 @@ class View extends PureComponent {
     participateError: null,
     transaction: {
       data: null,
+      loading: false,
     },
   };
 
@@ -45,7 +46,8 @@ class View extends PureComponent {
   submit = async e => {
     e.preventDefault();
     const { currentToken, amount, transaction } = this.state;
-    console.log('asuhu', currentToken, amount);
+    this.setState({ transaction: { ...transaction, loading: true } });
+
     try {
       const TransactionData = await Client.participateToken({ ...currentToken, amount });
       if (!TransactionData) {
@@ -60,6 +62,8 @@ class View extends PureComponent {
       // Now do something
     } catch (error) {
       this.setState({ participateError: 'Something wrong participating for Token' });
+    } finally {
+      this.setState({ transaction: { ...transaction, loading: false } });
     }
   };
 
@@ -90,6 +94,7 @@ class View extends PureComponent {
 
   renderCollapse = ownerAddress => {
     const { currentToken, amount, acceptTerms } = this.state;
+    const { loading } = this.state.transaction;
     if (currentToken && currentToken.ownerAddress === ownerAddress) {
       return (
         <tr>
@@ -114,6 +119,7 @@ class View extends PureComponent {
                 className={styles.amount}
                 name="amount"
                 type="number"
+                min="0"
                 value={amount}
                 onChange={this.onChange}
               />
@@ -137,9 +143,9 @@ class View extends PureComponent {
             </div>
             <div className={styles.collapseRow}>
               <button
-                className={acceptTerms && amount > 0 ? styles.transaction : styles.disabled}
+                className={styles.transaction}
                 onClick={this.submit}
-                disabled={!acceptTerms}
+                disabled={!acceptTerms || loading}
               >
                 Confirm transaction
               </button>
