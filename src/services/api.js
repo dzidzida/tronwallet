@@ -1,7 +1,6 @@
 import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
-import { privateKeyToAddress } from '../utils/wallet-service/utils/crypto';
 // framework default apis
 export const signIn = async (email, password) => {
   try {
@@ -56,12 +55,10 @@ export const confirmForgotPassword = async ({ email, code, newPassword }) => {
   return Auth.forgotPasswordSubmit(email, code, newPassword);
 };
 
-export const setUserPk = async privatekey => {
-  const publickey = privateKeyToAddress(privatekey);
+export const setUserPk = async publickey => {
   const user = await Auth.currentAuthenticatedUser();
   return Auth.updateUserAttributes(user, {
     'custom:publickey': publickey,
-    'custom:privatekey': privatekey,
   });
 };
 

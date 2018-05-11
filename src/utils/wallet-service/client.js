@@ -1,7 +1,5 @@
 import axios from 'axios';
 import qs from 'qs';
-import { Auth, Logger } from 'aws-amplify';
-
 // import { buildApplyForDelegate } from "./utils/transaction";
 // const longToByteArray = require("./utils/bytes").longToByteArray;
 // const hexStr2byteArray = require("./lib/code").hexStr2byteArray;
@@ -11,6 +9,7 @@ import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
 import { stringToBytes } from './lib/code';
 import { getBase58CheckAddress } from './utils/crypto';
 import deserializeTransaction from './protocol/serializer';
+import { getUserAttributes } from '../../services/api';
 
 const TRON_URL = 'https://tronscan.io';
 
@@ -19,30 +18,11 @@ export const ONE_TRX = 1000000;
 class ClientWallet {
   constructor(opt = null) {
     this.url = opt || TRON_URL;
-    this.user = {};
-    this.initiateUser();
-  }
-
-  async initiateUser() {
-    // For now just update for dummy data;
-    const authenticatedUser = await Auth.currentAuthenticatedUser();
-    // const updateUser = await Auth.updateUserAttributes(authenticatedUser, {
-    //   address: '27cmix5pFFCGukK97kxB7oPoBvxGx1hLdVr',
-    // });
-    const userAttributes = await Auth.userAttributes(authenticatedUser);
-
-    for (const attribute of userAttributes) {
-      this.user[attribute.Name] = attribute.Value;
-    }
-  }
-
-  getUser() {
-    return this.user;
   }
 
   // SEND TRANSACTION
   async send({ token, to, amount }) {
-    const from = this.user.address;
+    const from = await this.getPublicKey();
     if (token.toUpperCase() === 'TRX') {
       const { data } = await axios.post(
         `${this.url}/sendCoinToView`,
@@ -69,6 +49,11 @@ class ClientWallet {
     }
   }
 
+  getPublicKey = async () => {
+    const userAttr = await getUserAttributes();
+    return userAttr['custom:publickey'];
+  }
+
   getTransactionDetails = async data => {
     let transaction;
     if (typeof data === 'string') {
@@ -78,12 +63,12 @@ class ClientWallet {
       transaction = data;
     }
     const transactionDetail = deserializeTransaction(transaction);
-    Logger.log('TransactionDetail:', transactionDetail);
+    console.log('TransactionDetail:', transactionDetail);
     return transactionDetail;
   };
   // CREATE TOKEN
   async createToken(form) {
-    const from = this.user.address;
+    const from = await this.getPublicKey();
     const body = qs.stringify({
       name: form.tokenName,
       totalSupply: form.totalSupply,
@@ -138,7 +123,7 @@ class ClientWallet {
   }
 
   async voteForWitnesses(votes) {
-    const owner = this.user.address;
+    const owner = await this.getPublicKey();
     const { data } = await axios.post(`${this.url}/createVoteWitnessToView`, {
       owner,
       list: votes,
@@ -148,7 +133,7 @@ class ClientWallet {
   }
 
   async getBalances() {
-    const owner = this.user.address;
+    const owner = await this.getPublicKey();
     const { data } = await axios.post(
       `${this.url}/queryAccount`,
       qs.stringify({
@@ -180,7 +165,7 @@ class ClientWallet {
   }
 
   async participateToken(config) {
-    const owner = this.user.address;
+    const owner = await this.getPublicKey();
     const body = qs.stringify({
       name: byteArray2hexStr(stringToBytes(config.name)),
       ownerAddress: owner,

@@ -7,14 +7,11 @@ class Account extends Component {
   state = {
     balances: [],
     user: {},
-    showPk: false,
   };
 
   componentDidMount() {
     this.loadData();
   }
-
-  togglePk = () => this.setState({ showPk: true });
 
   loadData = async () => {
     const data = await Promise.all([Client.getBalances(), getUserAttributes()]);
@@ -31,7 +28,7 @@ class Account extends Component {
   };
 
   render() {
-    const { balances, user, showPk } = this.state;
+    const { balances, user } = this.state;
     let trxAmount = '0.00000';
     if (balances.length) trxAmount = balances.find(el => el.name === 'TRX').balance;
 
@@ -59,22 +56,13 @@ class Account extends Component {
                 </h3>
               </div>
             </div>
-            <div className={styles.row}>
+            {/* <div className={styles.row}>
               <div className={styles.space}>
                 <h3 className={styles.simpleText}>
                   <b>Private Key</b>
                 </h3>
               </div>
-              {!showPk ? (
-                <button onClick={this.togglePk} className={styles.default}>
-                  Show Private Key
-                </button>
-              ) : (
-                <div className={styles.column}>
-                  <h3 className={styles.privatekey}>{user['custom:privatekey']}</h3>
-                </div>
-              )}
-            </div>
+            </div> */}
           </div>
         </div>
 

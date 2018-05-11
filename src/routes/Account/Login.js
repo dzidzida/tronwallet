@@ -73,7 +73,7 @@ class Login extends PureComponent {
     try {
       await confirmSignIn(user, totpCode, code);
       // Confirmed sign successfully
-      await setUserPk(pk);
+      if (totpCode) await setUserPk(pk);
       this.setState({ signInsuccess: true, modalVisible: false });
       setAuthority('user');
       reloadAuthorized();
@@ -120,17 +120,17 @@ class Login extends PureComponent {
       body = (
         <>
           <p>
-            Since this is your first time we need to configure the app. We will need your Private
-            key. Wrong private keys can lead to a irreversible
+            Since this is your first time we need to configure the app. We will need your Public
+            key. Wrong Public keys can cause malfunction.
           </p>
-          <h3>First provide your Private Key</h3>
+          <h3>First provide your Public Key</h3>
           <input
             className={styles.formControl}
             onChange={this.change}
             type="text"
             name="pk"
             id="pk"
-            placeholder="Insert your Private Key"
+            placeholder="Insert your Public Key"
           />
           <Divider />
           <p>
