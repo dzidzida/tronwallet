@@ -167,16 +167,7 @@ const menuData = [
     name: 'account',
     icon: 'user',
     path: 'account',
-    children: [
-      {
-        name: 'signup',
-        path: 'signup',
-      },
-      {
-        name: 'login',
-        path: 'login',
-      },
-    ],
+    children: [],
   },
   {
     name: 'send',
@@ -194,16 +185,7 @@ const menuData = [
     name: 'tokens',
     icon: 'form',
     path: 'tokens',
-    children: [
-      {
-        name: 'view',
-        path: 'view',
-      },
-      {
-        name: 'create',
-        path: 'create',
-      },
-    ],
+    children: [],
   },
   {
     name: 'Vote',

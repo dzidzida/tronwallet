@@ -35,7 +35,13 @@ class Signup extends PureComponent {
   confirmSignup = async () => {
     try {
       await confirmSignup(this.state);
-      this.setState({ modalVisible: false, signupSuccess: true });
+      this.setState({
+        modalVisible: false,
+        signupSuccess: true,
+        password: '',
+        email: '',
+        phoneNumber: '',
+      });
       setAuthority('user');
       reloadAuthorized();
       this.props.dispatch(routerRedux.push('/user/login'));
