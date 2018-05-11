@@ -54,6 +54,4 @@ function deserializeTransaction(tx) {
   return transactions;
 }
 
-module.exports = {
-  deserializeTransaction,
-};
+export default deserializeTransaction;

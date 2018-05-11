@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import moment from 'moment';
 import styles from './View.less';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 class View extends PureComponent {
@@ -45,6 +45,7 @@ class View extends PureComponent {
   submit = async e => {
     e.preventDefault();
     const { currentToken, amount, transaction } = this.state;
+    console.log('asuhu', currentToken, amount);
     try {
       const TransactionData = await Client.participateToken({ ...currentToken, amount });
       if (!TransactionData) {
@@ -103,7 +104,7 @@ class View extends PureComponent {
               <h3 className={styles.item}>
                 <b>Price</b>
               </h3>
-              <h3 className={styles.item}>{currentToken.price} TRX</h3>
+              <h3 className={styles.item}>{Number(currentToken.price / ONE_TRX).toFixed(5)} TRX</h3>
             </div>
             <div className={styles.collapseRow}>
               <h3 className={styles.item}>
@@ -125,8 +126,13 @@ class View extends PureComponent {
                 value={acceptTerms}
               />
               <span className={styles.checkboxText}>
-                I&#39;ve confirmed to spend <b>{currentToken.price * amount} TRX</b> on token
-                distribution, and get a total of <b>{amount} Beetle Juice</b> tokens.
+                I&#39;ve confirmed to spend{' '}
+                <b>{(amount * currentToken.price / ONE_TRX).toFixed(5)} TRX</b> on token
+                distribution, and get a total of{' '}
+                <b>
+                  {amount} {currentToken.name}
+                </b>{' '}
+                tokens.
               </span>
             </div>
             <div className={styles.collapseRow}>
@@ -196,7 +202,7 @@ class View extends PureComponent {
         <h3 className={styles.error}>{participateError}</h3>
         <ModalTransaction
           title="Participate to asset"
-          message="You participated to the asset"
+          message="Please, validate your transaction"
           data={transaction.data}
           visible={modalVisible}
           onClose={this.onCloseModal}

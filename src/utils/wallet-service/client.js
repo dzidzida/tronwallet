@@ -1,15 +1,16 @@
 import axios from 'axios';
 import qs from 'qs';
-import { Auth } from 'aws-amplify';
+import { Auth, Logger } from 'aws-amplify';
 
 // import { buildApplyForDelegate } from "./utils/transaction";
 // const longToByteArray = require("./utils/bytes").longToByteArray;
 // const hexStr2byteArray = require("./lib/code").hexStr2byteArray;
 import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './utils/bytes';
-import { Account } from './protocol/core/Tron_pb';
+import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
 import { stringToBytes } from './lib/code';
 import { getBase58CheckAddress } from './utils/crypto';
+import deserializeTransaction from './protocol/serializer';
 
 const TRON_URL = 'https://tronscan.io';
 
@@ -19,10 +20,10 @@ class ClientWallet {
   constructor(opt = null) {
     this.url = opt || TRON_URL;
     this.user = {};
-    this.setUser();
+    this.initiateUser();
   }
 
-  async setUser() {
+  async initiateUser() {
     // For now just update for dummy data;
     const authenticatedUser = await Auth.currentAuthenticatedUser();
     // const updateUser = await Auth.updateUserAttributes(authenticatedUser, {
@@ -33,6 +34,10 @@ class ClientWallet {
     for (const attribute of userAttributes) {
       this.user[attribute.Name] = attribute.Value;
     }
+  }
+
+  getUser() {
+    return this.user;
   }
 
   // SEND TRANSACTION
@@ -48,6 +53,7 @@ class ClientWallet {
         })
       );
 
+      await this.getTransactionDetails(data);
       return data;
     } else {
       const { data } = await axios.post(
@@ -59,11 +65,22 @@ class ClientWallet {
           Amount: amount,
         })
       );
-
       return data;
     }
   }
 
+  getTransactionDetails = async data => {
+    let transaction;
+    if (typeof data === 'string') {
+      const bytesDecode = base64DecodeFromString(data);
+      transaction = Transaction.deserializeBinary(bytesDecode);
+    } else if (data instanceof Transaction) {
+      transaction = data;
+    }
+    const transactionDetail = deserializeTransaction(transaction);
+    Logger.log('TransactionDetail:', transactionDetail);
+    return transactionDetail;
+  };
   // CREATE TOKEN
   async createToken(form) {
     const from = this.user.address;
@@ -79,6 +96,8 @@ class ClientWallet {
       ownerAddress: from,
     });
     const { data } = await axios.post(`${this.url}/createAssetIssueToView`, body);
+    await this.getTransactionDetails(data);
+
     return data;
   }
 
@@ -119,13 +138,14 @@ class ClientWallet {
       };
     });
   }
-  // SUBMIT A VOTE
+
   async voteForWitnesses(votes) {
     const owner = this.user.address;
     const { data } = await axios.post(`${this.url}/createVoteWitnessToView`, {
       owner,
       list: votes,
     });
+    await this.getTransactionDetails(data);
     return data;
   }
 
@@ -167,9 +187,10 @@ class ClientWallet {
       name: byteArray2hexStr(stringToBytes(config.name)),
       ownerAddress: owner,
       toAddress: config.ownerAddress,
-      amount: config.amount * config.price,
+      amount: config.amount * config.trxNum,
     });
     const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
+    await this.getTransactionDetails(data);
     return data;
   }
 }

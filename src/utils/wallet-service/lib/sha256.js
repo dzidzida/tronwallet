@@ -10,7 +10,6 @@
  Several functions taken from Paul Johnston
 */
 /* eslint-disable */
-
 'use strict';
 (function(I) {
   function w(c, a, d) {

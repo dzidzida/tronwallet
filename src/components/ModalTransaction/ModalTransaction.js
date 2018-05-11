@@ -37,11 +37,11 @@ class TransactionQRCode extends Component {
         footer={footerButton}
       >
         <div className={styles.transaction}>
-          <div className={styles.messageContentSuccess}>
-            <h2 className={styles.messageSuccess}> {message}</h2>
+          <div className={styles.messageContentWarning}>
+            <h2 className={styles.messageWarning}> {message}</h2>
           </div>
           <img className={styles.qrcode} src={qrcode} alt="Transaction QRCode" />
-          <h3>You can check the transaction using this QRCode</h3>
+          <h3>Use this QRCode to validate it</h3>
         </div>
       </Modal>
     );

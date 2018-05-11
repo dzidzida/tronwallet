@@ -8,8 +8,8 @@ import Client from '../../utils/wallet-service/client';
 class Vote extends Component {
   state = {
     voteList: [],
-    totalTrx: 1000000,
-    totalRemaining: 1000000,
+    totalTrx: 0,
+    totalRemaining: 0,
     transaction: {
       loading: false,
       status: false,
@@ -20,11 +20,20 @@ class Vote extends Component {
 
   componentDidMount() {
     this.onLoadWitness();
+    this.onLoadAvailable();
   }
 
   onLoadWitness = async () => {
     const voteList = await Client.getWitnesses();
     this.setState({ voteList });
+  };
+
+  onLoadAvailable = async () => {
+    const balances = await Client.getBalances();
+    const trxBalance = balances.find(bl => bl.name === 'TRX');
+    let totalTrx = 0;
+    if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
+    this.setState({ totalTrx, totalRemaining: totalTrx });
   };
 
   onCloseModal = () => {
@@ -50,7 +59,7 @@ class Vote extends Component {
     const votesPrepared = [];
     this.setState({ transaction: { ...transaction, loading: true } });
     voteList.forEach(vote => {
-      if (vote.amount && vote.amount > 0) {
+      if (vote.amount && Number(vote.amount) > 0) {
         votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
       }
     });
@@ -71,11 +80,10 @@ class Vote extends Component {
     }
   };
 
-  change = (e, id) => {
+  change = (e, address) => {
     const { voteList, totalTrx } = this.state;
     const { value } = e.target;
-    voteList.find(v => v.id === id).amount = value;
-
+    voteList.find(v => v.address === address).amount = value;
     this.setState({ voteList }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
         return Number(prev) + Number(vote.amount || 0);
@@ -171,7 +179,7 @@ class Vote extends Component {
                           type="number"
                           className={styles.vote}
                           min="0"
-                          onChange={e => this.change(e, vote.id)}
+                          onChange={e => this.change(e, vote.address)}
                         />
                       </td>
                     </tr>
@@ -200,7 +208,7 @@ class Vote extends Component {
         </div>
         <ModalTransaction
           title="Vote"
-          message="Thanks for the vote submission"
+          message="Please, validate your transaction"
           data={transaction.data}
           visible={modalVisible}
           onClose={this.onCloseModal}

@@ -143,7 +143,7 @@ class Send extends Component {
           </div>
           <ModalTransaction
             title="Send TRX"
-            message="Succesfully sent!"
+            message="Please, validate your transaction"
             data={transaction.data}
             visible={modalVisible}
             onClose={this.onCloseModal}
