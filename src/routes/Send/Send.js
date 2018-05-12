@@ -71,11 +71,6 @@ class Send extends Component {
     this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
-  handleBack = () => {
-    const { transaction } = this.state;
-    this.setState({ transaction: { ...transaction, status: false, qrcode: '', error: null } });
-  };
-
   renderOptions = () => {
     const { balances } = this.state;
     return balances.map(bl => (
@@ -144,6 +139,7 @@ class Send extends Component {
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
+            type="SEND"
             data={transaction.data}
             visible={modalVisible}
             onClose={this.onCloseModal}

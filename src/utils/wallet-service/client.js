@@ -66,6 +66,7 @@ class ClientWallet {
     console.log('TransactionDetail:', transactionDetail);
     return transactionDetail;
   };
+
   // CREATE TOKEN
   async createToken(form) {
     const from = await this.getPublicKey();
@@ -173,6 +174,14 @@ class ClientWallet {
       amount: config.amount * config.trxNum,
     });
     const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
+    return data;
+  }
+
+  async submitTransaction(tx) {
+    const { data } = await axios.post(`${this.url}/transactionFromView`, qs.stringify({
+      transactionData: tx,
+    }));
+
     return data;
   }
 }
