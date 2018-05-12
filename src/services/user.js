@@ -1,9 +1,9 @@
-import request from '../utils/request';
+import { Auth } from 'aws-amplify';
 
 export async function query() {
-  return request('/api/users');
+  return {};
 }
 
 export async function queryCurrent() {
-  return request('/api/currentUser');
+  return Auth.currentAuthenticatedUser();
 }
