@@ -150,3 +150,7 @@ export async function fakeRegister(params) {
 export async function queryNotices() {
   return request('/api/notices');
 }
+
+export async function getTronPrice() {
+  return request('https://min-api.cryptocompare.com/data/histoday?fsym=TRX&tsym=USD&limit=90&e=CCCAGG&aggregate=1', { credentials: false });
+}

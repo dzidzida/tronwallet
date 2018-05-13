@@ -1,81 +1,55 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 
 import { MiniArea } from '../Charts';
 import NumberInfo from '../NumberInfo';
 
 import styles from './index.less';
 
-function fixedZero(val) {
-  return val * 1 < 10 ? `0${val}` : val;
-}
-
-function getActiveData() {
-  const activeData = [];
-  for (let i = 0; i < 24; i += 1) {
-    activeData.push({
-      x: `${fixedZero(i)}:00`,
-      y: Math.floor(Math.random() * 200) + i * 50,
-    });
-  }
-  return activeData;
-}
-
 export default class ActiveChart extends Component {
-  state = {
-    activeData: getActiveData(),
+  static propTypes = {
+    lastDay: PropTypes.object,
   };
 
-  componentDidMount() {
-    this.timer = setInterval(() => {
-      this.setState({
-        activeData: getActiveData(),
-      });
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
+  static defaultProps = {
+    lastDay: {},
+  };
 
   render() {
-    const { activeData = [] } = this.state;
+    const { data, lastDay } = this.props;
 
     return (
       <div className={styles.activeChart}>
-        <NumberInfo subTitle="Last 24h" total="$1.50" />
+        {lastDay.total && <NumberInfo subTitle="Last 24h" total={`$${lastDay.total}`} />}
         <div style={{ marginTop: 32 }}>
           <MiniArea
             animate={false}
             line
             borderWidth={2}
             height={84}
-            scale={{
-              y: {
-                tickCount: 3,
-              },
-            }}
             yAxis={{
-              tickLine: false,
+              tickLine: true,
               label: false,
               title: false,
               line: false,
             }}
-            data={activeData}
+            data={data}
           />
         </div>
-        {activeData && (
-          <div className={styles.activeChartGrid}>
-            <p>{[...activeData].sort()[activeData.length - 1].y + 200} MAX</p>
-            <p>{[...activeData].sort()[Math.floor(activeData.length / 2)].y} MIN</p>
-          </div>
-        )}
-        {activeData && (
+        {data &&
+          data.length && (
+            <div className={styles.activeChartGrid}>
+              <p>{lastDay.max} MAX</p>
+              <p>{lastDay.min} MIN</p>
+            </div>
+          )}
+        {/* data && data.length && (
           <div className={styles.activeChartLegend}>
-            <span>00:00</span>
-            <span>{activeData[Math.floor(activeData.length / 2)].x}</span>
-            <span>{activeData[activeData.length - 1].x}</span>
+            {data.map(d => {
+              return (<span>{d.x}</span>)
+            })}
           </div>
-        )}
+        ) */}
       </div>
     );
   }

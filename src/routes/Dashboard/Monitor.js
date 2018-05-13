@@ -1,27 +1,45 @@
 import React, { PureComponent, Fragment } from 'react';
-import { connect } from 'dva';
 import { Row, Col, Card, List } from 'antd';
+import moment from 'moment';
 import ActiveChart from 'components/ActiveChart';
-import Authorized from '../../utils/Authorized';
 
-const { Secured } = Authorized;
+import { getTronPrice } from '../../services/api';
 
-// use permission as a parameter
-const havePermissionAsync = new Promise(resolve => {
-  // Call resolve on behalf of passed
-  setTimeout(() => resolve(), 1000);
-});
-@Secured(havePermissionAsync)
-@connect(({ monitor, loading }) => ({
-  monitor,
-  loading: loading.models.monitor,
-}))
-export default class Monitor extends PureComponent {
-  componentDidMount() {
-    // this.props.dispatch({
-    //   type: 'monitor/fetchTags',
-    // });
+class Monitor extends PureComponent {
+  state = {
+    tronPriceData: [],
+    lastDay: {},
+  };
+
+  async componentDidMount() {
+    await this.loadData();
   }
+
+  getLastDayFromTronPriceList = tronPriceList => {
+    const lastTronPrice = tronPriceList[tronPriceList.length - 1];
+    return {
+      total: `${lastTronPrice.close}`,
+      min: lastTronPrice.low,
+      max: lastTronPrice.high,
+    };
+  };
+
+  loadData = async () => {
+    const { Data: tronPriceList = [] } = await getTronPrice();
+
+    if (!tronPriceList.length) {
+      return;
+    }
+
+    const tronPriceData = tronPriceList.map(price => ({
+      x: `${moment.unix(price.time).format('YYYY-MM-DD HH:mm')}`,
+      y: price.close,
+    }));
+
+    const lastDay = this.getLastDayFromTronPriceList(tronPriceList);
+
+    this.setState({ tronPriceData, lastDay });
+  };
 
   render() {
     return (
@@ -29,7 +47,7 @@ export default class Monitor extends PureComponent {
         <Row gutter={24}>
           <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card title="TRON Price" style={{ marginBottom: 24 }} bordered={false}>
-              <ActiveChart />
+              <ActiveChart data={this.state.tronPriceData} lastDay={this.state.lastDay} />
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
@@ -43,7 +61,7 @@ export default class Monitor extends PureComponent {
             <Card title="TOKENS" style={{ marginBottom: 24 }} bordered={false}>
               <List.Item key="..........">
                 <List.Item.Meta
-                  title={<a href="https://ant.design">TRX</a>}
+                  title={<span href="https://getty.io">TRX</span>}
                   description="dio@getty.io"
                 />
                 <div>Content</div>
@@ -62,3 +80,5 @@ export default class Monitor extends PureComponent {
     );
   }
 }
+
+export default Monitor;
