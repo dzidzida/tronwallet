@@ -36,13 +36,6 @@ export default class ActiveChart extends Component {
             data={data}
           />
         </div>
-        {data &&
-          data.length && (
-            <div className={styles.activeChartGrid}>
-              <p>{lastDay.max} MAX</p>
-              <p>{lastDay.min} MIN</p>
-            </div>
-          )}
         {/* data && data.length && (
           <div className={styles.activeChartLegend}>
             {data.map(d => {
