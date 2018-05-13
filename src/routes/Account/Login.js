@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import * as QRCode from 'qrcode';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
-import { Modal, Divider } from 'antd';
+import { Modal } from 'antd';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
 import { signIn, confirmSignIn, setUserPk } from '../../services/api';
@@ -119,20 +119,6 @@ class Login extends PureComponent {
     if (totpCode) {
       body = (
         <>
-          <p>
-            Since this is your first time we need to configure the app. We will need your Public
-            key. Wrong Public keys can cause malfunction.
-          </p>
-          <h3>First provide your Public Key</h3>
-          <input
-            className={styles.formControl}
-            onChange={this.change}
-            type="text"
-            name="pk"
-            id="pk"
-            placeholder="Insert your Public Key"
-          />
-          <Divider />
           <p>
             Please, link your account with some TOTP authenticator using this QRCode (We recommend
             Google Authenticator). You wont be able to log into your account without a six digit

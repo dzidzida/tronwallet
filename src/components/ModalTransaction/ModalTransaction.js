@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Modal } from 'antd';
 import * as QRCode from 'qrcode';
 import styles from './ModalTransaction.less';
+import { getUserAttributes } from '../../services/api';
+
+const URL = 'http://192.168.0.7:8000/#/user/validate';
 
 class TransactionQRCode extends Component {
   state = {
@@ -15,9 +18,14 @@ class TransactionQRCode extends Component {
   }
 
   loadUrl = async (data = 'getty.io') => {
-    const qrcode = await QRCode.toDataURL(data);
+    const { type } = this.props;
+    const user = await getUserAttributes();
+    const validateData = JSON.stringify({ data, type, URL, pk: user['custom:publickey'] });
+    console.log('Seding this data', validateData);
+    const qrcode = await QRCode.toDataURL(validateData);
     this.setState({ qrcode });
   };
+
   render() {
     const { title, message, visible, onClose, textFooter } = this.props;
     const { qrcode } = this.state;
