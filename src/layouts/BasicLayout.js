@@ -16,6 +16,8 @@ import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
+import { getUserAttributes } from '../services/api';
+import SetPkModal from '../components/SetPkModal/SetPkModal';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
@@ -91,6 +93,7 @@ class BasicLayout extends React.PureComponent {
   };
   state = {
     isMobile,
+    modalVisible: false,
   };
   getChildContext() {
     const { location, routerData } = this.props;
@@ -99,7 +102,9 @@ class BasicLayout extends React.PureComponent {
       breadcrumbNameMap: getBreadcrumbNameMap(getMenuData(), routerData),
     };
   }
+
   componentDidMount() {
+    this.getUserAttr();
     this.enquireHandler = enquireScreen(mobile => {
       this.setState({
         isMobile: mobile,
@@ -112,6 +117,17 @@ class BasicLayout extends React.PureComponent {
   componentWillUnmount() {
     unenquireScreen(this.enquireHandler);
   }
+
+  onCloseModal = () => {
+    this.setState({ modalVisible: false });
+  };
+
+  getUserAttr = async () => {
+    const usrAttr = await getUserAttributes();
+    if (!usrAttr['custom:publickey']) {
+      this.setState({ modalVisible: true });
+    }
+  };
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
@@ -220,6 +236,7 @@ class BasicLayout extends React.PureComponent {
             />
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
+            <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
             <Switch>
               {redirectData.map(item => (
                 <Redirect key={item.from} exact from={item.from} to={item.to} />
@@ -262,7 +279,10 @@ class BasicLayout extends React.PureComponent {
               ]}
               copyright={
                 <Fragment>
-                  Copyright <Icon type="copyright" /> 2018 <a src="https://getty.io" target="_blank">Getty/IO Inc.</a>
+                  Copyright <Icon type="copyright" /> 2018{' '}
+                  <a src="https://getty.io" target="_blank">
+                    Getty/IO Inc.
+                  </a>
                 </Fragment>
               }
             />

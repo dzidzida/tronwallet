@@ -2,16 +2,21 @@ import React, { Component } from 'react';
 import styles from './Account.less';
 import Client from '../../utils/wallet-service/client';
 import { getUserAttributes } from '../../services/api';
+import SetPkModal from '../../components/SetPkModal/SetPkModal';
 
 class Account extends Component {
   state = {
     balances: [],
     user: {},
+    modalVisible: false,
   };
 
   componentDidMount() {
     this.loadData();
   }
+  onOpenModal = () => this.setState({ modalVisible: true });
+
+  onCloseModal = () => this.setState({ modalVisible: false });
 
   loadData = async () => {
     const data = await Promise.all([Client.getBalances(), getUserAttributes()]);
@@ -56,13 +61,11 @@ class Account extends Component {
                 </h3>
               </div>
             </div>
-            {/* <div className={styles.row}>
-              <div className={styles.space}>
-                <h3 className={styles.simpleText}>
-                  <b>Private Key</b>
-                </h3>
-              </div>
-            </div> */}
+            <div className={styles.row}>
+              <button className={styles.default} onClick={this.onOpenModal}>
+                <b>Edit your Public Key</b>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -87,6 +90,7 @@ class Account extends Component {
             <tbody>{this.renderBalanceTokens()}</tbody>
           </table>
         </div>
+        <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
       </div>
     );
   }
