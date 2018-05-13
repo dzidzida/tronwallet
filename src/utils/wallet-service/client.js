@@ -176,6 +176,14 @@ class ClientWallet {
     const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
     return data;
   }
+
+  async submitTransaction(tx) {
+    const { data } = await axios.post(`${this.url}/transactionFromView`, qs.stringify({
+      transactionData: tx,
+    }));
+
+    return data;
+  }
 }
 
 export default new ClientWallet();

@@ -102,6 +102,9 @@ export const getRouterData = app => {
     '/user/signup': {
       component: dynamicWrapper(app, ['register'], () => import('../routes/Account/Signup')),
     },
+    '/user/validate': {
+      component: dynamicWrapper(app, ['register'], () => import('../routes/Validate/Validate')),
+    },
   };
   // Get name from ./menu.js or just set it in the router data.
   const menuData = getFlatMenuData(getMenuData());
