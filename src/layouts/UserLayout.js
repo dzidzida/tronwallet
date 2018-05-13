@@ -6,9 +6,11 @@ import GlobalFooter from '../components/GlobalFooter';
 import styles from './UserLayout.less';
 import tronLogo from '../../public/tron-logo.png';
 import { getRoutes } from '../utils/utils';
+import { version } from './../../package.json';
 
 const copyright = (
   <Fragment>
+    <p>{`v${version}`}</p>
     Copyright <Icon type="copyright" /> 2018{' '}
     <a src="https://getty.io" target="_blank">
       Getty/IO Inc.
