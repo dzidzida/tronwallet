@@ -2,6 +2,10 @@ import React, { PureComponent, Fragment } from 'react';
 import { Row, Col, Card, List } from 'antd';
 import moment from 'moment';
 import ActiveChart from 'components/ActiveChart';
+import {
+  ChartCard,
+  Field,
+} from 'components/Charts';
 
 import { getTronPrice } from '../../services/api';
 
@@ -51,9 +55,16 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card title="TRX Balance" style={{ marginBottom: 24 }} bordered={false}>
-              <p>1999.0000</p>
-            </Card>
+            <Card title="TRXBalance" style={{ marginBottom: 30 }} bordered={false}>
+              <ChartCard
+                bordered={false}
+                title="TRX Avaliable"
+                total={199}
+                footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
+                contentHeight={46}
+              />
+            </Card>					
+
           </Col>
         </Row>
         <Row gutter={24}>
