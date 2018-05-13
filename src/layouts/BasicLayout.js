@@ -18,6 +18,7 @@ import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
 import { getUserAttributes } from '../services/api';
 import SetPkModal from '../components/SetPkModal/SetPkModal';
+import { version } from './../../package.json';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
@@ -279,6 +280,7 @@ class BasicLayout extends React.PureComponent {
               ]}
               copyright={
                 <Fragment>
+                  <p>{`v${version}`}</p>
                   Copyright <Icon type="copyright" /> 2018{' '}
                   <a src="https://getty.io" target="_blank">
                     Getty/IO Inc.

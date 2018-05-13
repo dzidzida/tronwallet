@@ -154,3 +154,12 @@ export async function queryNotices() {
 export async function getTronPrice() {
   return request('https://min-api.cryptocompare.com/data/histoday?fsym=TRX&tsym=USD&limit=90&e=CCCAGG&aggregate=1', { credentials: false });
 }
+
+
+export async function getTransactionsForAddress(address) {
+  return request(`https://api.tronscan.org/api/transaction?sort=-timestamp&limit=50&address=${address}`, { credentials: false });
+}
+
+export async function getVotesForAddress(address) {
+  return request(`https://api.tronscan.org/api/vote?sort=-timestamp&limit=50&address=${address}`, { credentials: false });
+}

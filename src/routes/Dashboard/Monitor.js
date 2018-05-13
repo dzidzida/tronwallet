@@ -2,10 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { Row, Col, Card, List } from 'antd';
 import moment from 'moment';
 import ActiveChart from 'components/ActiveChart';
-import {
-  ChartCard,
-  Field,
-} from 'components/Charts';
+import { ChartCard, Field } from 'components/Charts';
 
 import { getTronPrice } from '../../services/api';
 
@@ -30,7 +27,6 @@ class Monitor extends PureComponent {
 
   loadData = async () => {
     const { Data: tronPriceList = [] } = await getTronPrice();
-
     if (!tronPriceList.length) {
       return;
     }
@@ -63,8 +59,7 @@ class Monitor extends PureComponent {
                 footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
                 contentHeight={46}
               />
-            </Card>					
-
+            </Card>
           </Col>
         </Row>
         <Row gutter={24}>
