@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Row, Col, Card, List } from 'antd';
+import moment from 'moment';
 import ActiveChart from 'components/ActiveChart';
 
 import { getTronPrice } from '../../services/api';
@@ -10,8 +11,8 @@ class Monitor extends PureComponent {
     lastDay: {},
   };
 
-  componentDidMount() {
-    this.loadData();
+  async componentDidMount() {
+    await this.loadData();
   }
 
   getLastDayFromTronPriceList = tronPriceList => {
@@ -31,7 +32,7 @@ class Monitor extends PureComponent {
     }
 
     const tronPriceData = tronPriceList.map(price => ({
-      x: `${price.time}`,
+      x: `${moment.unix(price.time).format('YYYY-MM-DD HH:mm')}`,
       y: price.close,
     }));
 
@@ -60,7 +61,7 @@ class Monitor extends PureComponent {
             <Card title="TOKENS" style={{ marginBottom: 24 }} bordered={false}>
               <List.Item key="..........">
                 <List.Item.Meta
-                  title={<a href="https://ant.design">TRX</a>}
+                  title={<span href="https://getty.io">TRX</span>}
                   description="dio@getty.io"
                 />
                 <div>Content</div>

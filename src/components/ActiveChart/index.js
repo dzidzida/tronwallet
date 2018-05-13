@@ -28,7 +28,7 @@ export default class ActiveChart extends Component {
             borderWidth={2}
             height={84}
             yAxis={{
-              tickLine: false,
+              tickLine: true,
               label: false,
               title: false,
               line: false,
