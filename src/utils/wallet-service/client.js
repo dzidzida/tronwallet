@@ -65,7 +65,8 @@ class ClientWallet {
     const transactionDetail = deserializeTransaction(transaction);
     console.log('TransactionDetail:', transactionDetail);
     return transactionDetail;
-  };
+	};
+	
   // CREATE TOKEN
   async createToken(form) {
     const from = await this.getPublicKey();

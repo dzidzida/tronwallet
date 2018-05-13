@@ -7,24 +7,6 @@ import styles from './UserLayout.less';
 import tronLogo from '../../public/tron-logo.png';
 import { getRoutes } from '../utils/utils';
 
-// const links = [
-//   {
-//     key: 'help',
-//     title: '帮助',
-//     href: '',
-//   },
-//   {
-//     key: 'privacy',
-//     title: '隐私',
-//     href: '',
-//   },
-//   {
-//     key: 'terms',
-//     title: '条款',
-//     href: '',
-//   },
-// ];
-
 const copyright = (
   <Fragment>
     Copyright <Icon type="copyright" /> 2018{' '}
@@ -38,9 +20,9 @@ class UserLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Ant Design Pro';
+    let title = 'TronWallet';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - Ant Design Pro`;
+      title = `${routerData[pathname].name} - TronWallet`;
     }
     return title;
   }
