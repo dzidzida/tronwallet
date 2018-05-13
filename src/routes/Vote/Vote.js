@@ -1,9 +1,47 @@
 import React, { Component } from 'react';
-import { Affix } from 'antd';
+import {
+  Affix,
+  Card,
+  Row,
+  Col,
+  List
+} from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
+
+const Info = ({ title, value, bordered }) => (
+  <div className={styles.headerInfo}>
+    <span>{title}</span>
+    <p>{value}</p>
+    {bordered && <em />}
+  </div>
+);
+
+const ListContent = ({ data: { owner, createdAt, percent, status } }) => (
+  <div className={styles.listContent}>
+    <div className={styles.listContentItem}>
+      <span>Owner</span>
+      <p>{owner}</p>
+    </div>
+    <div className={styles.listContentItem}>
+      <span>开始时间</span>
+      <p>{moment(createdAt).format('YYYY-MM-DD HH:mm')}</p>
+    </div>
+    <div className={styles.listContentItem}>
+      <Progress percent={percent} status={status} strokeWidth={6} style={{ width: 180 }} />
+    </div>
+  </div>
+);
+
+// const MoreBtn = () => (
+//   <Dropdown overlay={menu}>
+//     <a>
+//       更多 <Icon type="down" />
+//     </a>
+//   </Dropdown>
+// );
 
 class Vote extends Component {
   state = {
@@ -140,78 +178,32 @@ class Vote extends Component {
     const { voteList, transaction, voteError, modalVisible } = this.state;
     return (
       <div className={styles.container}>
-        <input
-          className={styles.search}
-          placeholder="Search for address or URL"
-          onChange={this.handleSearch}
-        />
-        <div className={styles.content}>
-          <div className={styles.tableCol}>
-            <div className={styles.divTitle}>Candidates</div>
-            <table className={styles.votes}>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Address</th>
-                  <th>Votes</th>
-                  <th>My Vote</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voteList.map((vote, index) => {
-                  return (
-                    <tr key={vote.address}>
-                      <td>
-                        <b>{index + 1}</b>
-                      </td>
-                      <td>
-                        {vote.address}
-                        <br />
-                        <small>{vote.url}</small>
-                      </td>
-                      <td>
-                        {vote.votes}
-                        <br />
-                        TRX
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          className={styles.vote}
-                          min="0"
-                          onChange={e => this.change(e, vote.address)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          <Affix offsetTop={10} className={styles.voteCol}>
-            <div className={styles.divTitle}>Vote</div>
-            <div className={styles.voteCard}>
-              {this.renderTrxRemaining()}
-              <div className={styles.progress}>{this.renderProgressBar()}</div>
-              {this.renderSubmitButton()}
-              <p>
-                Use your TRX to vote for Super Representatives. For every TRX you hold in your
-                account you have one vote to spend. TRX will not be consumed. You can vote as many
-                times for the several representatives as you like. The votes are tallied once every
-                6 hours and the final election results will be updated at 0:00 AM (0:00) UTC, 6:00
-                AM (6:00) UTC, 12:00 PM (12:00) UTC and 6:00 PM (18:00) UTC, and the list of
-                SuperRepresentatives will be updated.
-              </p>
-            </div>
-            <h3 className={styles.error}>{voteError}</h3>
-          </Affix>
-        </div>
-        <ModalTransaction
-          title="Vote"
-          message="Please, validate your transaction"
-          data={transaction.data}
-          visible={modalVisible}
-          onClose={this.onCloseModal}
+
+        <Card bordered={false}>
+          <Row>
+            <Col sm={8} xs={24}>
+              <Info title="我的待办" value="8个任务" bordered />
+            </Col>
+            <Col sm={8} xs={24}>
+              <Info title="本周任务平均处理时间" value="32分钟" bordered />
+            </Col>
+            <Col sm={8} xs={24}>
+              <Info title="本周完成任务数" value="24个任务" />
+            </Col>
+          </Row>
+        </Card>
+
+
+        <List
+          size="large"
+          rowKey="id"
+          loading={false}
+          dataSource={votes}
+          renderItem={item => (
+            <List.Item >
+              asdasdasasasd
+            </List.Item>
+          )}
         />
       </div>
     );
