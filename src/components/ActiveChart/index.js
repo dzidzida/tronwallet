@@ -20,8 +20,8 @@ export default class ActiveChart extends Component {
 
     return (
       <div className={styles.activeChart}>
-        {lastDay.total && <NumberInfo subTitle="Last 24h" total={`$${lastDay.total}`} />}
-        <div style={{ marginTop: 32 }}>
+        {lastDay.total && <NumberInfo total={`$${lastDay.total}`} />}
+        <div style={{ marginTop: 24 }}>
           <MiniArea
             animate={false}
             line
