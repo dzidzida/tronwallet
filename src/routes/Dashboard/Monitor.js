@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon } from 'antd';
+import { Card, Col, List, Row, Button, Icon, Spin } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -32,6 +32,7 @@ class Monitor extends PureComponent {
     freezeTransaction: '',
     qrcodeVisible: false,
     totalFreeze: 0,
+    loading: true,
   };
 
   async componentDidMount() {
@@ -52,12 +53,29 @@ class Monitor extends PureComponent {
   };
 
   loadData = async () => {
-    const { Data: tronPriceList = [] } = await getTronPrice();
-    const balances = await Client.getBalances();
-    const tronAccount = await Client.getPublicKey();
+    const data = await Promise.all([
+      getTronPrice(),
+      Client.getBalances(),
+      Client.getPublicKey(),
+      Client.getTransactionList(),
+      Client.getFreeze(),
+    ]);
+
+    console.log('DATA::: ', data);
+
+    const { Data: tronPriceList = [] } = data[0];
+    const balances = data[1];
+    const tronAccount = data[2];
     const { balance } = balances.find(b => b.name === 'TRX');
-    const transactionsData = await Client.getTransactionList();
-    const { data: { frozen } } = await Client.getFreeze();
+    const transactionsData = data[3];
+    const { data: { frozen } } = data[4];
+
+    // const { Data: tronPriceList = [] } = await getTronPrice();
+    // const balances = await Client.getBalances();
+    // const tronAccount = await Client.getPublicKey();
+    // const { balance } = balances.find(b => b.name === 'TRX');
+    // const transactionsData = await Client.getTransactionList();
+    // const { data: { frozen } } = await Client.getFreeze();
 
     if (!tronPriceList.length) {
       return;
@@ -78,6 +96,7 @@ class Monitor extends PureComponent {
       tronAccount,
       transactionsData,
       totalFreeze: frozen,
+      loading: false,
     });
   };
 
@@ -176,7 +195,17 @@ class Monitor extends PureComponent {
       freezeTransaction,
       qrcodeVisible,
       totalFreeze,
+      loading,
     } = this.state;
+
+    if (loading) {
+      return (
+        <div className={styles.loading}>
+          <Spin size="large" />
+        </div>
+      );
+    }
+
     return (
       <Fragment>
         <Row gutter={24}>
