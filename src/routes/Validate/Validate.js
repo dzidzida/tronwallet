@@ -4,19 +4,23 @@ import styles from './Validate.less';
 
 export default class Transaction extends Component {
   state = {
-    transaction: 'Wating a transaction',
+    transaction: 'Waiting a transaction',
     result: null,
     error: null,
   };
   componentDidMount() {
     this.loadTransaction();
   }
+
   loadTransaction = async () => {
     const params = new URLSearchParams(this.props.location.search);
     const transaction = params.get('tx');
     try {
       if (transaction) {
         const result = await Client.submitTransaction(transaction);
+        if (!result) {
+          this.setState({ error: 'Transaction not successfull' });
+        }
         this.setState({ result });
       } else {
         throw Error('');
