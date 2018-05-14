@@ -79,16 +79,21 @@ class Monitor extends PureComponent {
       return transactionsData.transactions.map(tr => (
         <List.Item key={tr.timestamp}>
           <div className={styles.itemRow}>
-            <div>
-              <small className={styles.itemFont}>
-                {new Date(tr.timestamp).getHours()} hours ago
-              </small>
-            </div>
-
-            <div className={styles.address}>
-              <small>{tr.transferFromAddress}</small>
-              <small>{tr.transferToAddress}</small>
-            </div>
+            <List.Item.Meta
+              title={
+                <div className={styles.address}>
+                  <small>From: {tr.transferFromAddress}</small>
+                  <small>To: {tr.transferToAddress}</small>
+                </div>
+              }
+              description={
+                <div className={styles.address}>
+                  <small className={styles.itemFont}>
+                    {new Date(tr.timestamp).getHours()} hours ago
+                  </small>
+                </div>
+              }
+            />
 
             <div>
               <small className={styles.itemFont}>
@@ -201,14 +206,14 @@ class Monitor extends PureComponent {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col xl={9} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card title="TOKENS" style={{ marginBottom: 24 }} bordered={false}>
-              {this.renderTokens()}
+          <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+            <Card title="TRANSACTIONS" style={{ marginBottom: 16 }} bordered={false}>
+              {this.renderTransactions()}
             </Card>
           </Col>
-          <Col xl={9} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card title="TRANSACTIONS" style={{ marginBottom: 24 }} bordered={false}>
-              {this.renderTransactions()}
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
+            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
+              {this.renderTokens()}
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
