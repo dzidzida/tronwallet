@@ -12,12 +12,12 @@ class VoteControl extends Component {
   };
 
   state = {
-    isVotting: false,
+    // isVotting: false,
     affix: false,
   };
 
   onStartClick = () => {
-    this.setState({ isVotting: true }, this.props.onStartVote);
+    // this.setState({ isVotting: true }, this.props.onStartVote);
   };
 
   onChangeAffix = affix => this.setState({ affix });
@@ -33,7 +33,12 @@ class VoteControl extends Component {
       );
     }
     return (
-      <Button type="danger" size="large" onClick={onSubmit} disabled={totalTrx === totalRemaining}>
+      <Button
+        type="danger"
+        size="large"
+        onClick={onSubmit}
+        disabled={Number(totalTrx) === Number(totalRemaining)}
+      >
         Submit Votes
       </Button>
     );
@@ -49,7 +54,10 @@ class VoteControl extends Component {
           style={{ width: 300 }}
           actions={[<Button size="large">RESET</Button>, this.renderSubmitButton()]}
         >
-          <Meta title={<h1>{totalRemaining}</h1>} description="Votes Remaining" />
+          <Meta
+            title={<h1>{Number(totalRemaining).toLocaleString()}</h1>}
+            description="Votes Remaining"
+          />
         </Card>
       </Affix>
     );
@@ -62,10 +70,11 @@ class VoteControl extends Component {
   );
 
   render() {
-    const { isVotting } = this.state;
+    // const { isVotting } = this.state;
     return (
       <div className={styles.voteControl}>
-        {isVotting ? this.renderSubmit() : this.renderStart()}
+        {/* {isVotting ? this.renderSubmit() : this.renderStart()} */}
+        {this.renderSubmit()}
       </div>
     );
   }

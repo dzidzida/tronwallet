@@ -10,7 +10,8 @@ import Header from './../../components/Vote/Header';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-import VoteInput from './../../components/Vote/VoteInput';
+// import VoteInput from './../../components/Vote/VoteInput';
+import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -30,7 +31,6 @@ class Vote extends Component {
     totalVotes: 0,
     inVoting: false,
     transaction: '',
-    // value: 0,
     // transaction: {
     //   loading: false,
     //   status: false,
@@ -74,7 +74,8 @@ class Vote extends Component {
     if (!totalVotesWithouFormat) {
       return;
     }
-    const totalVotes = totalVotesWithouFormat.toLocaleString();
+
+    const totalVotes = totalVotesWithouFormat;
     this.setState({ totalVotes });
   };
 
@@ -109,11 +110,9 @@ class Vote extends Component {
 
     try {
       const TransactionData = await Client.voteForWitnesses(votesPrepared);
-      console.log('TransactionData::: ', TransactionData);
       if (!TransactionData) {
         throw Error();
       } else {
-        console.warn(TransactionData);
         this.setState({ modalVisible: true, transaction: TransactionData });
       }
       // TODO
@@ -195,10 +194,6 @@ class Vote extends Component {
       totalTrx,
     } = this.state;
 
-    // const mid = ((10 - 0) / 2).toFixed(5);
-    // const preColor = value >= mid ? '' : 'rgba(0, 0, 0, .45)';
-    // const nextColor = value >= mid ? 'rgba(0, 0, 0, .45)' : '';
-
     return (
       <div className={styles.container}>
         <Card bordered={false}>
@@ -207,7 +202,7 @@ class Vote extends Component {
               <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
             <Col sm={8} xs={24}>
-              <Info title="Total votes" value={totalVotes} />
+              <Info title="Total votes" value={totalVotes.toLocaleString()} />
             </Col>
 
             <Col sm={8} xs={24} bordered={false}>
@@ -239,20 +234,12 @@ class Vote extends Component {
               <List.Item
                 key={item.address}
                 actions={[
-                  <ProgressItem votes={item.votes} total={totalVotes} />,
-                  <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
-                  // <div className={styles.iconWrapper}>
-                  //   <Icon style={{ color: preColor }} className="anticon" type="frown-o" />
-                  //   <Slider
-                  //     {...this.props}
-                  //     onChange={(v) => {
-                  //       console.log('ITEM: ', item);
-                  //       this.onVoteChange(item.address, v);
-                  //     }}
-                  //     value={item.amount}
-                  //   />
-                  //   <Icon style={{ color: nextColor }} type="smile-o" />
-                  // </div>,
+                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />,
+                  <VoteSlider
+                    onVoteChange={v => this.onVoteChange(item.address, v)}
+                    totalRemaining={totalRemaining}
+                  />,
+                  // <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
                 ]}
               >
                 <ListContent index={index + 1} {...item} />
