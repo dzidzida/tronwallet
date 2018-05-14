@@ -164,12 +164,6 @@ const menuData = [
     children: [],
   },
   {
-    name: 'account',
-    icon: 'user',
-    path: 'account',
-    children: [],
-  },
-  {
     name: 'send',
     icon: 'form',
     path: 'send',

@@ -20,7 +20,6 @@ class Send extends Component {
   };
 
   componentDidMount() {
-    console.log('dsadasdsad');
     this.loadBalances();
   }
 
@@ -30,7 +29,6 @@ class Send extends Component {
 
   loadBalances = async () => {
     const balances = await Client.getBalances();
-    console.log('AQUI AQUI:::: ', balances);
     this.setState({ balances, token: balances[0].name || '' });
   };
 
