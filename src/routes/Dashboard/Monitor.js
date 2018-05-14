@@ -6,11 +6,17 @@ import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
+import {
+  buildFreezeBalance,
+  buildUnfreezeBalance,
+} from '../../utils/wallet-service/utils/transaction';
+import { byteArray2hexStr } from '../../utils/wallet-service/utils/bytes';
+import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 class Monitor extends PureComponent {
   state = {
@@ -23,6 +29,9 @@ class Monitor extends PureComponent {
     modalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
+    freezeTransaction: '',
+    qrcodeVisible: false,
+    totalFreeze: 0,
   };
 
   async componentDidMount() {
@@ -31,7 +40,7 @@ class Monitor extends PureComponent {
 
   onOpenModal = () => this.setState({ modalVisible: true });
 
-  onCloseModal = () => this.setState({ modalVisible: false });
+  onCloseModal = () => this.setState({ modalVisible: false, qrcodeVisible: false });
 
   getLastDayFromTronPriceList = tronPriceList => {
     const lastTronPrice = tronPriceList[tronPriceList.length - 1];
@@ -48,6 +57,7 @@ class Monitor extends PureComponent {
     const tronAccount = await Client.getPublicKey();
     const { balance } = balances.find(b => b.name === 'TRX');
     const transactionsData = await Client.getTransactionList();
+    const { data: { frozen } } = await Client.getFreeze();
 
     if (!tronPriceList.length) {
       return;
@@ -60,11 +70,49 @@ class Monitor extends PureComponent {
 
     const lastDay = this.getLastDayFromTronPriceList(tronPriceList);
 
-    this.setState({ tronPriceData, lastDay, balance, balances, tronAccount, transactionsData });
+    this.setState({
+      tronPriceData,
+      lastDay,
+      balance,
+      balances,
+      tronAccount,
+      transactionsData,
+      totalFreeze: frozen,
+    });
   };
 
   formatBalance = balance => {
     return Number(balance).toLocaleString('en', {});
+  };
+
+  handleFreeze = async amount => {
+    const tronAccount = await Client.getPublicKey();
+    const transaction = buildFreezeBalance(tronAccount, amount * ONE_TRX, 3);
+    const transactionBytes = transaction.serializeBinary();
+    const transactionString = byteArray2hexStr(transactionBytes);
+
+    if (transactionString) {
+      this.setState({
+        freezeTransaction: transactionString,
+        qrcodeVisible: true,
+        freezeModalVisible: false,
+      });
+    }
+  };
+
+  handleUnfreeze = async () => {
+    const tronAccount = await Client.getPublicKey();
+    const transaction = buildUnfreezeBalance(tronAccount);
+    const transactionBytes = transaction.serializeBinary();
+    const transactionString = byteArray2hexStr(transactionBytes);
+
+    if (transactionString) {
+      this.setState({
+        freezeTransaction: transactionString,
+        qrcodeVisible: true,
+        unFreezeModalVisible: false,
+      });
+    }
   };
 
   renderTokens = () => {
@@ -112,7 +160,18 @@ class Monitor extends PureComponent {
   };
 
   render() {
-    const { tronPriceData, lastDay, balance, tronAccount, modalVisible, freezeModalVisible, unFreezeModalVisible } = this.state;
+    const {
+      tronPriceData,
+      lastDay,
+      balance,
+      tronAccount,
+      modalVisible,
+      freezeModalVisible,
+      unFreezeModalVisible,
+      freezeTransaction,
+      qrcodeVisible,
+      totalFreeze,
+    } = this.state;
     return (
       <Fragment>
         <Row gutter={24}>
@@ -122,7 +181,9 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 24 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={tronPriceData.length ? tronPriceData[tronPriceData.length - 1].y : ''}>
+                <CopyToClipboard
+                  text={tronPriceData.length ? tronPriceData[tronPriceData.length - 1].y : ''}
+                >
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
               }
@@ -180,10 +241,17 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Amount"
-                total={199}
+                total={this.formatBalance(totalFreeze.total)}
                 contentHeight={46}
                 footer={
-                  <Field label="Expires" value={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />
+                  totalFreeze.balances ? (
+                    <Field
+                      label="Expires"
+                      value={moment(new Date(totalFreeze.balances[0].expires)).format(
+                        'DD-MM-YYYY HH:mm:ss'
+                      )}
+                    />
+                  ) : null
                 }
               />
             </Card>
@@ -242,8 +310,23 @@ class Monitor extends PureComponent {
           </Col>
         </Row>
         <SetPkModal visible={modalVisible} onClose={this.onCloseModal} />
-        <FreezeModal visible={freezeModalVisible} onClose={() => this.setState({ freezeModalVisible: false })} />
-        <UnfreezeModal visible={unFreezeModalVisible} onClose={() => this.setState({ unFreezeModalVisible: false })} />
+        <FreezeModal
+          visible={freezeModalVisible}
+          onClose={() => this.setState({ freezeModalVisible: false })}
+          onOk={this.handleFreeze}
+        />
+        <UnfreezeModal
+          visible={unFreezeModalVisible}
+          onClose={() => this.setState({ unFreezeModalVisible: false })}
+          onOk={this.handleUnfreeze}
+        />
+        <ModalTransaction
+          title="Freeze amount"
+          message="Please, validate your transaction"
+          data={freezeTransaction}
+          visible={qrcodeVisible}
+          onClose={this.onCloseModal}
+        />
       </Fragment>
     );
   }

@@ -192,6 +192,14 @@ class ClientWallet {
     obj.transactions = data.data;
     return obj;
   }
+
+  async getFreeze() {
+    const owner = await this.getPublicKey();
+    const obj = { owner };
+    const { data } = await axios.get(`${this.api}/account/${owner}/balance`);
+    obj.data = data;
+    return obj;
+  }
 }
 
 export default new ClientWallet();

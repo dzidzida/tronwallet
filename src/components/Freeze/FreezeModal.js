@@ -14,10 +14,10 @@ class FreezeModal extends Component {
   };
 
   render() {
-    const { visible, onClose } = this.props;
+    const { visible, onClose, onOk } = this.props;
     const { amount, terms } = this.state;
     const footerButton = (
-      <button className={styles.button} disabled={!terms} onClick={() => {}}>
+      <button className={styles.button} disabled={!terms} onClick={() => onOk(amount)}>
         FREEZE BALANCE
       </button>
     );
