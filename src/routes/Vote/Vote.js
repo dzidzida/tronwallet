@@ -46,8 +46,16 @@ class Vote extends Component {
     this.onLoadTotalVotes();
   }
 
-  onVoteChange = (id, value) => {
-    console.log('vote', id, value);
+  onVoteChange = (address, value) => {
+    const { voteList, totalTrx } = this.state;
+    // const { value } = e.target;
+    voteList.find(v => v.address === address).amount = value;
+    this.setState({ voteList }, () => {
+      const totalVotes = this.state.voteList.reduce((prev, vote) => {
+        return Number(prev) + Number(vote.amount || 0);
+      }, 0);
+      this.setState({ totalRemaining: totalTrx - totalVotes });
+    });
   };
 
   onLoadWitness = async () => {
@@ -89,18 +97,6 @@ class Vote extends Component {
     this.setState({ inVoting: true });
   };
 
-  change = (e, address) => {
-    const { voteList, totalTrx } = this.state;
-    const { value } = e.target;
-    voteList.find(v => v.address === address).amount = value;
-    this.setState({ voteList }, () => {
-      const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount || 0);
-      }, 0);
-      this.setState({ totalRemaining: totalTrx - totalVotes });
-    });
-  };
-
   submit = async () => {
     const { voteList, transaction } = this.state;
     const votesPrepared = [];
@@ -110,8 +106,12 @@ class Vote extends Component {
         votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
       }
     });
+
+    console.log('votesPrepared:: ', votesPrepared);
+
     try {
       const TransactionData = await Client.voteForWitnesses(votesPrepared);
+      console.log('TransactionData::: ', TransactionData);
       if (!TransactionData) {
         throw Error();
       } else {
@@ -198,6 +198,7 @@ class Vote extends Component {
       inVoting,
       totalTrx,
     } = this.state;
+
     return (
       <div className={styles.container}>
         <Card bordered={false}>
@@ -241,7 +242,7 @@ class Vote extends Component {
                   <ProgressItem votes={item.votes} total={totalVotes} />,
                   <VoteInput
                     show={inVoting}
-                    onChange={value => this.onVoteChange(item.id, value)}
+                    onChange={value => this.onVoteChange(item.address, value)}
                   />,
                 ]}
               >
