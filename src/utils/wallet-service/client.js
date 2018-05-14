@@ -1,24 +1,32 @@
+/* eslint-disable*/
 import axios from 'axios';
 import qs from 'qs';
 // import { buildApplyForDelegate } from "./utils/transaction";
-// const longToByteArray = require("./utils/bytes").longToByteArray;
 // const hexStr2byteArray = require("./lib/code").hexStr2byteArray;
-import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './utils/bytes';
+import {
+  base64DecodeFromString,
+  byteArray2hexStr,
+  bytesToString,
+  longToByteArray,
+} from './utils/bytes';
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
-import { stringToBytes } from './lib/code';
+import { stringToBytes, hexStr2byteArray } from './lib/code';
 import { getBase58CheckAddress } from './utils/crypto';
 import deserializeTransaction from './protocol/serializer';
 import { getUserAttributes } from '../../services/api';
-
+import { HttpClient } from '@tronprotocol/wallet-api';
+import { buildVote } from './utils/transaction';
+console.log('buildVote: ', buildVote);
 const TRON_URL = 'https://tronscan.io';
+const Client = new HttpClient();
 
 export const ONE_TRX = 1000000;
 
 class ClientWallet {
   constructor(opt = null) {
     this.url = opt || TRON_URL;
-    this.api = 'https://api.tronscan.org/api'
+    this.api = 'https://api.tronscan.org/api';
   }
 
   // SEND TRANSACTION
@@ -53,7 +61,7 @@ class ClientWallet {
   getPublicKey = async () => {
     const userAttr = await getUserAttributes();
     return userAttr['custom:publickey'];
-  }
+  };
 
   getTransactionDetails = async data => {
     let transaction;
@@ -65,8 +73,8 @@ class ClientWallet {
     }
     const transactionDetail = deserializeTransaction(transaction);
     return transactionDetail;
-	};
-	
+  };
+
   // CREATE TOKEN
   async createToken(form) {
     const from = await this.getPublicKey();
@@ -123,16 +131,6 @@ class ClientWallet {
     });
   }
 
-  async voteForWitnesses(votes) {
-    const owner = await this.getPublicKey();
-    const { data } = await axios.post(`${this.url}/createVoteWitnessToView`, {
-      owner,
-      list: votes,
-    });
-    await this.getTransactionDetails(data);
-    return data;
-  }
-
   async getBalances() {
     const owner = await this.getPublicKey();
     const { data } = await axios.post(
@@ -178,20 +176,45 @@ class ClientWallet {
   }
 
   async submitTransaction(tx) {
-    const { data } = await axios.post(`${this.url}/transactionFromView`, qs.stringify({
-      transactionData: tx,
-    }));
+    const { data } = await axios.post(
+      `${this.url}/transactionFromView`,
+      qs.stringify({
+        transactionData: tx,
+      })
+    );
 
     return data;
   }
 
-  async getTransactionList () {
+  async getTransactionList() {
     const owner = await this.getPublicKey();
     const obj = { owner };
-    const { data } = await axios.get(`${this.api}/transaction?sort=-timestamp&limit=50&address=${owner}`);
+    const { data } = await axios.get(
+      `${this.api}/transaction?sort=-timestamp&limit=50&address=${owner}`
+    );
     obj.transactions = data.data;
     return obj;
   }
+
+  addRef = async transaction => {
+    const latestBlock = await this.getLatestBlock();
+
+    const latestBlockHash = latestBlock.hash;
+    const latestBlockNum = latestBlock.number;
+
+    const numBytes = longToByteArray(latestBlockNum);
+    numBytes.reverse();
+    const hashBytes = hexStr2byteArray(latestBlockHash);
+
+    const generateBlockId = [...numBytes.slice(0, 8), ...hashBytes.slice(8, hashBytes.length - 1)];
+
+    const rawData = transaction.getRawData();
+    rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
+    rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
+
+    transaction.setRawData(rawData);
+    return transaction;
+  };
 
   async getFreeze() {
     const owner = await this.getPublicKey();
@@ -199,6 +222,20 @@ class ClientWallet {
     const { data } = await axios.get(`${this.api}/account/${owner}/balance`);
     obj.data = data;
     return obj;
+  }
+
+  async voteForWitnesses(votes) {
+    try {
+      const owner = await this.getPublicKey();
+      let transaction = buildVote(owner, votes);
+      transaction = await Client.addRef(transaction);
+      const transactionBytes = transaction.serializeBinary();
+      const transactionString = byteArray2hexStr(transactionBytes);
+      console.warn(transactionString);
+      return transactionString;
+    } catch (error) {
+      console.warn(error);
+    }
   }
 }
 

@@ -1,20 +1,34 @@
-/* eslint-disable */
-const decode58Check = require('./crypto').decode58Check;
-
-const { Transaction } = require('../protocol/core/Tron_pb');
-const google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
+/*eslint-disable*/
+import { decode58Check } from '@tronprotocol/wallet-api/src/utils/crypto';
+import { keys } from 'lodash';
 const {
+  Block,
+  Transaction,
+  Account,
+} = require('@tronprotocol/wallet-api/src/protocol/core/Tron_pb');
+const base64DecodeFromString = require('@tronprotocol/wallet-api/src/lib/code')
+  .base64DecodeFromString;
+const google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
+
+const {
+  TransferContract,
+  TransferAssetContract,
+  AccountUpdateContract,
+  VoteWitnessContract,
+  ParticipateAssetIssueContract,
+  AssetIssueContract,
   FreezeBalanceContract,
   UnfreezeBalanceContract,
+  WitnessUpdateContract,
+  WithdrawBalanceContract,
   WitnessCreateContract,
-} = require('../protocol/core/Contract_pb');
-const base64DecodeFromString = require('../lib/code').base64DecodeFromString;
+} = require('@tronprotocol/wallet-api/src/protocol/core/Contract_pb');
 
-function encodeString(str) {
+export function encodeString(str) {
   return Uint8Array.from(base64DecodeFromString(btoa(str)));
 }
 
-function buildTransferContract(message, contractType, typeName) {
+export function buildTransferContract(message, contractType, typeName) {
   var anyValue = new google_protobuf_any_pb.Any();
   anyValue.pack(message.serializeBinary(), 'protocol.' + typeName);
 
@@ -32,6 +46,137 @@ function buildTransferContract(message, contractType, typeName) {
   return transaction;
 }
 
+export function buildTransferTransaction(token, from, to, amount) {
+  if (token.toUpperCase() === 'TRX') {
+    let transferContract = new TransferContract();
+    transferContract.setToAddress(Uint8Array.from(decode58Check(to)));
+    transferContract.setOwnerAddress(Uint8Array.from(decode58Check(from)));
+    transferContract.setAmount(amount);
+
+    return buildTransferContract(
+      transferContract,
+      Transaction.Contract.ContractType.TRANSFERCONTRACT,
+      'TransferContract'
+    );
+  } else {
+    let transferContract = new TransferAssetContract();
+    transferContract.setToAddress(Uint8Array.from(decode58Check(to)));
+    transferContract.setOwnerAddress(Uint8Array.from(decode58Check(from)));
+    transferContract.setAmount(amount);
+    transferContract.setAssetName(encodeString(token));
+
+    return buildTransferContract(
+      transferContract,
+      Transaction.Contract.ContractType.TRANSFERASSETCONTRACT,
+      'TransferAssetContract'
+    );
+  }
+}
+
+export function buildAccountUpdate(address, name) {
+  let contract = new AccountUpdateContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+  contract.setAccountName(encodeString(name));
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.ACCOUNTUPDATECONTRACT,
+    'AccountUpdateContract'
+  );
+}
+
+export function buildWitnessCreate(address, url) {
+  let contract = new WitnessCreateContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+  contract.setUrl(encodeString(url));
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.WITNESSCREATECONTRACT,
+    'WitnessCreateContract'
+  );
+}
+
+export function buildWitnessUpdate(address, url) {
+  let contract = new WitnessUpdateContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+  contract.setUpdateUrl(encodeString(url));
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.WITNESSUPDATECONTRACT,
+    'WitnessUpdateContract'
+  );
+}
+
+export function buildWithdrawBalance(address) {
+  let contract = new WithdrawBalanceContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.WITHDRAWBALANCECONTRACT,
+    'WithdrawBalanceContract'
+  );
+}
+
+export function buildVote(address, votes) {
+  let contract = new VoteWitnessContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+
+  const _keys = Object.keys(votes);
+  _keys.forEach(address => {
+    let vote = new VoteWitnessContract.Vote();
+    vote.setVoteAddress(Uint8Array.from(decode58Check(address)));
+    let numberOfVotes = parseInt(votes[address]);
+    if (isNaN(numberOfVotes) || numberOfVotes <= 0) {
+      return;
+    }
+    vote.setVoteCount(numberOfVotes);
+    contract.addVotes(vote);
+  });
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.VOTEWITNESSCONTRACT,
+    'VoteWitnessContract'
+  );
+}
+
+export function buildAssetParticipate(address, issuerAddress, token, amount) {
+  var contract = new ParticipateAssetIssueContract();
+
+  contract.setToAddress(Uint8Array.from(decode58Check(issuerAddress)));
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
+  contract.setAssetName(encodeString(token));
+  contract.setAmount(amount);
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.PARTICIPATEASSETISSUECONTRACT,
+    'ParticipateAssetIssueContract'
+  );
+}
+
+export function buildAssetIssue(options) {
+  var contract = new AssetIssueContract();
+  contract.setOwnerAddress(Uint8Array.from(decode58Check(options.address)));
+  contract.setName(encodeString(options.name));
+  contract.setTotalSupply(options.totalSupply);
+  contract.setNum(options.num);
+  contract.setEndTime(Date.parse(options.endTime));
+  contract.setStartTime(Date.parse(options.startTime));
+  contract.setTrxNum(options.trxNum);
+  contract.setDescription(encodeString(options.description));
+  contract.setUrl(encodeString(options.url));
+
+  return buildTransferContract(
+    contract,
+    Transaction.Contract.ContractType.ASSETISSUECONTRACT,
+    'AssetIssueContract'
+  );
+}
+
 /**
  * Freeze balance
  *
@@ -39,7 +184,7 @@ function buildTransferContract(message, contractType, typeName) {
  * @param amount The amount of TRX to freeze
  * @param duration Duration in days
  */
-function buildFreezeBalance(address, amount, duration) {
+export function buildFreezeBalance(address, amount, duration) {
   var contract = new FreezeBalanceContract();
 
   contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
@@ -58,7 +203,7 @@ function buildFreezeBalance(address, amount, duration) {
  *
  * @param address From which address to freze
  */
-function buildUnfreezeBalance(address) {
+export function buildUnfreezeBalance(address) {
   var contract = new UnfreezeBalanceContract();
 
   contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
@@ -70,27 +215,14 @@ function buildUnfreezeBalance(address) {
   );
 }
 
-/**
- * Unfreeze balance
- *
- * @param address From which address to freze
- * @param url url
- */
-function buildApplyForDelegate(address, url) {
-  var contract = new WitnessCreateContract();
-
-  contract.setOwnerAddress(Uint8Array.from(decode58Check(address)));
-  contract.setUrl(encodeString(url));
-
-  return buildTransferContract(
-    contract,
-    Transaction.Contract.ContractType.WITNESSCREATECONTRACT,
-    'WitnessCreateContract'
-  );
-}
-
-module.exports = {
-  buildFreezeBalance,
-  buildUnfreezeBalance,
-  buildApplyForDelegate,
-};
+// export default {
+//   buildTransferTransaction,
+//   buildAccountUpdate,
+//   buildAssetParticipate,
+//   buildFreezeBalance,
+//   buildUnfreezeBalance,
+//   buildAssetIssue,
+//   buildWitnessUpdate,
+//   buildWithdrawBalance,
+//   buildWitnessCreate,
+// };
