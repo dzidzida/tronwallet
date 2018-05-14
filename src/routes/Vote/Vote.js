@@ -5,15 +5,19 @@ import {
   Row,
   Col,
   List,
-  Progress
 } from 'antd';
 
-import moment from 'moment';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
+import Header from './../../components/Vote/Header';
+import ListContent from './../../components/Vote/ListContent';
+import ProgressItem from './../../components/Vote/ProgessItem';
+import VoteControl from './../../components/Vote/VoteControl';
+import VoteInput from './../../components/Vote/VoteInput';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -23,49 +27,6 @@ const Info = ({ title, value, bordered }) => (
   </div>
 );
 
-const ListContent = ({ index, url, address }) => (
-  <div className={styles.actionContainer}>
-    <Row>
-      <Col xs={4}>
-        <ItemIndex index={index} />
-      </Col>
-      <Col sm={8} xs={24}>
-        <List.Item.Meta
-          title={<a href="#">{url}</a>}
-          description={address}
-        />
-      </Col>
-    </Row>
-  </div>
-);
-
-const ItemIndex = ({ index }) => (
-  <div className={styles.itemIndex}>
-    <strong>#{index}</strong>
-  </div>
-);
-
-const Header = () => (
-  <div className={styles.header}>
-    <Row>
-      <Col xs={1}>#</Col>
-      <Col xs={20}>
-        <span className={styles.textLeft}>URL</span>
-      </Col>
-    </Row>
-  </div>
-);
-
-const ProgressItem = (props) => {
-  // const votesPrecent = ((votes.total_votes / props.votes) * 100);
-  const percent = Math.floor((props.votes * 100) / votes.total_votes);
-  return (
-    <div className={styles.actionContainer}>
-      <strong>{props.votes}</strong>
-      <Progress percent={percent} status="active" />
-    </div>
-  )
-}
 
 class Vote extends Component {
   state = {
@@ -74,6 +35,7 @@ class Vote extends Component {
     totalRemaining: 0,
     endTime: null,
     totalVotes: 0,
+    inVoting: false,
     transaction: {
       loading: false,
       status: false,
@@ -88,6 +50,10 @@ class Vote extends Component {
     this.onLoadAvailable();
     this.onLoadEndTime();
     this.onLoadTotalVotes();
+  }
+
+  onVoteChange = (id, value) => {
+    console.log("vote", id, value);
   }
 
   onLoadWitness = async () => {
@@ -177,6 +143,10 @@ class Vote extends Component {
     });
   };
 
+  onStartVote = () => {
+    this.setState({ inVoting: true });
+  }
+
   handleBack = () => {
     const { transaction } = this.state;
     this.setState({ transaction: { ...transaction, status: false, qrcode: '' } });
@@ -220,20 +190,28 @@ class Vote extends Component {
     }
     return <div className={styles.progressBar} style={{ width: `${percent}%` }} />;
   };
-
   // #endregion
 
   render() {
-    const { voteList, transaction, voteError, modalVisible, endTime, totalVotes } = this.state;
+    const { voteList, transaction, voteError, modalVisible, endTime, totalVotes, totalRemaining, inVoting, totalTrx } = this.state;
     return (
       <div className={styles.container}>
         <Card bordered={false}>
-          <Row className={styles.blockSeparator}>
+          <Row className={styles.blockSeparator} type="flex" align="middle">
             <Col sm={8} xs={24}>
-              <CowntDownInfo title="Vote cycle ends in" endTime={endTime} bordered />
+              <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
             <Col sm={8} xs={24}>
-              <Info title="Total votes" value={totalVotes} bordered />
+              <Info title="Total votes" value={totalVotes} />
+            </Col>
+
+            <Col sm={8} xs={24} bordered={false}>
+              <VoteControl
+                totalRemaining={totalRemaining}
+                onStartVote={this.onStartVote}
+                totalTrx={totalTrx}
+                onSubmit={this.submit}
+              />
             </Col>
           </Row>
         </Card>
@@ -250,18 +228,27 @@ class Vote extends Component {
             loading={false}
             size="large"
             dataSource={voteList}
-            header={<Header />}
+            header={<Header inVoting={inVoting} />}
             renderItem={(item, index) => (
               <List.Item
                 key={item.id}
-                actions={[<ProgressItem votes={item.votes} />]}
+                actions={[
+                  <ProgressItem votes={item.votes} total={totalVotes} />,
+                  <VoteInput show={inVoting} onChange={(value) => this.onVoteChange(item.id, value)} />,
+                ]}
               >
                 <ListContent index={index + 1} {...item} />
               </List.Item>
             )}
           />
         </Card>
-
+        <ModalTransaction
+          title="Vote"
+          message="Please, validate your transaction"
+          data={transaction.data}
+          visible={modalVisible}
+          onClose={this.onCloseModal}
+        />
       </div>
     );
   }
