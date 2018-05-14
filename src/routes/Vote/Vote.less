@@ -211,6 +211,27 @@ button:disabled {
   cursor: default;
 }
 
+.blockSeparator {
+  div {
+    border-right: 1px solid #e8e8e8;
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
+.headerInfo {
+  text-align: center;
+  span {
+    color: rgba(0,0,0,.45);
+  }
+  p {
+    color: rgba(0,0,0,.85);
+    font-size: 1.8rem;
+    margin-bottom: 0;
+  }
+}
+
 @media (max-width: 800px) {
   .content {
     flex-direction: column;
@@ -219,4 +240,18 @@ button:disabled {
     width: 100%;
     margin: 0 auto;
   }
+}
+
+
+.textLeft {
+  text-align: left;
+}
+
+.header {
+  padding: 0 10px;
+}
+
+.actionContainer {
+  padding: 10px;
+  min-width: 200px;
 }

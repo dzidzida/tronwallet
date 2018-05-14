@@ -1,4 +1,7 @@
-[
+{
+  "total_votes": 13953075050,
+  "end_time": 1526342387970,
+  "data": [
   {
     "id": "1",
     "address": "27cLJRHL9mb9fvAi4e7vUrArqGXSyafn4eN",
@@ -63,3 +66,4 @@
     "amount": 0
   }
 ]
+}

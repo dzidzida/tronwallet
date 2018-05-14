@@ -1,15 +1,35 @@
 import React, { Component } from 'react';
-import { Affix } from 'antd';
+import { Card, Row, Col, List } from 'antd';
+
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
+import CowntDownInfo from './CowntDownInfo';
+import Header from './../../components/Vote/Header';
+import ListContent from './../../components/Vote/ListContent';
+import ProgressItem from './../../components/Vote/ProgessItem';
+import VoteControl from './../../components/Vote/VoteControl';
+import VoteInput from './../../components/Vote/VoteInput';
+
+const Info = ({ title, value, bordered }) => (
+  <div className={styles.headerInfo}>
+    <span>{title}</span>
+    <p>{value}</p>
+    {bordered && <em />}
+  </div>
+);
 
 class Vote extends Component {
   state = {
+    voteError: undefined,
     voteList: [],
     totalTrx: 0,
     totalRemaining: 0,
+    endTime: null,
+    totalVotes: 0,
+    inVoting: false,
     transaction: {
       loading: false,
       status: false,
@@ -18,10 +38,17 @@ class Vote extends Component {
     },
   };
 
+  // #region logic
   componentDidMount() {
     this.onLoadWitness();
     this.onLoadAvailable();
+    this.onLoadEndTime();
+    this.onLoadTotalVotes();
   }
+
+  onVoteChange = (id, value) => {
+    console.log('vote', id, value);
+  };
 
   onLoadWitness = async () => {
     const voteList = await Client.getWitnesses();
@@ -36,22 +63,42 @@ class Vote extends Component {
     this.setState({ totalTrx, totalRemaining: totalTrx });
   };
 
+  onLoadEndTime = async () => {
+    const endTimeInMilis = votes.end_time;
+    if (!endTimeInMilis) {
+      return;
+    }
+    const endTime = new Date(endTimeInMilis);
+    this.setState({ endTime });
+  };
+
+  onLoadTotalVotes = async () => {
+    const totalVotesWithouFormat = +votes.total_votes;
+    if (!totalVotesWithouFormat) {
+      return;
+    }
+    const totalVotes = totalVotesWithouFormat.toLocaleString();
+    this.setState({ totalVotes });
+  };
+
   onCloseModal = () => {
     this.setState({ modalVisible: false });
   };
 
-  handleSearch = e => {
+  onStartVote = () => {
+    this.setState({ inVoting: true });
+  };
+
+  change = (e, address) => {
+    const { voteList, totalTrx } = this.state;
     const { value } = e.target;
-    const { voteList } = this.state;
-    if (value) {
-      const regex = new RegExp(value, 'i');
-      const votesFilter = voteList.filter(vote => {
-        return vote.address.match(regex) || vote.url.match(regex);
-      });
-      this.setState({ voteList: votesFilter });
-    } else {
-      this.setState({ voteList: votes });
-    }
+    voteList.find(v => v.address === address).amount = value;
+    this.setState({ voteList }, () => {
+      const totalVotes = this.state.voteList.reduce((prev, vote) => {
+        return Number(prev) + Number(vote.amount || 0);
+      }, 0);
+      this.setState({ totalRemaining: totalTrx - totalVotes });
+    });
   };
 
   submit = async () => {
@@ -80,16 +127,18 @@ class Vote extends Component {
     }
   };
 
-  change = (e, address) => {
-    const { voteList, totalTrx } = this.state;
+  handleSearch = e => {
     const { value } = e.target;
-    voteList.find(v => v.address === address).amount = value;
-    this.setState({ voteList }, () => {
-      const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount || 0);
-      }, 0);
-      this.setState({ totalRemaining: totalTrx - totalVotes });
-    });
+    const { voteList } = this.state;
+    if (value) {
+      const regex = new RegExp(value, 'i');
+      const votesFilter = voteList.filter(vote => {
+        return vote.address.match(regex) || vote.url.match(regex);
+      });
+      this.setState({ voteList: votesFilter });
+    } else {
+      this.setState({ voteList: votes });
+    }
   };
 
   handleBack = () => {
@@ -135,77 +184,72 @@ class Vote extends Component {
     }
     return <div className={styles.progressBar} style={{ width: `${percent}%` }} />;
   };
+  // #endregion
 
   render() {
-    const { voteList, transaction, voteError, modalVisible } = this.state;
+    const {
+      voteList,
+      transaction,
+      voteError,
+      modalVisible,
+      endTime,
+      totalVotes,
+      totalRemaining,
+      inVoting,
+      totalTrx,
+    } = this.state;
     return (
       <div className={styles.container}>
-        <input
-          className={styles.search}
-          placeholder="Search for address or URL"
-          onChange={this.handleSearch}
-        />
-        <div className={styles.content}>
-          <div className={styles.tableCol}>
-            <div className={styles.divTitle}>Candidates</div>
-            <table className={styles.votes}>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Address</th>
-                  <th>Votes</th>
-                  <th>My Vote</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voteList.map((vote, index) => {
-                  return (
-                    <tr key={vote.address}>
-                      <td>
-                        <b>{index + 1}</b>
-                      </td>
-                      <td>
-                        {vote.address}
-                        <br />
-                        <small>{vote.url}</small>
-                      </td>
-                      <td>
-                        {vote.votes}
-                        <br />
-                        TRX
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          className={styles.vote}
-                          min="0"
-                          onChange={e => this.change(e, vote.address)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          <Affix offsetTop={10} className={styles.voteCol}>
-            <div className={styles.divTitle}>Vote</div>
-            <div className={styles.voteCard}>
-              {this.renderTrxRemaining()}
-              <div className={styles.progress}>{this.renderProgressBar()}</div>
-              {this.renderSubmitButton()}
-              <p>
-                Use your TRX to vote for Super Representatives. For every TRX you hold in your
-                account you have one vote to spend. TRX will not be consumed. You can vote as many
-                times for the several representatives as you like. The votes are tallied once every
-                6 hours and the final election results will be updated at 0:00 AM (0:00) UTC, 6:00
-                AM (6:00) UTC, 12:00 PM (12:00) UTC and 6:00 PM (18:00) UTC, and the list of
-                SuperRepresentatives will be updated.
-              </p>
-            </div>
-            <h3 className={styles.error}>{voteError}</h3>
-          </Affix>
-        </div>
+        <Card bordered={false}>
+          <Row className={styles.blockSeparator} type="flex" align="middle">
+            <Col sm={8} xs={24}>
+              <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
+            </Col>
+            <Col sm={8} xs={24}>
+              <Info title="Total votes" value={totalVotes} />
+            </Col>
+
+            <Col sm={8} xs={24} bordered={false}>
+              <VoteControl
+                totalRemaining={totalRemaining}
+                onStartVote={this.onStartVote}
+                totalTrx={totalTrx}
+                onSubmit={this.submit}
+              />
+            </Col>
+          </Row>
+        </Card>
+
+        <Card
+          className={styles.listCard}
+          title="VOTES"
+          style={{ marginTop: 24 }}
+          bodyStyle={{ padding: '0 0px 40px 0px' }}
+          loading={transaction.status}
+        >
+          <p>{voteError}</p>
+          <List
+            rowKey="id"
+            loading={false}
+            size="large"
+            dataSource={voteList}
+            header={<Header inVoting={inVoting} />}
+            renderItem={(item, index) => (
+              <List.Item
+                key={item.id}
+                actions={[
+                  <ProgressItem votes={item.votes} total={totalVotes} />,
+                  <VoteInput
+                    show={inVoting}
+                    onChange={value => this.onVoteChange(item.id, value)}
+                  />,
+                ]}
+              >
+                <ListContent index={index + 1} {...item} />
+              </List.Item>
+            )}
+          />
+        </Card>
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
