@@ -5,6 +5,7 @@ import groupBy from 'lodash/groupBy';
 import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
 import tronLogo from '../../../public/tron-logo2.jpg';
+import tronLogoDark from '../../../public/favicon.png';
 // import NoticeIcon from '../NoticeIcon';
 // import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
@@ -79,7 +80,7 @@ export default class GlobalHeader extends PureComponent {
       <div className={styles.header}>
         {isMobile && [
           <Link to="/" className={styles.logo} key="logo">
-            <img src={logo} alt="logo" width="32" />
+            <img src={tronLogoDark} alt="logo" width="32" />
           </Link>,
           <Divider type="vertical" key="line" />,
         ]}
