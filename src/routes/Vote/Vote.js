@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Card, Row, Col, List } from 'antd';
-
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -11,7 +10,8 @@ import Header from './../../components/Vote/Header';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-import VoteInput from './../../components/Vote/VoteInput';
+// import VoteInput from './../../components/Vote/VoteInput';
+import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -30,12 +30,13 @@ class Vote extends Component {
     endTime: null,
     totalVotes: 0,
     inVoting: false,
-    transaction: {
-      loading: false,
-      status: false,
-      qrcode: null,
-      error: null,
-    },
+    transaction: '',
+    // transaction: {
+    //   loading: false,
+    //   status: false,
+    //   qrcode: null,
+    //   error: null,
+    // },
   };
 
   // #region logic
@@ -45,10 +46,6 @@ class Vote extends Component {
     this.onLoadEndTime();
     this.onLoadTotalVotes();
   }
-
-  onVoteChange = (id, value) => {
-    console.log('vote', id, value);
-  };
 
   onLoadWitness = async () => {
     const voteList = await Client.getWitnesses();
@@ -77,7 +74,8 @@ class Vote extends Component {
     if (!totalVotesWithouFormat) {
       return;
     }
-    const totalVotes = totalVotesWithouFormat.toLocaleString();
+
+    const totalVotes = totalVotesWithouFormat;
     this.setState({ totalVotes });
   };
 
@@ -89,9 +87,8 @@ class Vote extends Component {
     this.setState({ inVoting: true });
   };
 
-  change = (e, address) => {
+  onVoteChange = (address, value) => {
     const { voteList, totalTrx } = this.state;
-    const { value } = e.target;
     voteList.find(v => v.address === address).amount = value;
     this.setState({ voteList }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
@@ -102,23 +99,21 @@ class Vote extends Component {
   };
 
   submit = async () => {
-    const { voteList, transaction } = this.state;
-    const votesPrepared = [];
-    this.setState({ transaction: { ...transaction, loading: true } });
+    const { voteList } = this.state;
+    const votesPrepared = {};
     voteList.forEach(vote => {
       if (vote.amount && Number(vote.amount) > 0) {
-        votesPrepared.push({ address: vote.address, amount: Number(vote.amount) });
+        const key = vote.address;
+        votesPrepared[key] = vote.amount;
       }
     });
+
     try {
       const TransactionData = await Client.voteForWitnesses(votesPrepared);
       if (!TransactionData) {
         throw Error();
       } else {
-        this.setState({
-          modalVisible: true,
-          transaction: { ...transaction, data: TransactionData },
-        });
+        this.setState({ modalVisible: true, transaction: TransactionData });
       }
       // TODO
       // Now do something
@@ -198,6 +193,7 @@ class Vote extends Component {
       inVoting,
       totalTrx,
     } = this.state;
+
     return (
       <div className={styles.container}>
         <Card bordered={false}>
@@ -206,7 +202,7 @@ class Vote extends Component {
               <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
             <Col sm={8} xs={24}>
-              <Info title="Total votes" value={totalVotes} />
+              <Info title="Total votes" value={totalVotes.toLocaleString()} />
             </Col>
 
             <Col sm={8} xs={24} bordered={false}>
@@ -236,13 +232,14 @@ class Vote extends Component {
             header={<Header inVoting={inVoting} />}
             renderItem={(item, index) => (
               <List.Item
-                key={item.id}
+                key={item.address}
                 actions={[
-                  <ProgressItem votes={item.votes} total={totalVotes} />,
-                  <VoteInput
-                    show={inVoting}
-                    onChange={value => this.onVoteChange(item.id, value)}
+                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />,
+                  <VoteSlider
+                    onVoteChange={v => this.onVoteChange(item.address, v)}
+                    totalRemaining={totalRemaining}
                   />,
+                  // <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
                 ]}
               >
                 <ListContent index={index + 1} {...item} />
@@ -253,7 +250,7 @@ class Vote extends Component {
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
-          data={transaction.data}
+          data={transaction}
           visible={modalVisible}
           onClose={this.onCloseModal}
         />

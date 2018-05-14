@@ -61,21 +61,12 @@ class Monitor extends PureComponent {
       Client.getFreeze(),
     ]);
 
-    console.log('DATA::: ', data);
-
     const { Data: tronPriceList = [] } = data[0];
     const balances = data[1];
     const tronAccount = data[2];
     const { balance } = balances.find(b => b.name === 'TRX');
     const transactionsData = data[3];
     const { data: { frozen } } = data[4];
-
-    // const { Data: tronPriceList = [] } = await getTronPrice();
-    // const balances = await Client.getBalances();
-    // const tronAccount = await Client.getPublicKey();
-    // const { balance } = balances.find(b => b.name === 'TRX');
-    // const transactionsData = await Client.getTransactionList();
-    // const { data: { frozen } } = await Client.getFreeze();
 
     if (!tronPriceList.length) {
       return;
@@ -275,10 +266,10 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Amount"
-                total={this.formatBalance(totalFreeze.total)}
+                total={this.formatBalance(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
-                  totalFreeze.balances ? (
+                  totalFreeze.balances && totalFreeze.balances.length ? (
                     <Field
                       label="Expires"
                       value={moment(new Date(totalFreeze.balances[0].expires)).format(
