@@ -48,7 +48,7 @@ class Monitor extends PureComponent {
         <Row gutter={24}>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
-              title="TRON Price"
+              title="TRX PRICE"
               style={{ marginBottom: 24 }}
               bordered={false}
               extra={
@@ -62,7 +62,7 @@ class Monitor extends PureComponent {
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
-              title="TRX BALANCE"
+              title="BALANCE"
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
@@ -73,7 +73,7 @@ class Monitor extends PureComponent {
             >
               <ChartCard
                 bordered={false}
-                title="TRX Avaliable"
+                title="TRX"
                 total={199}
                 footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
                 contentHeight={46}
@@ -95,7 +95,7 @@ class Monitor extends PureComponent {
             >
               <ChartCard
                 bordered={false}
-                title="Amount"
+                title="TRX"
                 total={199}
                 contentHeight={46}
                 footer={<Field label="Expires" value={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
