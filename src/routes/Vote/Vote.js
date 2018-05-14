@@ -8,10 +8,12 @@ import {
   Progress
 } from 'antd';
 
+import moment from 'moment';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
+import CowntDownInfo from './CowntDownInfo';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -70,6 +72,8 @@ class Vote extends Component {
     voteList: [],
     totalTrx: 0,
     totalRemaining: 0,
+    endTime: null,
+    totalVotes: 0,
     transaction: {
       loading: false,
       status: false,
@@ -82,6 +86,8 @@ class Vote extends Component {
   componentDidMount() {
     this.onLoadWitness();
     this.onLoadAvailable();
+    this.onLoadEndTime();
+    this.onLoadTotalVotes();
   }
 
   onLoadWitness = async () => {
@@ -95,6 +101,24 @@ class Vote extends Component {
     let totalTrx = 0;
     if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
     this.setState({ totalTrx, totalRemaining: totalTrx });
+  };
+
+  onLoadEndTime = async () => {
+    const endTimeInMilis = votes.end_time;
+    if (!endTimeInMilis) {
+      return;
+    }
+    const endTime = new Date(endTimeInMilis);
+    this.setState({ endTime });
+  };
+
+  onLoadTotalVotes = async () => {
+    const totalVotesWithouFormat = +votes.total_votes;
+    if (!totalVotesWithouFormat) {
+      return;
+    }
+    const totalVotes = totalVotesWithouFormat.toLocaleString();
+    this.setState({ totalVotes });
   };
 
   onCloseModal = () => {
@@ -200,20 +224,16 @@ class Vote extends Component {
   // #endregion
 
   render() {
-    const { voteList, transaction, voteError, modalVisible } = this.state;
+    const { voteList, transaction, voteError, modalVisible, endTime, totalVotes } = this.state;
     return (
       <div className={styles.container}>
-
         <Card bordered={false}>
-          <Row>
+          <Row className={styles.blockSeparator}>
             <Col sm={8} xs={24}>
-              <Info title="我的待办" value="8个任务" bordered />
+              <CowntDownInfo title="Vote cycle ends in" endTime={endTime} bordered />
             </Col>
             <Col sm={8} xs={24}>
-              <Info title="本周任务平均处理时间" value="32分钟" bordered />
-            </Col>
-            <Col sm={8} xs={24}>
-              <Info title="本周完成任务数" value="24个任务" />
+              <Info title="Total votes" value={totalVotes} bordered />
             </Col>
           </Row>
         </Card>
