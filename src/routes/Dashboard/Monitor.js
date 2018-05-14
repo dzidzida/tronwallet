@@ -4,9 +4,12 @@ import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
 import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
 import Client from '../../utils/wallet-service/client';
 import SetPkModal from '../../components/SetPkModal/SetPkModal';
+import FreezeModal from '../../components/Freeze/FreezeModal';
+import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
 
 class Monitor extends PureComponent {
@@ -18,6 +21,8 @@ class Monitor extends PureComponent {
     tronAccount: '',
     transactionsData: [],
     modalVisible: false,
+    freezeModalVisible: false,
+    unFreezeModalVisible: false,
   };
 
   async componentDidMount() {
@@ -43,7 +48,6 @@ class Monitor extends PureComponent {
     const tronAccount = await Client.getPublicKey();
     const { balance } = balances.find(b => b.name === 'TRX');
     const transactionsData = await Client.getTransactionList();
-    // console.log('>>>>>>>> TRANSACTION', transactionsData);
 
     if (!tronPriceList.length) {
       return;
@@ -108,7 +112,7 @@ class Monitor extends PureComponent {
   };
 
   render() {
-    const { tronPriceData, lastDay, balance, tronAccount, modalVisible } = this.state;
+    const { tronPriceData, lastDay, balance, tronAccount, modalVisible, freezeModalVisible, unFreezeModalVisible } = this.state;
     return (
       <Fragment>
         <Row gutter={24}>
@@ -118,9 +122,9 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 24 }}
               bordered={false}
               extra={
-                <Fragment>
+                <CopyToClipboard text={tronPriceData.length ? tronPriceData[tronPriceData.length - 1].y : ''}>
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </Fragment>
+                </CopyToClipboard>
               }
             >
               <ActiveChart data={tronPriceData} lastDay={lastDay} />
@@ -132,9 +136,9 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <Fragment>
+                <CopyToClipboard text={this.formatBalance(balance)}>
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </Fragment>
+                </CopyToClipboard>
               }
             >
               <ChartCard
@@ -153,9 +157,23 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Fragment>
-                  <Button type="danger" size="default" ghost icon="close" shape="circle" />
+                  <Button
+                    type="danger"
+                    size="default"
+                    ghost
+                    icon="close"
+                    shape="circle"
+                    onClick={() => this.setState({ unFreezeModalVisible: true })}
+                  />
                   {'  '}
-                  <Button type="primary" size="default" icon="check" shape="circle" ghost />
+                  <Button
+                    type="primary"
+                    size="default"
+                    icon="check"
+                    shape="circle"
+                    ghost
+                    onClick={() => this.setState({ freezeModalVisible: true })}
+                  />
                 </Fragment>
               }
             >
@@ -186,7 +204,9 @@ class Monitor extends PureComponent {
                     onClick={this.onOpenModal}
                   />
                   {'    '}
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
+                  <CopyToClipboard text={tronAccount}>
+                    <Button type="primary" size="default" icon="copy" shape="circle" ghost />
+                  </CopyToClipboard>
                 </Fragment>
               }
             >
@@ -222,6 +242,8 @@ class Monitor extends PureComponent {
           </Col>
         </Row>
         <SetPkModal visible={modalVisible} onClose={this.onCloseModal} />
+        <FreezeModal visible={freezeModalVisible} onClose={() => this.setState({ freezeModalVisible: false })} />
+        <UnfreezeModal visible={unFreezeModalVisible} onClose={() => this.setState({ unFreezeModalVisible: false })} />
       </Fragment>
     );
   }
