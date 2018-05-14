@@ -4,8 +4,10 @@ import {
   Card,
   Row,
   Col,
-  List
+  List,
+  Progress
 } from 'antd';
+
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
@@ -19,29 +21,49 @@ const Info = ({ title, value, bordered }) => (
   </div>
 );
 
-const ListContent = ({ data: { owner, createdAt, percent, status } }) => (
-  <div className={styles.listContent}>
-    <div className={styles.listContentItem}>
-      <span>Owner</span>
-      <p>{owner}</p>
-    </div>
-    <div className={styles.listContentItem}>
-      <span>开始时间</span>
-      <p>{moment(createdAt).format('YYYY-MM-DD HH:mm')}</p>
-    </div>
-    <div className={styles.listContentItem}>
-      <Progress percent={percent} status={status} strokeWidth={6} style={{ width: 180 }} />
-    </div>
+const ListContent = ({ index, url, address }) => (
+  <div className={styles.actionContainer}>
+    <Row>
+      <Col xs={4}>
+        <ItemIndex index={index} />
+      </Col>
+      <Col sm={8} xs={24}>
+        <List.Item.Meta
+          title={<a href="#">{url}</a>}
+          description={address}
+        />
+      </Col>
+    </Row>
   </div>
 );
 
-// const MoreBtn = () => (
-//   <Dropdown overlay={menu}>
-//     <a>
-//       更多 <Icon type="down" />
-//     </a>
-//   </Dropdown>
-// );
+const ItemIndex = ({ index }) => (
+  <div className={styles.itemIndex}>
+    <strong>#{index}</strong>
+  </div>
+);
+
+const Header = () => (
+  <div className={styles.header}>
+    <Row>
+      <Col xs={1}>#</Col>
+      <Col xs={20}>
+        <span className={styles.textLeft}>URL</span>
+      </Col>
+    </Row>
+  </div>
+);
+
+const ProgressItem = (props) => {
+  // const votesPrecent = ((votes.total_votes / props.votes) * 100);
+  const percent = Math.floor((props.votes * 100) / votes.total_votes);
+  return (
+    <div className={styles.actionContainer}>
+      <strong>{props.votes}</strong>
+      <Progress percent={percent} status="active" />
+    </div>
+  )
+}
 
 class Vote extends Component {
   state = {
@@ -56,6 +78,7 @@ class Vote extends Component {
     },
   };
 
+  // #region logic
   componentDidMount() {
     this.onLoadWitness();
     this.onLoadAvailable();
@@ -174,6 +197,8 @@ class Vote extends Component {
     return <div className={styles.progressBar} style={{ width: `${percent}%` }} />;
   };
 
+  // #endregion
+
   render() {
     const { voteList, transaction, voteError, modalVisible } = this.state;
     return (
@@ -193,18 +218,30 @@ class Vote extends Component {
           </Row>
         </Card>
 
+        <Card
+          className={styles.listCard}
+          title="VOTES"
+          style={{ marginTop: 24 }}
+          bodyStyle={{ padding: '0 0px 40px 0px' }}
+          loading={transaction.status}
+        >
+          <List
+            rowKey="id"
+            loading={false}
+            size="large"
+            dataSource={voteList}
+            header={<Header />}
+            renderItem={(item, index) => (
+              <List.Item
+                key={item.id}
+                actions={[<ProgressItem votes={item.votes} />]}
+              >
+                <ListContent index={index + 1} {...item} />
+              </List.Item>
+            )}
+          />
+        </Card>
 
-        <List
-          size="large"
-          rowKey="id"
-          loading={false}
-          dataSource={votes}
-          renderItem={item => (
-            <List.Item >
-              asdasdasasasd
-            </List.Item>
-          )}
-        />
       </div>
     );
   }
