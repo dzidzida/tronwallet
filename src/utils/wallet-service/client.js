@@ -18,6 +18,7 @@ export const ONE_TRX = 1000000;
 class ClientWallet {
   constructor(opt = null) {
     this.url = opt || TRON_URL;
+    this.api = 'https://api.tronscan.org/api'
   }
 
   // SEND TRANSACTION
@@ -63,7 +64,6 @@ class ClientWallet {
       transaction = data;
     }
     const transactionDetail = deserializeTransaction(transaction);
-    console.log('TransactionDetail:', transactionDetail);
     return transactionDetail;
 	};
 	
@@ -183,6 +183,14 @@ class ClientWallet {
     }));
 
     return data;
+  }
+
+  async getTransactionList () {
+    const owner = await this.getPublicKey();
+    const obj = { owner };
+    const { data } = await axios.get(`${this.api}/transaction?sort=-timestamp&limit=50&address=${owner}`);
+    obj.transactions = data.data;
+    return obj;
   }
 }
 
