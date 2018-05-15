@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input } from 'antd';
+import { Card, Row, Col, List, Spin, Input, Button } from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -122,6 +122,14 @@ class Vote extends Component {
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
   };
+
+  onMax = () => {
+    console.log('MAX');
+  }
+
+  onResetOneVote = () => {
+    console.log('RESET');
+  }
 
   submit = async () => {
     const { voteList } = this.state;
@@ -283,7 +291,12 @@ class Vote extends Component {
                     onVoteChange={v => this.onVoteChange(item.address, v)}
                     totalTrx={totalTrx}
                     isReset={isReset}
+                    isMax={item.amount || 0}
                   />,
+                  <div style={{ padding: 10 }}>
+                    <Button type="primary" size="small" onClick={() => this.onVoteChange(item.address, totalTrx)}>Máx</Button>
+                    <Button type="primary" size="small" onClick={this.onResetOneVote}>Reset</Button>
+                  </div>,
                 ]}
               >
                 <ListContent index={index + 1} {...item} />
