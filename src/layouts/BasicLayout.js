@@ -21,6 +21,7 @@ import { getUserAttributes } from '../services/api';
 import SetPkModal from '../components/SetPkModal/SetPkModal';
 import TransactionResultModal from '../components/TransactionResultModal/TransactionResultModal';
 import { version } from './../../package.json';
+import Client from '../utils/wallet-service/client';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
@@ -98,8 +99,6 @@ class BasicLayout extends React.PureComponent {
   state = {
     isMobile,
     modalVisible: false,
-    txModal: false,
-    txResult: null,
   };
   getChildContext() {
     const { location, routerData } = this.props;
@@ -109,8 +108,10 @@ class BasicLayout extends React.PureComponent {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.openSocket();
+  }
+  componentDidMount() {
     this.checkUserAttr();
 
     this.enquireHandler = enquireScreen(mobile => {
@@ -127,7 +128,12 @@ class BasicLayout extends React.PureComponent {
     unenquireScreen(this.enquireHandler);
   }
 
-  onCloseTransactionModal = () => this.setState({ txModal: false });
+  onCloseTransactionModal = () => {
+    this.props.dispatch({
+      type: 'monitor/changeModalResult',
+      payload: { visible: false, result: false },
+    });
+  };
 
   onCloseModal = () => {
     this.setState({ modalVisible: false });
@@ -177,13 +183,17 @@ class BasicLayout extends React.PureComponent {
       this.setState({ modalVisible: true });
     }
   };
+
   openSocket = async () => {
-    const user = await getUserAttributes();
-    const pk = user['custom:publickey'];
+    const { dispatch } = this.props;
+    const pk = await Client.getPublicKey();
     this.socket = openSocket(URL_SOCKET);
     this.socket.on('payback', data => {
       if (data.uuid === pk) {
-        this.setState({ txResult: data.succeeded, txModal: true });
+        dispatch({
+          type: 'monitor/changeModalResult',
+          payload: { visible: true, result: data.succeeded },
+        });
       }
     });
   };
@@ -228,6 +238,8 @@ class BasicLayout extends React.PureComponent {
       routerData,
       match,
       location,
+      isResultVisible,
+      transactionResult,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
     const layout = (
@@ -262,8 +274,8 @@ class BasicLayout extends React.PureComponent {
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
             <TransactionResultModal
-              result={this.state.txResult}
-              visible={this.state.txModal}
+              result={transactionResult}
+              visible={isResultVisible}
               onClose={this.onCloseTransactionModal}
             />
             <Switch>
@@ -333,9 +345,11 @@ class BasicLayout extends React.PureComponent {
   }
 }
 
-export default connect(({ user, global, loading }) => ({
+export default connect(({ user, global, loading, monitor }) => ({
   currentUser: user.currentUser,
   collapsed: global.collapsed,
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
+  isResultVisible: monitor.isResultVisible,
+  transactionResult: monitor.transactionResult,
 }))(BasicLayout);

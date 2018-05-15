@@ -317,7 +317,7 @@ class Vote extends Component {
           message="Please, validate your transaction"
           data={transaction}
           visible={modalVisible}
-          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx }}
+          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx - totalRemaining }}
           onClose={this.onCloseModal}
         />
       </div>
