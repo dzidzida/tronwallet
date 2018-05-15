@@ -237,7 +237,7 @@ class Vote extends Component {
                   <ProgressItem votes={Number(item.votes)} total={totalVotes} />,
                   <VoteSlider
                     onVoteChange={v => this.onVoteChange(item.address, v)}
-                    totalRemaining={totalRemaining}
+                    totalTrx={totalTrx}
                   />,
                   // <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
                 ]}

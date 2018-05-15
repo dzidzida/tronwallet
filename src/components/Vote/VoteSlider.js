@@ -8,7 +8,7 @@ class VoteSlider extends PureComponent {
   };
 
   render() {
-    const { onVoteChange, totalRemaining } = this.props;
+    const { onVoteChange, totalTrx } = this.props;
     const { value } = this.state;
     return (
       <div className={styles.iconWrapper}>
@@ -18,7 +18,7 @@ class VoteSlider extends PureComponent {
           onChange={v => this.setState({ value: v })}
           step={10}
           value={value}
-          max={totalRemaining}
+          max={totalTrx}
         />
         <Icon className={styles.anticon} type="smile-o" />
       </div>
