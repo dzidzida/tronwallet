@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin } from 'antd';
+import { Card, Row, Col, List, Spin, Input } from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -147,7 +147,7 @@ class Vote extends Component {
     }
   };
 
-  handleSearch = e => {
+  handleSearch = async (e) => {
     const { value } = e.target;
     const { voteList } = this.state;
     if (value) {
@@ -157,7 +157,8 @@ class Vote extends Component {
       });
       this.setState({ voteList: votesFilter });
     } else {
-      this.setState({ voteList: votes });
+      const allVotes = await Client.getWitnesses();
+      this.setState({ voteList: allVotes });
     }
   };
 
@@ -258,6 +259,13 @@ class Vote extends Component {
           style={{ marginTop: 24 }}
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
+          extra={
+            <Input
+              placeholder="Search vote"
+              onChange={this.handleSearch}
+              style={{ width: 400 }}
+            />
+          }
         >
           <p>{voteError}</p>
           <List
