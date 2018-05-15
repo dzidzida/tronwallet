@@ -31,6 +31,7 @@ class Vote extends Component {
     totalVotes: 0,
     inVoting: false,
     transaction: '',
+    isReset: true,
     // transaction: {
     //   loading: false,
     //   status: false,
@@ -87,10 +88,21 @@ class Vote extends Component {
     this.setState({ inVoting: true });
   };
 
+  onResetVotes = () => {
+    const { voteList, totalTrx } = this.state;
+    voteList
+      .filter(v => v.amount)
+      .forEach(v => {
+        const vt = v;
+        delete vt.amount;
+      });
+    this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+  }
+
   onVoteChange = (address, value) => {
     const { voteList, totalTrx } = this.state;
     voteList.find(v => v.address === address).amount = value;
-    this.setState({ voteList }, () => {
+    this.setState({ voteList, isReset: false }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
         return Number(prev) + Number(vote.amount || 0);
       }, 0);
@@ -192,6 +204,7 @@ class Vote extends Component {
       totalRemaining,
       inVoting,
       totalTrx,
+      isReset,
     } = this.state;
 
     return (
@@ -211,6 +224,7 @@ class Vote extends Component {
                 onStartVote={this.onStartVote}
                 totalTrx={totalTrx}
                 onSubmit={this.submit}
+                onResetVotes={this.onResetVotes}
               />
             </Col>
           </Row>
@@ -237,9 +251,9 @@ class Vote extends Component {
                   <ProgressItem votes={Number(item.votes)} total={totalVotes} />,
                   <VoteSlider
                     onVoteChange={v => this.onVoteChange(item.address, v)}
-                    totalRemaining={totalRemaining}
+                    totalTrx={totalTrx}
+                    isReset={isReset}
                   />,
-                  // <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
                 ]}
               >
                 <ListContent index={index + 1} {...item} />

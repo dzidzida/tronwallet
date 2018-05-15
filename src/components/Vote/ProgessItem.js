@@ -4,7 +4,6 @@ import { Progress } from 'antd';
 import styles from './index.less';
 
 const ProgressItem = props => {
-  console.log('HRER:::: ', props.votes, props.total);
   const percent = Math.floor(props.votes * 100 / props.total);
   return (
     <div className={styles.actionContainer}>
