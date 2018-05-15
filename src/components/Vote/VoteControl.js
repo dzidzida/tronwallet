@@ -55,7 +55,11 @@ class VoteControl extends Component {
           actions={[<Button size="large">RESET</Button>, this.renderSubmitButton()]}
         >
           <Meta
-            title={<h1>{Number(totalRemaining).toLocaleString()}</h1>}
+            title={
+              <h1 className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
+                {Number(totalRemaining).toLocaleString()}
+              </h1>
+            }
             description="Votes Remaining"
           />
         </Card>
