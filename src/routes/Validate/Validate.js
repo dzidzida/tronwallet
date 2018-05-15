@@ -23,8 +23,8 @@ export default class Transaction extends Component {
       console.warn('err', err);
     } finally {
       setTimeout(() => {
-        window.history.replaceState({}, document.title, '/#/user/');
-      }, 5000);
+        history.replaceState({}, '', '/#/user/');
+      }, 8000);
     }
   };
 
