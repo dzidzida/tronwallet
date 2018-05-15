@@ -54,7 +54,7 @@ class VoteControl extends Component {
         <Card
           style={{ width: 350 }}
           actions={[
-            <Button size="large" onClick={onResetVotes} icon="close-circle-o">
+            <Button size="large" onClick={() => onResetVotes(null)} icon="close-circle-o">
               RESET
             </Button>,
             this.renderSubmitButton(),

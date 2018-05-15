@@ -103,13 +103,23 @@ class Vote extends Component {
     this.setState({ inVoting: true });
   };
 
-  onResetVotes = () => {
+  onResetVotes = address => {
     const { voteList, totalTrx } = this.state;
-    voteList.filter(v => v.amount).forEach(v => {
-      const vt = v;
-      delete vt.amount;
-    });
-    this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+    if (address) {
+      delete voteList.find(v => v.address === address).amount;
+      this.setState({ voteList, isReset: true }, () => {
+        const totalVotes = this.state.voteList.reduce((prev, vote) => {
+          return Number(prev) + Number(vote.amount || 0);
+        }, 0);
+        this.setState({ totalRemaining: totalTrx - totalVotes });
+      });
+    } else {
+      voteList.filter(v => v.amount).forEach(v => {
+        const vt = v;
+        delete vt.amount;
+      });
+      this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+    }
   };
 
   onVoteChange = (address, value) => {
@@ -122,14 +132,6 @@ class Vote extends Component {
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
   };
-
-  onMax = () => {
-    console.log('MAX');
-  }
-
-  onResetOneVote = () => {
-    console.log('RESET');
-  }
 
   submit = async () => {
     const { voteList } = this.state;
@@ -155,7 +157,7 @@ class Vote extends Component {
     }
   };
 
-  handleSearch = async (e) => {
+  handleSearch = async e => {
     const { value } = e.target;
     const { voteList } = this.state;
     if (value) {
@@ -268,11 +270,7 @@ class Vote extends Component {
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
           extra={
-            <Input
-              placeholder="Search vote"
-              onChange={this.handleSearch}
-              style={{ width: 400 }}
-            />
+            <Input placeholder="Search vote" onChange={this.handleSearch} style={{ width: 400 }} />
           }
         >
           <p>{voteError}</p>
@@ -293,9 +291,23 @@ class Vote extends Component {
                     isReset={isReset}
                     isMax={item.amount || 0}
                   />,
-                  <div style={{ padding: 10 }}>
-                    <Button type="primary" size="small" onClick={() => this.onVoteChange(item.address, totalTrx)}>Máx</Button>
-                    <Button type="primary" size="small" onClick={this.onResetOneVote}>Reset</Button>
+                  <div className={styles.smallButtonsContainer}>
+                    <Button
+                      style={{ marginBottom: 5 }}
+                      type="primary"
+                      size="small"
+                      onClick={() => this.onVoteChange(item.address, totalTrx)}
+                      icon="to-top"
+                    >
+                      Máx
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => this.onResetVotes(item.address)}
+                      icon="close-circle-o"
+                    >
+                      Reset
+                    </Button>
                   </div>,
                 ]}
               >
