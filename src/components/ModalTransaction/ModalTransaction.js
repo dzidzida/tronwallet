@@ -18,16 +18,14 @@ class TransactionQRCode extends Component {
   }
 
   loadUrl = async (data = 'getty.io') => {
-    const { type } = this.props;
     const user = await getUserAttributes();
     const validateData = JSON.stringify({
       data,
-      type,
       URL,
       pk: user['custom:publickey'],
       token: 'tron-wallet-getty',
     });
-    console.log('Seding this data', validateData);
+    console.log('Sending this data', validateData);
     const qrcode = await QRCode.toDataURL(validateData);
     this.setState({ qrcode });
   };
