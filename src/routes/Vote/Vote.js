@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List } from 'antd';
+import { Card, Row, Col, List, Spin, Input, Button } from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -31,6 +31,8 @@ class Vote extends Component {
     totalVotes: 0,
     inVoting: false,
     transaction: '',
+    isReset: true,
+    loading: true,
     // transaction: {
     //   loading: false,
     //   status: false,
@@ -41,24 +43,34 @@ class Vote extends Component {
 
   // #region logic
   componentDidMount() {
-    this.onLoadWitness();
-    this.onLoadAvailable();
+    // this.onLoadWitness();
+    // this.onLoadAvailable();
+    this.onLoadData();
     this.onLoadEndTime();
     this.onLoadTotalVotes();
   }
 
-  onLoadWitness = async () => {
-    const voteList = await Client.getWitnesses();
-    this.setState({ voteList });
+  onLoadData = async () => {
+    const data = await Promise.all([Client.getWitnesses(), Client.getFreeze()]);
+
+    const voteList = data[0];
+    const frozen = data[1];
+    const totalTrx = frozen.total || 0;
+    this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
   };
 
-  onLoadAvailable = async () => {
-    const balances = await Client.getBalances();
-    const trxBalance = balances.find(bl => bl.name === 'TRX');
-    let totalTrx = 0;
-    if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
-    this.setState({ totalTrx, totalRemaining: totalTrx });
-  };
+  // onLoadWitness = async () => {
+  //   const voteList = await Client.getWitnesses();
+  //   this.setState({ voteList });
+  // };
+
+  // onLoadAvailable = async () => {
+  //   const balances = await Client.getBalances();
+  //   const trxBalance = balances.find(bl => bl.name === 'TRX');
+  //   let totalTrx = 0;
+  //   if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
+  //   this.setState({ totalTrx, totalRemaining: totalTrx });
+  // };
 
   onLoadEndTime = async () => {
     const endTimeInMilis = votes.end_time;
@@ -87,10 +99,29 @@ class Vote extends Component {
     this.setState({ inVoting: true });
   };
 
+  onResetVotes = address => {
+    const { voteList, totalTrx } = this.state;
+    if (address) {
+      delete voteList.find(v => v.address === address).amount;
+      this.setState({ voteList, isReset: true }, () => {
+        const totalVotes = this.state.voteList.reduce((prev, vote) => {
+          return Number(prev) + Number(vote.amount || 0);
+        }, 0);
+        this.setState({ totalRemaining: totalTrx - totalVotes });
+      });
+    } else {
+      voteList.filter(v => v.amount).forEach(v => {
+        const vt = v;
+        delete vt.amount;
+      });
+      this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+    }
+  };
+
   onVoteChange = (address, value) => {
     const { voteList, totalTrx } = this.state;
     voteList.find(v => v.address === address).amount = value;
-    this.setState({ voteList }, () => {
+    this.setState({ voteList, isReset: false }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
         return Number(prev) + Number(vote.amount || 0);
       }, 0);
@@ -122,7 +153,7 @@ class Vote extends Component {
     }
   };
 
-  handleSearch = e => {
+  handleSearch = async e => {
     const { value } = e.target;
     const { voteList } = this.state;
     if (value) {
@@ -132,7 +163,8 @@ class Vote extends Component {
       });
       this.setState({ voteList: votesFilter });
     } else {
-      this.setState({ voteList: votes });
+      const allVotes = await Client.getWitnesses();
+      this.setState({ voteList: allVotes });
     }
   };
 
@@ -192,12 +224,22 @@ class Vote extends Component {
       totalRemaining,
       inVoting,
       totalTrx,
+      isReset,
+      loading,
     } = this.state;
+
+    if (loading) {
+      return (
+        <div className={styles.loading}>
+          <Spin size="large" />
+        </div>
+      );
+    }
 
     return (
       <div className={styles.container}>
         <Card bordered={false}>
-          <Row  type="flex" align="middle">
+          <Row type="flex" align="middle">
             <Col sm={8} xs={24}>
               <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
@@ -212,6 +254,7 @@ class Vote extends Component {
                 onStartVote={this.onStartVote}
                 totalTrx={totalTrx}
                 onSubmit={this.submit}
+                onResetVotes={this.onResetVotes}
               />
             </Col>
           </Row>
@@ -223,6 +266,9 @@ class Vote extends Component {
           style={{ marginTop: 24 }}
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
+          extra={
+            <Input placeholder="Search vote" onChange={this.handleSearch} style={{ width: 400 }} />
+          }
         >
           <p>{voteError}</p>
           <List
@@ -239,8 +285,27 @@ class Vote extends Component {
                   <VoteSlider
                     onVoteChange={v => this.onVoteChange(item.address, v)}
                     totalTrx={totalTrx}
+                    isReset={isReset}
+                    isMax={item.amount || 0}
                   />,
-                  // <VoteInput show={inVoting} onChange={v => this.onVoteChange(item.address, v)} />,
+                  <div className={styles.smallButtonsContainer}>
+                    <Button
+                      style={{ marginBottom: 5 }}
+                      type="primary"
+                      size="small"
+                      onClick={() => this.onVoteChange(item.address, totalTrx)}
+                      icon="to-top"
+                    >
+                      Máx
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => this.onResetVotes(item.address)}
+                      icon="close-circle-o"
+                    >
+                      Reset
+                    </Button>
+                  </div>,
                 ]}
               >
                 <ListContent index={index + 1} {...item} />
@@ -253,6 +318,7 @@ class Vote extends Component {
           message="Please, validate your transaction"
           data={transaction}
           visible={modalVisible}
+          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx }}
           onClose={this.onCloseModal}
         />
       </div>

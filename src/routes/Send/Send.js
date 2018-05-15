@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
 import Client from '../../utils/wallet-service/client';
@@ -125,21 +126,24 @@ class Send extends Component {
               </h2>
             </div>
             <h3 className={styles.messageError}>{transaction.error}</h3>
-            <button
+            <Button
               disabled={transaction.loading || !canSend}
+              type="primary"
               onClick={this.handleSend}
               className={[
                 styles.button,
                 !canSend || transaction.loading ? styles.disabled : null,
               ].join(' ')}
+              icon="check-circle-o"
+              loading={transaction.loading}
             >
               {transaction.loading ? 'Processing transaction' : 'Send'}
-            </button>
+            </Button>
           </div>
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
-            type="SEND"
+            txDetails={{ To: to, Amount: amount, Type: 'SEND' }}
             data={transaction.data}
             visible={modalVisible}
             onClose={this.onCloseModal}

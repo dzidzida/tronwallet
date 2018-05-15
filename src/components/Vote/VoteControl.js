@@ -37,6 +37,7 @@ class VoteControl extends Component {
         type="primary"
         onClick={onSubmit}
         disabled={Number(totalTrx) === Number(totalRemaining)}
+        icon="check-circle-o"
       >
         SUBMIT
       </Button>
@@ -44,14 +45,26 @@ class VoteControl extends Component {
   };
 
   renderSubmit = () => {
-    const { totalRemaining } = this.props;
+    const { totalRemaining, onResetVotes } = this.props;
     const { affix } = this.state;
     const affixStyle = affix ? { position: 'absolute' } : null;
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
-        <Card>
+        <Card
+          style={{ width: 350 }}
+          actions={[
+            <Button size="large" onClick={() => onResetVotes(null)} icon="close-circle-o">
+              RESET
+            </Button>,
+            this.renderSubmitButton(),
+          ]}
+        >
           <Meta
-            title={<h1>{Number(totalRemaining).toLocaleString()}</h1>}
+            title={
+              <h1 className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
+                {Number(totalRemaining).toLocaleString()}
+              </h1>
+            }
             description="Votes Remaining"
           />
 

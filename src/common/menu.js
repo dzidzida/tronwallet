@@ -175,12 +175,12 @@ const menuData = [
     path: 'receive',
     children: [],
   },
-  {
-    name: 'tokens',
-    icon: 'form',
-    path: 'tokens',
-    children: [],
-  },
+  // {
+  //   name: 'tokens',
+  //   icon: 'form',
+  //   path: 'tokens',
+  //   children: [],
+  // },
   {
     name: 'Vote',
     icon: 'like-o',
