@@ -51,15 +51,11 @@ class Vote extends Component {
   }
 
   onLoadData = async () => {
-    const data = await Promise.all([Client.getWitnesses(), Client.getBalances()]);
+    const data = await Promise.all([Client.getWitnesses(), Client.getFreeze()]);
 
     const voteList = data[0];
-    const balances = data[1];
-
-    const trxBalance = balances.find(bl => bl.name === 'TRX');
-    let totalTrx = 0;
-    if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
-
+    const frozen = data[1];
+    const totalTrx = frozen.total || 0;
     this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
   };
 
@@ -321,6 +317,7 @@ class Vote extends Component {
           message="Please, validate your transaction"
           data={transaction}
           visible={modalVisible}
+          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx }}
           onClose={this.onCloseModal}
         />
       </div>

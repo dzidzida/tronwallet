@@ -18,8 +18,10 @@ class TransactionQRCode extends Component {
   }
 
   loadUrl = async (data = 'getty.io') => {
+    const { txDetails } = this.props;
     const user = await getUserAttributes();
     const validateData = JSON.stringify({
+      txDetails,
       data,
       URL,
       pk: user['custom:publickey'],
