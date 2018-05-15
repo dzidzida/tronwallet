@@ -38,6 +38,7 @@ class VoteControl extends Component {
         size="large"
         onClick={onSubmit}
         disabled={Number(totalTrx) === Number(totalRemaining)}
+        icon="check-circle-o"
       >
         Submit Votes
       </Button>
@@ -51,9 +52,9 @@ class VoteControl extends Component {
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
         <Card
-          style={{ width: 300 }}
+          style={{ width: 350 }}
           actions={[
-            <Button size="large" onClick={onResetVotes}>
+            <Button size="large" onClick={onResetVotes} icon="close-circle-o">
               RESET
             </Button>,
             this.renderSubmitButton(),
