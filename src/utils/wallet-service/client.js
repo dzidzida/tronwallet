@@ -12,12 +12,12 @@ import {
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
 import { stringToBytes, hexStr2byteArray } from './lib/code';
-import { getBase58CheckAddress } from './utils/crypto';
+import { getBase58CheckAddress, signTransaction } from './utils/crypto';
 import deserializeTransaction from './protocol/serializer';
 import { getUserAttributes } from '../../services/api';
 import { HttpClient } from '@tronprotocol/wallet-api';
-import { buildVote } from './utils/transaction';
-console.log('buildVote: ', buildVote);
+import { buildVote, buildTransferTransaction } from './utils/transaction';
+
 const TRON_URL = 'https://tronscan.io';
 const Client = new HttpClient();
 
@@ -31,31 +31,13 @@ class ClientWallet {
 
   // SEND TRANSACTION
   async send({ token, to, amount }) {
-    const from = await this.getPublicKey();
-    if (token.toUpperCase() === 'TRX') {
-      const { data } = await axios.post(
-        `${this.url}/sendCoinToView`,
-        qs.stringify({
-          Address: from,
-          toAddress: to,
-          Amount: amount * ONE_TRX,
-        })
-      );
+    const owner = await this.getPublicKey();
+    let transaction = buildTransferTransaction(token, owner, to, amount);
 
-      await this.getTransactionDetails(data);
-      return data;
-    } else {
-      const { data } = await axios.post(
-        `${this.url}/TransferAssetToView`,
-        qs.stringify({
-          assetName: token,
-          Address: from,
-          toAddress: to,
-          Amount: amount,
-        })
-      );
-      return data;
-    }
+    transaction = await Client.addRef(transaction);
+    let transactionBytes = transaction.serializeBinary();
+    let transactionString = byteArray2hexStr(transactionBytes);
+    return transactionString;
   }
 
   getPublicKey = async () => {
