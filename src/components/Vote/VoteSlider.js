@@ -7,9 +7,16 @@ class VoteSlider extends PureComponent {
     value: 0,
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isReset) {
+      this.setState({ value: 0 });
+    }
+  }
+
   render() {
     const { onVoteChange, totalTrx } = this.props;
     const { value } = this.state;
+
     return (
       <div className={styles.iconWrapper}>
         <Icon className={styles.anticon} type="frown-o" />
