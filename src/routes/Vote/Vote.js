@@ -197,10 +197,11 @@ class Vote extends Component {
     return (
       <div className={styles.container}>
         <Card bordered={false}>
-          <Row className={styles.blockSeparator} type="flex" align="middle">
+          <Row  type="flex" align="middle">
             <Col sm={8} xs={24}>
               <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
+
             <Col sm={8} xs={24}>
               <Info title="Total votes" value={totalVotes.toLocaleString()} />
             </Col>

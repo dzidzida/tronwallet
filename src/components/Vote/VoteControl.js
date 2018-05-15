@@ -27,19 +27,18 @@ class VoteControl extends Component {
 
     if (totalRemaining < 0) {
       return (
-        <Button type="danger" size="large" disabled>
-          Submit Votes
+        <Button type="primary" disabled>
+          SUBMIT
         </Button>
       );
     }
     return (
       <Button
-        type="danger"
-        size="large"
+        type="primary"
         onClick={onSubmit}
         disabled={Number(totalTrx) === Number(totalRemaining)}
       >
-        Submit Votes
+        SUBMIT
       </Button>
     );
   };
@@ -50,14 +49,17 @@ class VoteControl extends Component {
     const affixStyle = affix ? { position: 'absolute' } : null;
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
-        <Card
-          style={{ width: 300 }}
-          actions={[<Button size="large">RESET</Button>, this.renderSubmitButton()]}
-        >
+        <Card>
           <Meta
             title={<h1>{Number(totalRemaining).toLocaleString()}</h1>}
             description="Votes Remaining"
           />
+
+          <div style={{ marginTop: 8 }}>
+            <Button>RESET</Button>
+            {'   '}
+            {this.renderSubmitButton()}
+          </div>
         </Card>
       </Affix>
     );
