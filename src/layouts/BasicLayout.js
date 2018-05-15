@@ -7,6 +7,7 @@ import { Route, Redirect, Switch, routerRedux } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
+import openSocket from 'socket.io-client';
 import { enquireScreen, unenquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
@@ -18,10 +19,12 @@ import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
 import { getUserAttributes } from '../services/api';
 import SetPkModal from '../components/SetPkModal/SetPkModal';
+import TransactionResultModal from '../components/TransactionResultModal/TransactionResultModal';
 import { version } from './../../package.json';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
+const URL_SOCKET = 'https://tronnotifier.now.sh';
 
 /**
  * 根据菜单取得重定向地址.
@@ -95,6 +98,8 @@ class BasicLayout extends React.PureComponent {
   state = {
     isMobile,
     modalVisible: false,
+    txModal: false,
+    txResult: null,
   };
   getChildContext() {
     const { location, routerData } = this.props;
@@ -105,7 +110,9 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.getUserAttr();
+    this.openSocket();
+    this.checkUserAttr();
+
     this.enquireHandler = enquireScreen(mobile => {
       this.setState({
         isMobile: mobile,
@@ -115,20 +122,17 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     });
   }
+
   componentWillUnmount() {
     unenquireScreen(this.enquireHandler);
   }
+
+  onCloseTransactionModal = () => this.setState({ txModal: false });
 
   onCloseModal = () => {
     this.setState({ modalVisible: false });
   };
 
-  getUserAttr = async () => {
-    const usrAttr = await getUserAttributes();
-    if (!usrAttr['custom:publickey']) {
-      this.setState({ modalVisible: true });
-    }
-  };
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
@@ -145,6 +149,7 @@ class BasicLayout extends React.PureComponent {
     }
     return title;
   }
+
   getBashRedirect = () => {
     // According to the url parameter to redirect
     // 这里是重定向的,重定向到 url 的 redirect 参数所示地址
@@ -165,6 +170,24 @@ class BasicLayout extends React.PureComponent {
     }
     return redirect;
   };
+
+  checkUserAttr = async () => {
+    const usrAttr = await getUserAttributes();
+    if (!usrAttr['custom:publickey']) {
+      this.setState({ modalVisible: true });
+    }
+  };
+  openSocket = async () => {
+    const user = await getUserAttributes();
+    const pk = user['custom:publickey'];
+    this.socket = openSocket(URL_SOCKET);
+    this.socket.on('payback', data => {
+      if (data.uuid === pk) {
+        this.setState({ txResult: data.succeeded, txModal: true });
+      }
+    });
+  };
+
   handleMenuCollapse = collapsed => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
@@ -238,6 +261,11 @@ class BasicLayout extends React.PureComponent {
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
+            <TransactionResultModal
+              result={this.state.txResult}
+              visible={this.state.txModal}
+              onClose={this.onCloseTransactionModal}
+            />
             <Switch>
               {redirectData.map(item => (
                 <Redirect key={item.from} exact from={item.from} to={item.to} />
@@ -258,26 +286,28 @@ class BasicLayout extends React.PureComponent {
           </Content>
           <Footer style={{ padding: 0 }}>
             <GlobalFooter
-              links={[
-                // {
-                //   key: 'Tron Network',
-                //   title: 'Pro 首页',
-                //   href: 'http://pro.ant.design',
-                //   blankTarget: true,
-                // },
-                // {
-                //   key: 'github',
-                //   title: <Icon type="github" />,
-                //   href: 'https://github.com/ant-design/ant-design-pro',
-                //   blankTarget: true,
-                // },
-                // {
-                //   key: 'Ant Design',
-                //   title: 'Ant Design',
-                //   href: 'http://ant.design',
-                //   blankTarget: true,
-                // },
-              ]}
+              links={
+                [
+                  // {
+                  //   key: 'Tron Network',
+                  //   title: 'Pro 首页',
+                  //   href: 'http://pro.ant.design',
+                  //   blankTarget: true,
+                  // },
+                  // {
+                  //   key: 'github',
+                  //   title: <Icon type="github" />,
+                  //   href: 'https://github.com/ant-design/ant-design-pro',
+                  //   blankTarget: true,
+                  // },
+                  // {
+                  //   key: 'Ant Design',
+                  //   title: 'Ant Design',
+                  //   href: 'http://ant.design',
+                  //   blankTarget: true,
+                  // },
+                ]
+              }
               copyright={
                 <Fragment>
                   <p>{`v${version}`}</p>
