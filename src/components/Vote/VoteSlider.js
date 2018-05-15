@@ -13,6 +13,10 @@ class VoteSlider extends PureComponent {
     }
   }
 
+  formatter = value => {
+    return value.toLocaleString();
+  };
+
   render() {
     const { onVoteChange, totalTrx } = this.props;
     const { value } = this.state;
@@ -26,6 +30,7 @@ class VoteSlider extends PureComponent {
           step={10}
           value={value}
           max={totalTrx}
+          tipFormatter={this.formatter}
         />
         <Icon className={styles.anticon} type="smile-o" />
       </div>
