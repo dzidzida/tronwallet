@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List } from 'antd';
+import { Card, Row, Col, List, Spin } from 'antd';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -32,6 +32,7 @@ class Vote extends Component {
     inVoting: false,
     transaction: '',
     isReset: true,
+    loading: true,
     // transaction: {
     //   loading: false,
     //   status: false,
@@ -42,24 +43,38 @@ class Vote extends Component {
 
   // #region logic
   componentDidMount() {
-    this.onLoadWitness();
-    this.onLoadAvailable();
+    // this.onLoadWitness();
+    // this.onLoadAvailable();
+    this.onLoadData();
     this.onLoadEndTime();
     this.onLoadTotalVotes();
   }
 
-  onLoadWitness = async () => {
-    const voteList = await Client.getWitnesses();
-    this.setState({ voteList });
-  };
+  onLoadData = async () => {
+    const data = await Promise.all([Client.getWitnesses(), Client.getBalances()]);
 
-  onLoadAvailable = async () => {
-    const balances = await Client.getBalances();
+    const voteList = data[0];
+    const balances = data[1];
+
     const trxBalance = balances.find(bl => bl.name === 'TRX');
     let totalTrx = 0;
     if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
-    this.setState({ totalTrx, totalRemaining: totalTrx });
+
+    this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
   };
+
+  // onLoadWitness = async () => {
+  //   const voteList = await Client.getWitnesses();
+  //   this.setState({ voteList });
+  // };
+
+  // onLoadAvailable = async () => {
+  //   const balances = await Client.getBalances();
+  //   const trxBalance = balances.find(bl => bl.name === 'TRX');
+  //   let totalTrx = 0;
+  //   if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
+  //   this.setState({ totalTrx, totalRemaining: totalTrx });
+  // };
 
   onLoadEndTime = async () => {
     const endTimeInMilis = votes.end_time;
@@ -90,14 +105,12 @@ class Vote extends Component {
 
   onResetVotes = () => {
     const { voteList, totalTrx } = this.state;
-    voteList
-      .filter(v => v.amount)
-      .forEach(v => {
-        const vt = v;
-        delete vt.amount;
-      });
+    voteList.filter(v => v.amount).forEach(v => {
+      const vt = v;
+      delete vt.amount;
+    });
     this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
-  }
+  };
 
   onVoteChange = (address, value) => {
     const { voteList, totalTrx } = this.state;
@@ -205,7 +218,16 @@ class Vote extends Component {
       inVoting,
       totalTrx,
       isReset,
+      loading,
     } = this.state;
+
+    if (loading) {
+      return (
+        <div className={styles.loading}>
+          <Spin size="large" />
+        </div>
+      );
+    }
 
     return (
       <div className={styles.container}>
