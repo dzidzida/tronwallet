@@ -240,11 +240,10 @@ class Vote extends Component {
       <div className={styles.container}>
         <Card bordered={false}>
           <Row type="flex" align="middle">
-            <Col sm={8} xs={24}>
+            <Col sm={8} xs={24} className={styles.blockSeparator}>
               <CowntDownInfo title="Vote cycle ends in" endTime={endTime} />
             </Col>
-
-            <Col sm={8} xs={24}>
+            <Col sm={8} xs={24} className={styles.blockSeparator}>
               <Info title="Total votes" value={totalVotes.toLocaleString()} />
             </Col>
 
@@ -281,30 +280,36 @@ class Vote extends Component {
               <List.Item
                 key={item.address}
                 actions={[
-                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />,
-                  <VoteSlider
-                    onVoteChange={v => this.onVoteChange(item.address, v)}
-                    totalTrx={totalTrx}
-                    isReset={isReset}
-                    isMax={item.amount || 0}
-                  />,
-                  <div className={styles.smallButtonsContainer}>
-                    <Button
-                      style={{ marginBottom: 5 }}
-                      type="primary"
-                      size="small"
-                      onClick={() => this.onVoteChange(item.address, totalTrx)}
-                      icon="to-top"
-                    >
-                      Máx
-                    </Button>
-                    <Button
-                      size="small"
-                      onClick={() => this.onResetVotes(item.address)}
-                      icon="close-circle-o"
-                    >
-                      Reset
-                    </Button>
+                  <div className={styles.listItemRow}>
+                    <div style={{ margin: 15 }}>
+                      <ProgressItem votes={Number(item.votes)} total={totalVotes} />
+                    </div>
+                    <div style={{ margin: 15 }}>
+                      <VoteSlider
+                        onVoteChange={v => this.onVoteChange(item.address, v)}
+                        totalTrx={totalTrx}
+                        isReset={isReset}
+                        isMax={item.amount || 0}
+                      />
+                    </div>
+                    <div className={styles.smallButtonsContainer}>
+                      <Button
+                        style={{ marginBottom: 5 }}
+                        type="primary"
+                        size="small"
+                        onClick={() => this.onVoteChange(item.address, totalTrx)}
+                        icon="to-top"
+                      >
+                        Máx
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={() => this.onResetVotes(item.address)}
+                        icon="close-circle-o"
+                      >
+                        Reset
+                      </Button>
+                    </div>
                   </div>,
                 ]}
               >

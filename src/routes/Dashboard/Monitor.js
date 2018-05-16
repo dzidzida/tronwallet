@@ -6,7 +6,7 @@ import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
@@ -87,8 +87,12 @@ class Monitor extends PureComponent {
     });
   };
 
-  formatBalance = balance => {
-    return Number(balance).toLocaleString('en', {});
+  formatAmount = number => {
+    return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+  };
+
+  formatAmountTokens = number => {
+    return Number(number.toFixed(6)).toLocaleString();
   };
 
   handleFreeze = async amount => {
@@ -120,7 +124,7 @@ class Monitor extends PureComponent {
     return balances.map(bl => (
       <List.Item key={bl.name + bl.balance}>
         <List.Item.Meta title={<span>{bl.name}</span>} />
-        <div>{this.formatBalance(bl.balance)}</div>
+        <div>{this.formatAmount(bl.balance)}</div>
       </List.Item>
     ));
   };
@@ -149,7 +153,7 @@ class Monitor extends PureComponent {
 
             <div>
               <small className={styles.itemFont}>
-                {this.formatBalance(tr.amount)}
+                {this.formatAmount(tr.amount)}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
                   <Icon type="caret-down" style={{ marginLeft: 5, color: 'red' }} />
@@ -213,7 +217,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatBalance(balance)}>
+                <CopyToClipboard text={this.formatAmount(balance)}>
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
               }
@@ -221,7 +225,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX "
-                total={this.formatBalance(balance)}
+                total={this.formatAmount(balance)}
                 footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
                 contentHeight={46}
               />
@@ -257,7 +261,11 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Amount"
-                total={this.formatBalance(totalFreeze.total || 0)}
+                total={
+                  <span style={{ fontSize: 26 }}>
+                    {this.formatAmountTokens(totalFreeze.total || 0)}
+                  </span>
+                }
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (
@@ -325,7 +333,7 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
         </Row>
-        <SetPkModal visible={modalVisible} onClose={this.onCloseModal} />
+        <SetPkModal visible={modalVisible} onClose={this.onCloseModal} loadData={this.loadData} />
         <FreezeModal
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}

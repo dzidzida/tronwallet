@@ -50,15 +50,7 @@ class VoteControl extends Component {
     const affixStyle = affix ? { position: 'absolute' } : null;
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
-        <Card
-          style={{ width: 350 }}
-          actions={[
-            <Button size="large" onClick={() => onResetVotes(null)} icon="close-circle-o">
-              RESET
-            </Button>,
-            this.renderSubmitButton(),
-          ]}
-        >
+        <Card style={{ width: 350 }}>
           <Meta
             title={
               <h1 className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
@@ -67,10 +59,15 @@ class VoteControl extends Component {
             }
             description="Votes Remaining"
           />
-
-          <div style={{ marginTop: 8 }}>
-            <Button>RESET</Button>
-            {'   '}
+          <div className={styles.containerVoteButtons}>
+            <Button
+              size="large"
+              onClick={() => onResetVotes(null)}
+              icon="close-circle-o"
+              style={{ marginRight: 5 }}
+            >
+              RESET
+            </Button>
             {this.renderSubmitButton()}
           </div>
         </Card>

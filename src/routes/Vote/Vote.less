@@ -214,9 +214,6 @@ button:disabled {
 .blockSeparator {
   div {
     border-right: 1px solid #e8e8e8;
-    &:last-child {
-      border-right: none;
-    }
   }
 }
 
@@ -236,6 +233,14 @@ button:disabled {
   padding: 10px;
   display: flex;
   flex-direction: column;
+}
+
+.listItemRow {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center
 }
 
 @media (max-width: 800px) {
