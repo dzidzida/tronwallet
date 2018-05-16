@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal } from 'antd';
+import { connect } from 'dva';
 import styles from './SetPkModal.less';
 import { setUserPk } from '../../services/api';
 
@@ -16,6 +17,9 @@ class TransactionQRCode extends Component {
       if (pk) {
         await setUserPk(pk);
         loadData();
+        this.props.dispatch({
+          type: 'user/fetchWalletData',
+        });
         onClose();
       } else {
         throw new Error();
@@ -50,4 +54,4 @@ class TransactionQRCode extends Component {
   }
 }
 
-export default TransactionQRCode;
+export default connect()(TransactionQRCode);
