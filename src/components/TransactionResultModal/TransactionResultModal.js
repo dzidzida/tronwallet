@@ -10,7 +10,13 @@ class TransactionQRCode extends Component {
     if (!contracts) return;
     const contractsElements = [];
     for (const ctr in contracts[0]) {
-      if (ctr) {
+      if (ctr === 'amount') {
+        contractsElements.push(
+          <h3>
+            {ctr} : {contracts[0][ctr] / 1000000}
+          </h3>
+        );
+      } else {
         contractsElements.push(
           <h3>
             {ctr} : {contracts[0][ctr]}
