@@ -30,12 +30,17 @@ export default class Transaction extends Component {
   };
 
   loadTransaction = async () => {
-    const params = new URLSearchParams(this.props.location.search);
-    const transaction = params.get('tx');
-    const userpk = params.get('pk');
+    // const params = new URLSearchParams(this.props.location.search);
+    // const transaction = params.get('tx');
+    // const userpk = params.get('pk');
+    const route = window.location.hash.split('/');
+    const userpk = route[3];
+    const transaction = route[4];
+    const time = route[5];
+
     let error = null;
 
-    if (!userpk || !transaction) {
+    if (!userpk || !transaction || !time) {
       this.setState({ error: 'Missing data, please try again' });
       return;
     }
@@ -56,6 +61,7 @@ export default class Transaction extends Component {
 
   render() {
     const { transaction, result, error } = this.state;
+
     return (
       <div className={styles.container}>
         <section>
