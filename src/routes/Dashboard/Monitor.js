@@ -91,9 +91,9 @@ class Monitor extends PureComponent {
     });
   };
 
-  formatBalance = balance => {
-    return Number(balance).toLocaleString('en', {});
-  };
+  formatAmount = (number) => {
+    return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+  }
 
   handleFreeze = async amount => {
     const tronAccount = await Client.getPublicKey();
@@ -130,7 +130,7 @@ class Monitor extends PureComponent {
     return balances.map(bl => (
       <List.Item key={bl.name + bl.balance}>
         <List.Item.Meta title={<span>{bl.name}</span>} />
-        <div>{this.formatBalance(bl.balance)}</div>
+        <div>{this.formatAmount(bl.balance)}</div>
       </List.Item>
     ));
   };
@@ -159,7 +159,7 @@ class Monitor extends PureComponent {
 
             <div>
               <small className={styles.itemFont}>
-                {this.formatBalance(tr.amount)}
+                {this.formatAmount(tr.amount)}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
                   <Icon type="caret-down" style={{ marginLeft: 5, color: 'red' }} />
@@ -188,8 +188,6 @@ class Monitor extends PureComponent {
       totalFreeze,
       loading,
     } = this.state;
-
-    console.log('AQUI:: ', totalFreeze.total);
 
     if (loading) {
       return (
@@ -224,7 +222,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatBalance(balance)}>
+                <CopyToClipboard text={this.formatAmount(balance)}>
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
               }
@@ -232,7 +230,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX "
-                total={this.formatBalance(balance)}
+                total={this.formatAmount(balance)}
                 footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
                 contentHeight={46}
               />
@@ -269,7 +267,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="Amount"
                 total={
-                  <span style={{ fontSize: 26 }}>{this.formatBalance(totalFreeze.total || 0)}</span>
+                  <span style={{ fontSize: 26 }}>{this.formatAmount(totalFreeze.total || 0)}</span>
                 }
                 contentHeight={46}
                 footer={
