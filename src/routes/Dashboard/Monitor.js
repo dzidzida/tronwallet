@@ -189,6 +189,8 @@ class Monitor extends PureComponent {
       loading,
     } = this.state;
 
+    console.log('AQUI:: ', totalFreeze.total);
+
     if (loading) {
       return (
         <div className={styles.loading}>
@@ -266,7 +268,9 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Amount"
-                total={<span style={{ fontSize: 26 }}>{this.formatBalance(totalFreeze.total || 0)}</span>}
+                total={
+                  <span style={{ fontSize: 26 }}>{this.formatBalance(totalFreeze.total || 0)}</span>
+                }
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (
