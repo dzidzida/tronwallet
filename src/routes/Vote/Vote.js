@@ -118,22 +118,24 @@ class Vote extends Component {
     }
   };
 
-  onVoteChange = (address, value) => {
+  onVoteChange = (address, value, max) => {
     const { voteList, totalTrx } = this.state;
+    const findAddressAmount = voteList.find(v => v.address === address).amount
 
-    if (value) {
-      if (voteList.find(v => v.address === address).amount) {
+    if (!max) {
+      voteList.find(v => v.address === address).amount = value;
+    } else if (findAddressAmount) {
         voteList.find(v => v.address === address).amount += value;
-      } else {
-        voteList.find(v => v.address === address).amount = 0 + value;
-      }
-      this.setState({ voteList, isReset: false }, () => {
-        const totalVotes = this.state.voteList.reduce((prev, vote) => {
-          return Number(prev) + Number(vote.amount || 0);
-        }, 0);
-        this.setState({ totalRemaining: totalTrx - totalVotes });
-      });
+    } else {
+        voteList.find(v => v.address === address).amount = value;
     }
+
+    this.setState({ voteList, isReset: false }, () => {
+      const totalVotes = this.state.voteList.reduce((prev, vote) => {
+        return Number(prev) + Number(vote.amount || 0);
+      }, 0);
+      this.setState({ totalRemaining: totalTrx - totalVotes });
+    });
   };
 
   submit = async () => {
@@ -293,7 +295,7 @@ class Vote extends Component {
                     </div>
                     <div style={{ margin: 15 }}>
                       <VoteSlider
-                        onVoteChange={v => this.onVoteChange(item.address, v)}
+                        onVoteChange={v => this.onVoteChange(item.address, v, false)}
                         totalTrx={totalTrx}
                         isReset={isReset}
                         isMax={item.amount || 0}
@@ -304,7 +306,8 @@ class Vote extends Component {
                         style={{ marginBottom: 5 }}
                         type="primary"
                         size="small"
-                        onClick={() => this.onVoteChange(item.address, totalRemaining)}
+                        onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
+                        disabled={totalRemaining <= 0}
                         icon="to-top"
                       >
                         Máx
