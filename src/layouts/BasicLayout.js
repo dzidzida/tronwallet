@@ -239,7 +239,6 @@ class BasicLayout extends React.PureComponent {
       match,
       location,
       isResultVisible,
-      transactionResult,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
     const layout = (
@@ -274,7 +273,6 @@ class BasicLayout extends React.PureComponent {
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
             <TransactionResultModal
-              result={transactionResult}
               visible={isResultVisible}
               onClose={this.onCloseTransactionModal}
             />
@@ -351,5 +349,4 @@ export default connect(({ user, global, loading, monitor }) => ({
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
   isResultVisible: monitor.isResultVisible,
-  transactionResult: monitor.transactionResult,
 }))(BasicLayout);

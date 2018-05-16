@@ -2,6 +2,7 @@ import { Card, Col, List, Row, Button, Icon, Spin } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
+import { connect } from 'dva';
 import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -17,22 +18,20 @@ class Monitor extends PureComponent {
   state = {
     tronPriceData: [],
     lastDay: {},
-    balances: [],
-    balance: 0,
-    tronAccount: '',
-    transactionsData: [],
     transactionDetail: {},
     modalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
     freezeTransaction: '',
     qrcodeVisible: false,
-    totalFreeze: 0,
     loading: true,
   };
 
   async componentDidMount() {
     await this.loadData();
+    this.props.dispatch({
+      type: 'user/fetchWalletData',
+    });
   }
 
   onOpenModal = () => this.setState({ modalVisible: true });
@@ -49,51 +48,33 @@ class Monitor extends PureComponent {
   };
 
   loadData = async () => {
-    const data = await Promise.all([
-      getTronPrice(),
-      Client.getBalances(),
-      Client.getPublicKey(),
-      Client.getTransactionList(),
-      Client.getFreeze(),
-    ]);
-
-    const { Data: tronPriceList = [] } = data[0];
-    const balances = data[1];
-    const tronAccount = data[2];
-    const { balance } = balances.find(b => b.name === 'TRX');
-    const transactionsData = data[3];
-    const frozen = data[4];
+    const data = await getTronPrice();
+    const { Data: tronPriceList = [] } = data;
 
     if (!tronPriceList.length) {
+      this.setState({ loading: false });
       return;
     }
-
     const tronPriceData = tronPriceList.map(price => ({
       x: `${moment.unix(price.time).format('YYYY-MM-DD HH:mm')}`,
       y: price.close,
     }));
 
     const lastDay = this.getLastDayFromTronPriceList(tronPriceList);
-
     this.setState({
       tronPriceData,
       lastDay,
-      balance,
-      balances,
-      tronAccount,
-      transactionsData,
-      totalFreeze: frozen,
       loading: false,
     });
   };
 
-  formatAmount = (number) => {
+  formatAmount = number => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
-  }
+  };
 
-  formatAmountTokens = (number) => {
+  formatAmountTokens = number => {
     return Number(number.toFixed(6)).toLocaleString();
-  }
+  };
 
   handleFreeze = async amount => {
     const transactionString = await Client.freezeBalance(amount);
@@ -120,7 +101,8 @@ class Monitor extends PureComponent {
   };
 
   renderTokens = () => {
-    const { balances } = this.state;
+    const { balances } = this.props.userWallet;
+    console.log('OLHA AS BALANCES', balances);
     return balances.map(bl => (
       <List.Item key={bl.name + bl.balance}>
         <List.Item.Meta title={<span>{bl.name}</span>} />
@@ -130,7 +112,7 @@ class Monitor extends PureComponent {
   };
 
   renderTransactions = () => {
-    const { transactionsData } = this.state;
+    const { transactionsData } = this.props.userWallet;
     if (transactionsData.transactions) {
       return transactionsData.transactions.map(tr => (
         <List.Item key={tr.timestamp}>
@@ -172,26 +154,26 @@ class Monitor extends PureComponent {
     const {
       tronPriceData,
       lastDay,
-      balance,
-      tronAccount,
       modalVisible,
       freezeModalVisible,
       unFreezeModalVisible,
       freezeTransaction,
       qrcodeVisible,
-      totalFreeze,
       loading,
       transactionDetail,
     } = this.state;
 
-    if (loading) {
+    const { balance, tronAccount, totalFreeze } = this.props.userWallet;
+
+    const { loadingWallet } = this.props.user;
+
+    if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
           <Spin size="large" />
         </div>
       );
     }
-
     return (
       <Fragment>
         <Row gutter={24}>
@@ -262,7 +244,9 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="Amount"
                 total={
-                  <span style={{ fontSize: 26 }}>{this.formatAmountTokens(totalFreeze.total || 0)}</span>
+                  <span style={{ fontSize: 26 }}>
+                    {this.formatAmountTokens(totalFreeze.total || 0)}
+                  </span>
                 }
                 contentHeight={46}
                 footer={
@@ -355,4 +339,7 @@ class Monitor extends PureComponent {
   }
 }
 
-export default Monitor;
+export default connect(({ user }) => ({
+  user,
+  userWallet: user.userWalletData,
+}))(Monitor);
