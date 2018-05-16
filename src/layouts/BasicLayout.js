@@ -131,7 +131,7 @@ class BasicLayout extends React.PureComponent {
   onCloseTransactionModal = () => {
     this.props.dispatch({
       type: 'monitor/changeModalResult',
-      payload: { visible: false, result: false },
+      payload: { visible: false, transaction: {} },
     });
   };
 
@@ -192,7 +192,7 @@ class BasicLayout extends React.PureComponent {
       if (data.uuid === pk) {
         dispatch({
           type: 'monitor/changeModalResult',
-          payload: { visible: true, result: data.succeeded },
+          payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
         });
       }
     });

@@ -28,7 +28,7 @@ class ClientWallet {
   // SEND TRANSACTION
   async send({ token, to, amount }) {
     const owner = await this.getPublicKey();
-    let transaction = buildTransferTransaction(token, owner, to, amount);
+    let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
 
     transaction = await Client.addRef(transaction);
     const transactionBytes = transaction.serializeBinary();
@@ -122,7 +122,7 @@ class ClientWallet {
     const accountInfo = Account.deserializeBinary(bytesAccountInfo);
     const assetMap = accountInfo.getAssetMap().toArray();
     const trxBalance = accountInfo.getBalance();
-    const trxBalanceNum = (trxBalance / ONE_TRX).toFixed(6);
+    const trxBalanceNum = trxBalance.toFixed(5);
 
     const balances = [
       {
@@ -160,7 +160,6 @@ class ClientWallet {
         transactionData: tx,
       })
     );
-
     return data;
   }
 

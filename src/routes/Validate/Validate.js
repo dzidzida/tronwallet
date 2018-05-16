@@ -13,18 +13,19 @@ export default class Transaction extends Component {
     this.loadTransaction();
   }
 
-  postResult = async (result, userpk) => {
+  postResult = async (result, userpk, transaction) => {
     try {
       await axios.post('https://tronnotifier.now.sh/v1/notifier/emit', {
         uuid: userpk,
         succeeded: result,
+        hash: transaction,
       });
     } catch (err) {
       console.warn('err', err);
     } finally {
-      setTimeout(() => {
-        history.replaceState({}, '', '/#/user/');
-      }, 8000);
+      // setTimeout(() => {
+      //   history.replaceState({}, '', '/#/user/');
+      // }, 8000);
     }
   };
 
@@ -41,9 +42,8 @@ export default class Transaction extends Component {
     try {
       if (transaction) {
         const result = await Client.submitTransaction(transaction);
-        this.postResult(!!result, userpk);
-
-        if (!result) error = 'Transaction not successfull';
+        this.postResult(!!result, userpk, transaction);
+        if (!result) error = 'Transaction not successful';
 
         this.setState({ result, error });
       } else {
