@@ -153,12 +153,11 @@ class ClientWallet {
     return data;
   }
 
+
   async submitTransaction(tx) {
     const { data } = await axios.post(
-      `${this.url}/transactionFromView`,
-      qs.stringify({
-        transactionData: tx,
-      })
+      `${this.api}/transaction`,
+      { transaction: tx },
     );
     return data;
   }

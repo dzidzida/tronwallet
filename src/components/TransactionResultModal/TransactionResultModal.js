@@ -12,9 +12,9 @@ class TransactionQRCode extends Component {
     for (const ctr in contracts[0]) {
       if (ctr) {
         contractsElements.push(
-          <p>
+          <h3>
             {ctr} : {contracts[0][ctr]}
-          </p>
+          </h3>
         );
       }
     }
