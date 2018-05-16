@@ -54,4 +54,4 @@ class GrpcClient {
   }
 }
 
-module.exports = GrpcClient;
+export default GrpcClient;

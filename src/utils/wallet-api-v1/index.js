@@ -1,7 +1,7 @@
 const GrpcClient = require('./client/grpc');
 const HttpClient = require('./client/http');
 
-module.exports = {
+export default {
   GrpcClient,
   HttpClient,
 };

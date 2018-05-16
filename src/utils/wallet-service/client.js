@@ -1,18 +1,19 @@
 import axios from 'axios';
 import qs from 'qs';
-import { HttpClient } from '@tronprotocol/wallet-api';
-import {
-  base64DecodeFromString,
-  byteArray2hexStr,
-  bytesToString,
-} from './utils/bytes';
+import HttpClient from './../wallet-api-v1/client/http';
+import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './utils/bytes';
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
 import { stringToBytes } from './lib/code';
 import { getBase58CheckAddress } from './utils/crypto';
 import deserializeTransaction from './protocol/serializer';
 import { getUserAttributes } from '../../services/api';
-import { buildVote, buildTransferTransaction, buildFreezeBalance, buildUnfreezeBalance } from './utils/transaction';
+import {
+  buildVote,
+  buildTransferTransaction,
+  buildFreezeBalance,
+  buildUnfreezeBalance,
+} from './utils/transaction';
 
 const TRON_URL = 'https://tronscan.io';
 const Client = new HttpClient();

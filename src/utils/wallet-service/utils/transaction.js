@@ -1,13 +1,8 @@
 /*eslint-disable*/
-import { decode58Check } from '@tronprotocol/wallet-api/src/utils/crypto';
+import { decode58Check } from './../../wallet-api-v1/utils/crypto';
 import { keys } from 'lodash';
-const {
-  Block,
-  Transaction,
-  Account,
-} = require('@tronprotocol/wallet-api/src/protocol/core/Tron_pb');
-const base64DecodeFromString = require('@tronprotocol/wallet-api/src/lib/code')
-  .base64DecodeFromString;
+const { Block, Transaction, Account } = require('./../../wallet-api-v1/protocol/core/Tron_pb');
+const base64DecodeFromString = require('./../../wallet-api-v1/lib/code').base64DecodeFromString;
 const google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
 const {
@@ -22,7 +17,7 @@ const {
   WitnessUpdateContract,
   WithdrawBalanceContract,
   WitnessCreateContract,
-} = require('@tronprotocol/wallet-api/src/protocol/core/Contract_pb');
+} = require('./../../wallet-api-v1/protocol/core/Contract_pb');
 
 export function encodeString(str) {
   return Uint8Array.from(base64DecodeFromString(btoa(str)));

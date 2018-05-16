@@ -53,6 +53,6 @@ function deserializeTransaction(tx) {
   return transactions;
 }
 
-module.exports = {
+export default {
   deserializeTransaction,
 };
