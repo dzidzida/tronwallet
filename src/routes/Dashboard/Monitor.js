@@ -6,7 +6,7 @@ import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
@@ -89,6 +89,10 @@ class Monitor extends PureComponent {
 
   formatAmount = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+  }
+
+  formatAmountTokens = (number) => {
+    return Number(number.toFixed(6)).toLocaleString();
   }
 
   handleFreeze = async amount => {
@@ -258,7 +262,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="Amount"
                 total={
-                  <span style={{ fontSize: 26 }}>{this.formatAmount(totalFreeze.total || 0)}</span>
+                  <span style={{ fontSize: 26 }}>{this.formatAmountTokens(totalFreeze.total || 0)}</span>
                 }
                 contentHeight={46}
                 footer={
