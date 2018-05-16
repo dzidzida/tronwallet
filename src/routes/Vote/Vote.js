@@ -120,13 +120,20 @@ class Vote extends Component {
 
   onVoteChange = (address, value) => {
     const { voteList, totalTrx } = this.state;
-    voteList.find(v => v.address === address).amount = value;
-    this.setState({ voteList, isReset: false }, () => {
-      const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount || 0);
-      }, 0);
-      this.setState({ totalRemaining: totalTrx - totalVotes });
-    });
+
+    if (value) {
+      if (voteList.find(v => v.address === address).amount) {
+        voteList.find(v => v.address === address).amount += value;
+      } else {
+        voteList.find(v => v.address === address).amount = 0 + value;
+      }
+      this.setState({ voteList, isReset: false }, () => {
+        const totalVotes = this.state.voteList.reduce((prev, vote) => {
+          return Number(prev) + Number(vote.amount || 0);
+        }, 0);
+        this.setState({ totalRemaining: totalTrx - totalVotes });
+      });
+    }
   };
 
   submit = async () => {
@@ -297,7 +304,7 @@ class Vote extends Component {
                         style={{ marginBottom: 5 }}
                         type="primary"
                         size="small"
-                        onClick={() => this.onVoteChange(item.address, totalTrx)}
+                        onClick={() => this.onVoteChange(item.address, totalRemaining)}
                         icon="to-top"
                       >
                         Máx
