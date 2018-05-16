@@ -6,11 +6,9 @@ import styles from './Vote.less';
 import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
-import Header from './../../components/Vote/Header';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-// import VoteInput from './../../components/Vote/VoteInput';
 import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
@@ -29,7 +27,6 @@ class Vote extends Component {
     totalRemaining: 0,
     endTime: null,
     totalVotes: 0,
-    inVoting: false,
     transaction: '',
     isReset: true,
     loading: true,
@@ -75,7 +72,7 @@ class Vote extends Component {
   };
 
   onStartVote = () => {
-    this.setState({ inVoting: true });
+    // this.setState({ inVoting: true });
   };
 
   onResetVotes = address => {
@@ -210,7 +207,6 @@ class Vote extends Component {
       endTime,
       totalVotes,
       totalRemaining,
-      inVoting,
       totalTrx,
       isReset,
       loading,
@@ -263,7 +259,6 @@ class Vote extends Component {
             loading={false}
             size="large"
             dataSource={voteList}
-            header={<Header inVoting={inVoting} />}
             renderItem={(item, index) => (
               <List.Item
                 key={item.address}
