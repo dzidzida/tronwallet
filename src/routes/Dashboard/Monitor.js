@@ -266,7 +266,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Amount"
-                total={this.formatBalance(totalFreeze.total || 0)}
+                total={<span style={{ fontSize: 26 }}>{this.formatBalance(totalFreeze.total || 0)}</span>}
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (
@@ -334,7 +334,7 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
         </Row>
-        <SetPkModal visible={modalVisible} onClose={this.onCloseModal} />
+        <SetPkModal visible={modalVisible} onClose={this.onCloseModal} loadData={this.loadData} />
         <FreezeModal
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}

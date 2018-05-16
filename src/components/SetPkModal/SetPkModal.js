@@ -11,10 +11,11 @@ class TransactionQRCode extends Component {
 
   putUser = async () => {
     const { pk } = this.state;
-    const { onClose } = this.props;
+    const { onClose, loadData } = this.props;
     try {
       if (pk) {
         await setUserPk(pk);
+        loadData();
         onClose();
       } else {
         throw new Error();
