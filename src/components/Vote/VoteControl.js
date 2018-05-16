@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Affix, Card } from 'antd';
+import { Button, Affix } from 'antd';
 import styles from './index.less';
-
-const { Meta } = Card;
+import voteStyles from '../../routes/Vote/Vote.less';
 
 class VoteControl extends Component {
   static defautlProps = {
@@ -27,20 +26,19 @@ class VoteControl extends Component {
 
     if (totalRemaining < 0) {
       return (
-        <Button type="danger" size="large" disabled>
-          Submit Votes
+        <Button type="primary" disabled>
+          SUBMIT
         </Button>
       );
     }
     return (
       <Button
-        type="danger"
-        size="large"
+        type="primary"
         onClick={onSubmit}
         disabled={Number(totalTrx) === Number(totalRemaining)}
         icon="check-circle-o"
       >
-        Submit Votes
+        SUBMIT
       </Button>
     );
   };
@@ -48,21 +46,18 @@ class VoteControl extends Component {
   renderSubmit = () => {
     const { totalRemaining, onResetVotes } = this.props;
     const { affix } = this.state;
-    const affixStyle = affix ? { position: 'absolute' } : null;
+    const affixStyle = affix
+      ? { position: 'absolute', backgroundColor: '#ffffff', padding: 50 }
+      : null;
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
-        <Card style={{ width: 350 }}>
-          <Meta
-            title={
-              <h1 className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
-                {Number(totalRemaining).toLocaleString()}
-              </h1>
-            }
-            description="Votes Remaining"
-          />
+        <div className={affix ? voteStyles.out : voteStyles.headerInfo}>
+          <span>Votes Remaining</span>
+          <p className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
+            {Number(totalRemaining).toLocaleString()}
+          </p>
           <div className={styles.containerVoteButtons}>
             <Button
-              size="large"
               onClick={() => onResetVotes(null)}
               icon="close-circle-o"
               style={{ marginRight: 5 }}
@@ -71,7 +66,7 @@ class VoteControl extends Component {
             </Button>
             {this.renderSubmitButton()}
           </div>
-        </Card>
+        </div>
       </Affix>
     );
   };
