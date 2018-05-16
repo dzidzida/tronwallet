@@ -1,22 +1,18 @@
-/* eslint-disable*/
 import axios from 'axios';
 import qs from 'qs';
-// import { buildApplyForDelegate } from "./utils/transaction";
-// const hexStr2byteArray = require("./lib/code").hexStr2byteArray;
+import { HttpClient } from '@tronprotocol/wallet-api';
 import {
   base64DecodeFromString,
   byteArray2hexStr,
   bytesToString,
-  longToByteArray,
 } from './utils/bytes';
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
-import { stringToBytes, hexStr2byteArray } from './lib/code';
-import { getBase58CheckAddress, signTransaction } from './utils/crypto';
+import { stringToBytes } from './lib/code';
+import { getBase58CheckAddress } from './utils/crypto';
 import deserializeTransaction from './protocol/serializer';
 import { getUserAttributes } from '../../services/api';
-import { HttpClient } from '@tronprotocol/wallet-api';
-import { buildVote, buildTransferTransaction } from './utils/transaction';
+import { buildVote, buildTransferTransaction, buildFreezeBalance, buildUnfreezeBalance } from './utils/transaction';
 
 const TRON_URL = 'https://tronscan.io';
 const Client = new HttpClient();
@@ -32,11 +28,11 @@ class ClientWallet {
   // SEND TRANSACTION
   async send({ token, to, amount }) {
     const owner = await this.getPublicKey();
-    let transaction = buildTransferTransaction(token, owner, to, amount);
+    let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
 
     transaction = await Client.addRef(transaction);
-    let transactionBytes = transaction.serializeBinary();
-    let transactionString = byteArray2hexStr(transactionBytes);
+    const transactionBytes = transaction.serializeBinary();
+    const transactionString = byteArray2hexStr(transactionBytes);
     return transactionString;
   }
 
@@ -126,7 +122,7 @@ class ClientWallet {
     const accountInfo = Account.deserializeBinary(bytesAccountInfo);
     const assetMap = accountInfo.getAssetMap().toArray();
     const trxBalance = accountInfo.getBalance();
-    const trxBalanceNum = (trxBalance / ONE_TRX).toFixed(6);
+    const trxBalanceNum = trxBalance.toFixed(5);
 
     const balances = [
       {
@@ -157,14 +153,12 @@ class ClientWallet {
     return data;
   }
 
+
   async submitTransaction(tx) {
     const { data } = await axios.post(
-      `${this.url}/transactionFromView`,
-      qs.stringify({
-        transactionData: tx,
-      })
+      `${this.api}/transaction`,
+      { transaction: tx },
     );
-
     return data;
   }
 
@@ -178,32 +172,10 @@ class ClientWallet {
     return obj;
   }
 
-  addRef = async transaction => {
-    const latestBlock = await this.getLatestBlock();
-
-    const latestBlockHash = latestBlock.hash;
-    const latestBlockNum = latestBlock.number;
-
-    const numBytes = longToByteArray(latestBlockNum);
-    numBytes.reverse();
-    const hashBytes = hexStr2byteArray(latestBlockHash);
-
-    const generateBlockId = [...numBytes.slice(0, 8), ...hashBytes.slice(8, hashBytes.length - 1)];
-
-    const rawData = transaction.getRawData();
-    rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
-    rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
-
-    transaction.setRawData(rawData);
-    return transaction;
-  };
-
   async getFreeze() {
     const owner = await this.getPublicKey();
-    const obj = { owner };
-    const { data } = await axios.get(`${this.api}/account/${owner}/balance`);
-    obj.data = data;
-    return obj;
+    const { data: { frozen } } = await axios.get(`${this.api}/account/${owner}/balance`);
+    return { ...frozen, total: frozen.total / ONE_TRX };
   }
 
   async voteForWitnesses(votes) {
@@ -214,6 +186,32 @@ class ClientWallet {
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       console.warn(transactionString);
+      return transactionString;
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  async freezeBalance(amount) {
+    try {
+      const owner = await this.getPublicKey();
+      let transaction = buildFreezeBalance(owner, amount * ONE_TRX, 3);
+      transaction = await Client.addRef(transaction);
+      const transactionBytes = transaction.serializeBinary();
+      const transactionString = byteArray2hexStr(transactionBytes);
+      return transactionString;
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  async unfreezeBalance() {
+    try {
+      const owner = await this.getPublicKey();
+      let transaction = buildUnfreezeBalance(owner);
+      transaction = await Client.addRef(transaction);
+      const transactionBytes = transaction.serializeBinary();
+      const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
     } catch (error) {
       console.warn(error);

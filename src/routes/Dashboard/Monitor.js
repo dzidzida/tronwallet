@@ -6,16 +6,11 @@ import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
-import Client, { ONE_TRX } from '../../utils/wallet-service/client';
+import Client from '../../utils/wallet-service/client';
 import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
-import {
-  buildFreezeBalance,
-  buildUnfreezeBalance,
-} from '../../utils/wallet-service/utils/transaction';
-import { byteArray2hexStr } from '../../utils/wallet-service/utils/bytes';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 class Monitor extends PureComponent {
@@ -26,6 +21,7 @@ class Monitor extends PureComponent {
     balance: 0,
     tronAccount: '',
     transactionsData: [],
+    transactionDetail: {},
     modalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
@@ -66,7 +62,7 @@ class Monitor extends PureComponent {
     const tronAccount = data[2];
     const { balance } = balances.find(b => b.name === 'TRX');
     const transactionsData = data[3];
-    const { data: { frozen } } = data[4];
+    const frozen = data[4];
 
     if (!tronPriceList.length) {
       return;
@@ -96,13 +92,10 @@ class Monitor extends PureComponent {
   }
 
   handleFreeze = async amount => {
-    const tronAccount = await Client.getPublicKey();
-    const transaction = buildFreezeBalance(tronAccount, amount * ONE_TRX, 3);
-    const transactionBytes = transaction.serializeBinary();
-    const transactionString = byteArray2hexStr(transactionBytes);
-
+    const transactionString = await Client.freezeBalance(amount);
     if (transactionString) {
       this.setState({
+        transactionDetail: { Type: 'FREEZE', Amount: amount },
         freezeTransaction: transactionString,
         qrcodeVisible: true,
         freezeModalVisible: false,
@@ -111,14 +104,11 @@ class Monitor extends PureComponent {
   };
 
   handleUnfreeze = async () => {
-    const tronAccount = await Client.getPublicKey();
-    const transaction = buildUnfreezeBalance(tronAccount);
-    const transactionBytes = transaction.serializeBinary();
-    const transactionString = byteArray2hexStr(transactionBytes);
-
+    const transactionString = await Client.unfreezeBalance();
     if (transactionString) {
       this.setState({
         freezeTransaction: transactionString,
+        transactionDetail: { Type: 'UNFREEZE' },
         qrcodeVisible: true,
         unFreezeModalVisible: false,
       });
@@ -187,6 +177,7 @@ class Monitor extends PureComponent {
       qrcodeVisible,
       totalFreeze,
       loading,
+      transactionDetail,
     } = this.state;
 
     if (loading) {
@@ -351,6 +342,7 @@ class Monitor extends PureComponent {
           title="Freeze amount"
           message="Please, validate your transaction"
           data={freezeTransaction}
+          txDetail={transactionDetail}
           visible={qrcodeVisible}
           onClose={this.onCloseModal}
         />

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Modal } from 'antd';
 import * as QRCode from 'qrcode';
 import styles from './ModalTransaction.less';
-import { getUserAttributes } from '../../services/api';
+import Client from '../../utils/wallet-service/client';
 
 const URL = 'http://192.168.0.7:8000/#/user/validate';
 
@@ -11,18 +11,27 @@ class TransactionQRCode extends Component {
     qrcode: null,
   };
 
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.data != null) {
       this.loadUrl(nextProps.data);
     }
   }
 
+  onCloseModal = () => {
+    const { onClose } = this.props; // onClose From Parent component
+    this.setState({ qrcode: null }, onClose());
+  };
+
+
   loadUrl = async (data = 'getty.io') => {
-    const user = await getUserAttributes();
+    const { txDetails } = this.props;
+    const pk = await Client.getPublicKey();
     const validateData = JSON.stringify({
+      txDetails,
       data,
       URL,
-      pk: user['custom:publickey'],
+      pk,
       token: 'tron-wallet-getty',
     });
     console.log('Sending this data', validateData);
@@ -31,11 +40,10 @@ class TransactionQRCode extends Component {
   };
 
   render() {
-    const { title, message, visible, onClose, textFooter } = this.props;
+    const { title, visible, textFooter, message } = this.props;
     const { qrcode } = this.state;
-
     const footerButton = (
-      <button className={styles.button} onClick={onClose}>
+      <button className={styles.button} onClick={this.onCloseModal}>
         {textFooter || 'Make another Transaction'}
       </button>
     );
@@ -44,13 +52,13 @@ class TransactionQRCode extends Component {
       <Modal
         visible={visible}
         title={title}
-        onCancel={onClose}
-        onOk={onClose}
+        onCancel={this.onCloseModal}
+        onOk={this.onCloseModal}
         footer={footerButton}
       >
         <div className={styles.transaction}>
-          <div className={styles.messageContentWarning}>
-            <h2 className={styles.messageWarning}> {message}</h2>
+          <div className={styles.messageContent}>
+            <h2 className={styles.message}> {message}</h2>
           </div>
           <img className={styles.qrcode} src={qrcode} alt="Transaction QRCode" />
           <h3>Use this QRCode to validate it</h3>
