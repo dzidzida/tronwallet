@@ -5,6 +5,8 @@ export default {
 
   state: {
     tags: [],
+    isResultVisible: false,
+    transaction: {},
   },
 
   effects: {
@@ -15,6 +17,13 @@ export default {
         payload: response.list,
       });
     },
+    *changeModalResult({ payload }, { put }) {
+      yield put({
+        type: 'setResultVisible',
+        visible: payload.visible,
+        transaction: payload.transaction,
+      });
+    },
   },
 
   reducers: {
@@ -22,6 +31,13 @@ export default {
       return {
         ...state,
         tags: action.payload,
+      };
+    },
+    setResultVisible(state, action) {
+      return {
+        ...state,
+        isResultVisible: action.visible,
+        transaction: action.transaction,
       };
     },
   },
