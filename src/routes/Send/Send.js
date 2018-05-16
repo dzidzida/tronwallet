@@ -4,6 +4,7 @@ import ModalTransaction from '../../components/ModalTransaction/ModalTransaction
 import styles from './Send.less';
 import Client from '../../utils/wallet-service/client';
 import isAddressValid from '../../utils/wallet-service/utils/address';
+import { maskPrice } from '../../utils/mask';
 
 class Send extends Component {
   state = {
@@ -40,6 +41,12 @@ class Send extends Component {
     });
   };
 
+  changeAmount = e => {
+    const priceFormat = e.target.value;
+    const price = priceFormat.replace(/,/g, '');
+    this.setState({ amount: price });
+  };
+
   isToValid = () => {
     const { to } = this.state;
     return to === null ? true : isAddressValid(to);
@@ -58,8 +65,9 @@ class Send extends Component {
 
   handleSend = async () => {
     const { amount, transaction, to, token } = this.state;
+    const amountFormatted = amount * 10;
     this.setState({ transaction: { ...transaction, loading: true } });
-    const TransactionData = await Client.send({ to, token, amount });
+    const TransactionData = await Client.send({ to, token, amount: amountFormatted });
     const updatedTransaction = { ...transaction };
 
     if (TransactionData) {
@@ -110,9 +118,9 @@ class Send extends Component {
             <h3>Amount</h3>
             <input
               className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
-              onChange={this.change}
-              value={this.state.amount}
-              type="number"
+              onChange={this.changeAmount}
+              value={maskPrice(this.state.amount)}
+              type="text"
               name="amount"
               id="amount"
               placeholder="0.0000"
