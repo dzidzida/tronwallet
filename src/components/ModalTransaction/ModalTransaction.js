@@ -4,7 +4,7 @@ import * as QRCode from 'qrcode';
 import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 
-const URL = 'http://192.168.0.7:8000/#/user/validate';
+const URL = 'https://guard.tronwallet.me/#/user/validate';
 
 class TransactionQRCode extends Component {
   state = {
