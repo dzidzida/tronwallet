@@ -6,7 +6,7 @@ import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 
 const URL_SOCKET = 'https://tronnotifier.now.sh';
-const URL = 'http://192.168.0.7:8000/#/user/validate';
+const URL = 'https://secure.tronwallet.me/#/validate';
 
 class TransactionQRCode extends Component {
   state = {

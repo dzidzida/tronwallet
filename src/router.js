@@ -6,7 +6,6 @@ import dynamic from 'dva/dynamic';
 import { getRouterData } from './common/router';
 import Authorized from './utils/Authorized';
 import styles from './index.less';
-import Validate from './routes/Validate/Validate';
 
 const { ConnectedRouter } = routerRedux;
 const { AuthorizedRoute } = Authorized;
@@ -28,7 +27,7 @@ function RouterConfig({ history, app }) {
       <ConnectedRouter history={history}>
         <Switch>
           <Route path="/user" component={UserLayout} />
-          <Route path="/user/validate" component={Validate} />
+          <Route path="/validate" component={UserLayout} />
           <AuthorizedRoute
             path="/"
             render={props => <BasicLayout {...props} />}

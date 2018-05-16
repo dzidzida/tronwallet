@@ -34,9 +34,9 @@ export default class Transaction extends Component {
     // const transaction = params.get('tx');
     // const userpk = params.get('pk');
     const route = window.location.hash.split('/');
-    const userpk = route[3];
-    const transaction = route[4];
-    const time = route[5];
+    const userpk = route[2];
+    const transaction = route[3];
+    const time = route[4];
 
     let error = null;
 
