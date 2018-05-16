@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Modal } from 'antd';
 import * as QRCode from 'qrcode';
+import openSocket from 'socket.io-client';
 import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 
+const URL_SOCKET = 'https://tronnotifier.now.sh';
 const URL = 'https://guard.tronwallet.me/#/user/validate';
 
 class TransactionQRCode extends Component {
@@ -11,10 +13,18 @@ class TransactionQRCode extends Component {
     qrcode: null,
   };
 
+  componentDidMount() {
+    this.openSocket();
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.data != null) {
       this.loadUrl(nextProps.data);
+    }
+  }
+  componentWillUnmount() {
+    if (this.socket) {
+      this.socket.close();
     }
   }
 
@@ -22,7 +32,6 @@ class TransactionQRCode extends Component {
     const { onClose } = this.props; // onClose From Parent component
     this.setState({ qrcode: null }, onClose());
   };
-
 
   loadUrl = async (data = 'getty.io') => {
     const { txDetails } = this.props;
@@ -37,6 +46,17 @@ class TransactionQRCode extends Component {
     console.log('Sending this data', validateData);
     const qrcode = await QRCode.toDataURL(validateData);
     this.setState({ qrcode });
+  };
+
+  openSocket = async () => {
+    const pk = await Client.getPublicKey();
+    this.socket = openSocket(URL_SOCKET);
+    this.socket.on('payback', data => {
+      if (data.uuid === pk) {
+        // this.setState({ transactionResult: data.succeeded }, this.onCloseModal());
+        this.onCloseModal();
+      }
+    });
   };
 
   render() {
