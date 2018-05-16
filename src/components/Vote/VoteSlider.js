@@ -16,6 +16,7 @@ class VoteSlider extends PureComponent {
   }
 
   formatter = value => {
+    this.setState({ value });
     return value.toLocaleString();
   };
 
