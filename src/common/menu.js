@@ -158,19 +158,19 @@ import { isUrl } from '../utils/utils';
 
 const menuData = [
   {
-    name: 'dashboard',
+    name: 'Dashboard',
     icon: 'dashboard',
     path: 'dashboard',
     children: [],
   },
   {
-    name: 'send',
-    icon: 'form',
+    name: 'Send',
+    icon: 'export',
     path: 'send',
     children: [],
   },
   {
-    name: 'receive',
+    name: 'Receive',
     icon: 'qrcode',
     path: 'receive',
     children: [],

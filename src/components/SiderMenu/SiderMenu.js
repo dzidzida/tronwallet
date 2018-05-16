@@ -213,8 +213,8 @@ export default class SiderMenu extends PureComponent {
       >
         <div className={styles.logo} key="logo">
           <Link to="/">
-            <img src="https://d1lzt070f86yrq.cloudfront.net/tron-logo.png" alt="logo" />
-            <h1>Tron Wallet</h1>
+            <img src="/tron-logo.png" alt="logo" />
+            <h1>TronWallet</h1>
           </Link>
         </div>
         <Menu

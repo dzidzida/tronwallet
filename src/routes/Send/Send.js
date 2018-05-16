@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from 'antd';
+import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
 import Client from '../../utils/wallet-service/client';
@@ -11,7 +12,6 @@ class Send extends Component {
     to: null,
     amount: '0.0000',
     token: '',
-    balances: [],
     modalVisible: false,
     transaction: {
       loading: false,
@@ -22,16 +22,21 @@ class Send extends Component {
   };
 
   componentDidMount() {
-    this.loadBalances();
+    this.props.dispatch({
+      type: 'user/fetchWalletData',
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { balances } = nextProps.userWallet;
+    const { token } = this.state;
+    if (balances.length && token === '') {
+      this.setState({ token: balances[0].name });
+    }
   }
 
   onCloseModal = () => {
     this.setState({ modalVisible: false });
-  };
-
-  loadBalances = async () => {
-    const balances = await Client.getBalances();
-    this.setState({ balances, token: balances[0].name || '' });
   };
 
   change = e => {
@@ -55,7 +60,6 @@ class Send extends Component {
   isAmountValid = () => {
     const { amount } = this.state;
     const accountAmount = 100000;
-    // lógica de pegar a balance
     if (amount === '0.0000') return true;
     if (amount > 0 && amount <= accountAmount) return true;
     if (Number(amount) === 0 || amount === '') return false;
@@ -81,13 +85,14 @@ class Send extends Component {
   };
 
   renderOptions = () => {
-    const { balances } = this.state;
+    const { balances } = this.props.userWallet;
     return balances.map(bl => (
       <option key={bl.name + bl.balance} value={bl.name}>
         {bl.name} ({Number(bl.balance).toFixed(2)} available)
       </option>
     ));
   };
+
   render() {
     const { transaction, to, amount, modalVisible } = this.state;
     const amountValid = this.isAmountValid();
@@ -162,4 +167,7 @@ class Send extends Component {
   }
 }
 
-export default Send;
+export default connect(({ user }) => ({
+  loadWallet: user.loadWallet,
+  userWallet: user.userWalletData,
+}))(Send);

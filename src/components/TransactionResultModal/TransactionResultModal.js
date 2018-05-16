@@ -5,6 +5,14 @@ import moment from 'moment';
 import styles from './TransactionResultModal.less';
 
 class TransactionQRCode extends Component {
+  componentWillReceiveProps(nextProps) {
+    // Only Update values if transaction is successful
+    if (nextProps.transaction && nextProps.transaction.result) {
+      this.props.dispatch({
+        type: 'user/fetchWalletData',
+      });
+    }
+  }
   renderContracts = () => {
     const { contracts } = this.props.transaction;
     if (!contracts) return;

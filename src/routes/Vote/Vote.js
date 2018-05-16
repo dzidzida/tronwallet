@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Row, Col, List, Spin, Input, Button } from 'antd';
+import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -37,6 +38,14 @@ class Vote extends Component {
     this.onLoadData();
     this.onLoadEndTime();
     this.onLoadTotalVotes();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { totalFreeze } = nextProps.userWallet;
+    if (totalFreeze && totalFreeze.total > 0) {
+      const totalTrx = totalFreeze.total;
+      this.setState({ totalTrx, totalRemaining: totalTrx });
+    }
   }
 
   onLoadData = async () => {
@@ -309,4 +318,8 @@ class Vote extends Component {
     );
   }
 }
-export default Vote;
+
+export default connect(({ user }) => ({
+  loadWallet: user.loadWallet,
+  userWallet: user.userWalletData,
+}))(Vote);
