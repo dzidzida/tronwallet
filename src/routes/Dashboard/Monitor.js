@@ -226,7 +226,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX "
                 total={this.formatAmount(balance)}
-                footer={<Field label={moment(new Date()).format('DD-MM-YYYY HH:mm:ss')} />}
+                footer={<Field label={moment(new Date()).format('dddd, MMMM Do YYYY')} />}
                 contentHeight={46}
               />
             </Card>
@@ -270,7 +270,7 @@ class Monitor extends PureComponent {
                     <Field
                       label="Expires"
                       value={moment(new Date(totalFreeze.balances[0].expires)).format(
-                        'DD-MM-YYYY HH:mm:ss'
+                        'dddd, MMMM Do YYYY'
                       )}
                     />
                   ) : null

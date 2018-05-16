@@ -16,6 +16,7 @@ class VoteSlider extends PureComponent {
   }
 
   formatter = value => {
+    this.setState({ value });
     return value.toLocaleString();
   };
 
@@ -24,17 +25,20 @@ class VoteSlider extends PureComponent {
     const { value, maxValue } = this.state;
 
     return (
-      <div className={styles.iconWrapper}>
-        <Icon className={styles.anticon} type="frown-o" />
-        <Slider
-          onAfterChange={onVoteChange}
-          onChange={v => this.setState({ value: v, maxValue: v })}
-          step={10}
-          value={maxValue || value}
-          max={totalTrx}
-          tipFormatter={this.formatter}
-        />
-        <Icon className={styles.anticon} type="smile-o" />
+      <div>
+        <strong>{this.formatter(value)}</strong>
+        <div className={styles.iconWrapper}>
+          <Icon className={styles.anticon} type="frown-o" />
+          <Slider
+            onAfterChange={onVoteChange}
+            onChange={v => this.setState({ value: v, maxValue: v })}
+            step={10}
+            value={maxValue || value}
+            max={totalTrx}
+            tipFormatter={this.formatter}
+          />
+          <Icon className={styles.anticon} type="smile-o" />
+        </div>
       </div>
     );
   }
