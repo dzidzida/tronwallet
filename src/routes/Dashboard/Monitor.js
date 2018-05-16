@@ -226,7 +226,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX "
                 total={this.formatAmount(balance)}
-                footer={<Field label={moment(new Date()).format('dddd, MMMM Do YYYY')} />}
+                footer={<span>{tronAccount}</span>}
                 contentHeight={46}
               />
             </Card>

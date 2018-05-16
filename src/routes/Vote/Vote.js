@@ -9,7 +9,6 @@ import CowntDownInfo from './CowntDownInfo';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-// import VoteInput from './../../components/Vote/VoteInput';
 import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
@@ -31,18 +30,10 @@ class Vote extends Component {
     transaction: '',
     isReset: true,
     loading: true,
-    // transaction: {
-    //   loading: false,
-    //   status: false,
-    //   qrcode: null,
-    //   error: null,
-    // },
   };
 
   // #region logic
   componentDidMount() {
-    // this.onLoadWitness();
-    // this.onLoadAvailable();
     this.onLoadData();
     this.onLoadEndTime();
     this.onLoadTotalVotes();
@@ -56,19 +47,6 @@ class Vote extends Component {
     const totalTrx = frozen.total || 0;
     this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
   };
-
-  // onLoadWitness = async () => {
-  //   const voteList = await Client.getWitnesses();
-  //   this.setState({ voteList });
-  // };
-
-  // onLoadAvailable = async () => {
-  //   const balances = await Client.getBalances();
-  //   const trxBalance = balances.find(bl => bl.name === 'TRX');
-  //   let totalTrx = 0;
-  //   if (trxBalance) totalTrx = Number(trxBalance.balance).toFixed(0);
-  //   this.setState({ totalTrx, totalRemaining: totalTrx });
-  // };
 
   onLoadEndTime = async () => {
     const endTimeInMilis = votes.end_time;
@@ -249,7 +227,7 @@ class Vote extends Component {
               <Info title="Total votes" value={totalVotes.toLocaleString()} />
             </Col>
 
-            <Col sm={8} xs={24} bordered={false}>
+            <Col sm={8} xs={24}>
               <VoteControl
                 totalRemaining={totalRemaining}
                 totalTrx={totalTrx}
