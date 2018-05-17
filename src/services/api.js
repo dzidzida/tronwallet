@@ -51,7 +51,7 @@ export const forgotPassword = async email => {
   return Auth.forgotPassword(email);
 };
 
-export const confirmForgotPassword = async ({ email, code, newPassword }) => {
+export const confirmForgotPassword = async (email, code, newPassword ) => {
   return Auth.forgotPasswordSubmit(email, code, newPassword);
 };
 
