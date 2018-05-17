@@ -189,7 +189,7 @@ class Monitor extends PureComponent {
     return (
       <Fragment>
         <Row gutter={24}>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} >
             <Card
               title="TRX PRICE"
               style={{ marginBottom: 24 }}
@@ -205,7 +205,7 @@ class Monitor extends PureComponent {
               <ActiveChart data={tronPriceData} lastDay={lastDay} />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} >
             <Card
               title="BALANCE"
               style={{ marginBottom: 30 }}
@@ -225,7 +225,7 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} >
             <Card
               title="FROZEN TOKENS"
               style={{ marginBottom: 30 }}
@@ -274,7 +274,7 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} >
             <Card
               title="MY TRON ACCOUNT"
               style={{ marginBottom: 30 }}
@@ -308,17 +308,17 @@ class Monitor extends PureComponent {
         </Row>
         <Row gutter={24}>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card title="TOKENS"  bordered={false}>
               {this.renderTokens()}
             </Card>
           </Col>
-          <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card title="TRANSACTIONS" style={{ marginBottom: 16 }} bordered={false}>
+          <Col xl={12} lg={24} md={24} sm={24} xs={24} >
+            <Card title="TRANSACTIONS"  bordered={false}>
               {this.renderTransactions()}
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card title="OFFICIAL NEWS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card title="OFFICIAL NEWS"  bordered={false}>
               <TwitterTimelineEmbed
                 sourceType="profile"
                 screenName="justinsuntron"
