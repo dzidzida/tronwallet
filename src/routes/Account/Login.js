@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import * as QRCode from 'qrcode';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
 import { signIn, confirmSignIn, setUserPk } from '../../services/api';
@@ -26,6 +26,7 @@ class Login extends PureComponent {
     forgotPasswordEmail: '',
     newPassword: '',
     newPasswordVisible: false,
+    loading: false,
   };
 
   onCancel = () => {
@@ -42,17 +43,19 @@ class Login extends PureComponent {
       forgotPasswordEmail: '',
       newPassword: '',
       newPasswordVisible: '',
+      loading: false,
     });
   };
 
   submit = async () => {
     const { email, password } = this.state;
+    this.setState({ loading: true });
     try {
       const { user, totpCode } = await signIn(email, password);
       if (totpCode) this.renderQRCode(totpCode, email);
-      this.setState({ totpCode, user, modalVisible: true });
+      this.setState({ totpCode, user, modalVisible: true, loading: false });
     } catch (error) {
-      this.setState({ loginError: error.message });
+      this.setState({ loginError: error.message, loading: false });
     }
   };
 
@@ -227,7 +230,7 @@ class Login extends PureComponent {
   };
 
   render() {
-    const { email, password, loginError } = this.state;
+    const { email, password, loginError, loading } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -255,9 +258,14 @@ class Login extends PureComponent {
               id="password"
             />
             <h3 className={styles.error}>{loginError}</h3>
-            <button className={styles.button} onClick={this.submit}>
+            <Button
+              type="primary"
+              onClick={this.submit}
+              className={styles.button}
+              loading={loading}
+            >
               Login
-            </button>
+            </Button>
             <div className={styles.linksContainer}>
               <h3
                 onClick={() => this.props.dispatch(routerRedux.push('/user/signup'))}
