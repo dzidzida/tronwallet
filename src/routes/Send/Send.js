@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import isAddressValid from '../../utils/wallet-service/utils/address';
 import { maskPrice } from '../../utils/mask';
 
@@ -78,11 +78,15 @@ class Send extends Component {
     this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
+
+  format = number => {
+    return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+  }
   renderOptions = () => {
     const { balances } = this.props.userWallet;
     return balances.map(bl => (
       <option key={bl.name + bl.balance} value={bl.name}>
-        {bl.name} ({Number(bl.balance).toFixed(2)} available)
+        {bl.name} ({this.format(bl.balance)} available)
       </option>
     ));
   };
