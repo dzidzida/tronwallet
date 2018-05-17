@@ -23,21 +23,16 @@ export default class Transaction extends Component {
       });
     } catch (err) {
       console.warn('err', err);
-    } finally {
-      // setTimeout(() => {
-      //   history.replaceState({}, '', '/#/user/');
-      // }, 8000);
     }
   };
 
   loadTransaction = async () => {
     const route = window.location.hash.split('/');
     const userpk = route[2];
-    const transaction = route[3];
+    const transaction = route[3].split('?')[0];
     // const time = route[4];
 
     let error = null;
-
     if (!userpk || !transaction) {
       this.setState({ error: 'Missing data, please try again' });
       return;
