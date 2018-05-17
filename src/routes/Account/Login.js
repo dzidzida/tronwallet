@@ -5,7 +5,13 @@ import { connect } from 'dva';
 import { Modal, Button } from 'antd';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
-import { signIn, confirmSignIn, setUserPk } from '../../services/api';
+import {
+  signIn,
+  confirmSignIn,
+  setUserPk,
+  forgotPassword,
+  confirmForgotPassword,
+} from '../../services/api';
 import { reloadAuthorized } from '../../utils/Authorized';
 import { setAuthority } from '../../utils/authority';
 
@@ -24,6 +30,7 @@ class Login extends PureComponent {
     signInsuccess: false,
     forgotPasswordVisible: false,
     forgotPasswordEmail: '',
+    forgotPasswordCode: '',
     newPassword: '',
     newPasswordVisible: false,
     loading: false,
@@ -41,6 +48,7 @@ class Login extends PureComponent {
       confirmLoginError: '',
       forgotPasswordVisible: false,
       forgotPasswordEmail: '',
+      forgotPasswordCode: '',
       newPassword: '',
       newPasswordVisible: '',
       loading: false,
@@ -86,15 +94,20 @@ class Login extends PureComponent {
     }
   };
 
-  confirmForgotPassword = async () => {
-    // const { forgotPasswordEmail } = this.state;
+  sendEmailForgotPassword = async () => {
+    const { forgotPasswordEmail } = this.state;
     try {
-      this.onCancel();
-      // await forgotPassword(forgotPasswordEmail)
-      // TODO: FAZER CASO DE SUCESSO
+      await forgotPassword(forgotPasswordEmail);
+      this.setState({ forgotPasswordVisible: false, newPasswordVisible: true });
     } catch (error) {
       // TODO: FAZER CASO DE FALHA
     }
+  };
+
+  confirmForgotPassword = async () => {
+    const { forgotPasswordEmail, forgotPasswordCode, newPassword } = this.state;
+    await confirmForgotPassword(forgotPasswordEmail, forgotPasswordCode, newPassword);
+    this.onCancel();
   };
 
   renderQRCode = async (code, username) => {
@@ -175,7 +188,7 @@ class Login extends PureComponent {
       <Modal
         title="Forgot password"
         visible={forgotPasswordVisible}
-        onOk={this.confirmForgotPassword}
+        onOk={this.sendEmailForgotPassword}
         onCancel={this.onCancel}
       >
         <h3>Email</h3>
@@ -192,18 +205,19 @@ class Login extends PureComponent {
   };
 
   renderConfirmForgotPasswordModal = () => {
-    const { newPasswordVisible, newPassword } = this.state;
+    const { newPasswordVisible, newPassword, forgotPasswordEmail, forgotPasswordCode } = this.state;
     return (
       <Modal
         title="Forgot password"
         visible={newPasswordVisible}
-        onOk={() => {}}
+        onOk={this.confirmForgotPassword}
         onCancel={this.onCancel}
       >
         <h3>Email</h3>
         <input
           className={styles.formControl}
           onChange={this.change}
+          value={forgotPasswordEmail}
           type="email"
           name="forgotPasswordEmail"
           id="forgotPasswordEmail"
@@ -212,6 +226,7 @@ class Login extends PureComponent {
         <input
           className={styles.formControl}
           onChange={this.change}
+          value={forgotPasswordCode}
           type="text"
           name="forgotPasswordCode"
           id="forgotPasswordCode"

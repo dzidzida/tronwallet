@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Modal, Button } from 'antd';
+import { Modal, Button, Tooltip, Icon } from 'antd';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
 import styles from './Signup.less';
@@ -132,7 +132,15 @@ class Signup extends PureComponent {
               name="phoneNumber"
               id="phoneNumber"
             />
-            <h3>Password</h3>
+            <div style={{ display: 'flex', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+              <h3 style={{ paddingRight: 5 }}>Password</h3>
+              <Tooltip
+                placement="right"
+                title="Password must have at least one uppercase letter and one special character"
+              >
+                <Icon style={{ color: 'rgba(0,0,0,.25)' }} type="info-circle-o" />
+              </Tooltip>
+            </div>
             <input
               className={styles.formControl}
               value={password}
