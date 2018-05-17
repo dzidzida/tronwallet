@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
 import styles from './Signup.less';
@@ -16,9 +16,11 @@ class Signup extends PureComponent {
     signupError: '',
     confirmSignupError: '',
     signupSuccess: false,
+    loading: false,
   };
 
   submit = async () => {
+    this.setState({ loading: true });
     try {
       const response = await signUp(this.state);
       this.setState({
@@ -26,9 +28,10 @@ class Signup extends PureComponent {
         modalVisible: true,
         signupError: '',
         signupSuccess: false,
+        loading: false,
       });
     } catch (error) {
-      this.setState({ signupError: error.message, signupSuccess: false });
+      this.setState({ signupError: error.message, signupSuccess: false, loading: false });
     }
   };
 
@@ -102,7 +105,7 @@ class Signup extends PureComponent {
   };
 
   render() {
-    const { password, email, phoneNumber, signupError } = this.state;
+    const { password, email, phoneNumber, signupError, loading } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -139,9 +142,17 @@ class Signup extends PureComponent {
               id="password"
             />
             <h3 className={styles.error}>{signupError}</h3>
-            <button className={styles.button} onClick={this.submit}>
+            <Button
+              type="primary"
+              onClick={this.submit}
+              className={styles.button}
+              loading={loading}
+            >
               Register
-            </button>
+            </Button>
+            {/* <button className={styles.button} onClick={this.submit}>
+              Register
+            </button> */}
             <h3
               onClick={() => this.props.dispatch(routerRedux.push('/user/login'))}
               className={styles.backLogin}
