@@ -21,12 +21,6 @@ class Send extends Component {
     },
   };
 
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'user/fetchWalletData',
-    });
-  }
-
   componentWillReceiveProps(nextProps) {
     const { balances } = nextProps.userWallet;
     const { token } = this.state;

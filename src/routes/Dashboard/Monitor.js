@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon, Spin } from 'antd';
+import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -29,9 +29,6 @@ class Monitor extends PureComponent {
 
   async componentDidMount() {
     await this.loadData();
-    this.props.dispatch({
-      type: 'user/fetchWalletData',
-    });
   }
 
   onOpenModal = () => this.setState({ modalVisible: true });
@@ -89,20 +86,36 @@ class Monitor extends PureComponent {
   };
 
   handleUnfreeze = async () => {
-    const transactionString = await Client.unfreezeBalance();
-    if (transactionString) {
+    const { totalFreeze: { balances } } = this.props.userWallet;
+
+    if (!balances.length) {
+      Modal.error({
+        title: 'Something wrong getting balances',
+      });
+      return;
+    }
+    if (balances[0].expires > Date.now()) {
       this.setState({
-        freezeTransaction: transactionString,
-        transactionDetail: { Type: 'UNFREEZE' },
-        qrcodeVisible: true,
         unFreezeModalVisible: false,
       });
+      Modal.error({
+        title: 'Unable to Unfreeze',
+        content:
+          'Unable to unfreeze TRX. This could be caused because the minimal freeze period hasn`t been reached yet',
+      });
+      return;
     }
+    const transactionString = await Client.unfreezeBalance();
+    this.setState({
+      freezeTransaction: transactionString,
+      transactionDetail: { Type: 'UNFREEZE' },
+      qrcodeVisible: true,
+      unFreezeModalVisible: false,
+    });
   };
 
   renderTokens = () => {
     const { balances } = this.props.userWallet;
-    console.log('OLHA AS BALANCES', balances);
     return balances.map(bl => (
       <List.Item key={bl.name + bl.balance}>
         <List.Item.Meta title={<span>{bl.name}</span>} />
@@ -166,7 +179,6 @@ class Monitor extends PureComponent {
     const { balance, tronAccount, totalFreeze } = this.props.userWallet;
 
     const { loadingWallet } = this.props.user;
-
     if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
@@ -322,6 +334,7 @@ class Monitor extends PureComponent {
           onOk={this.handleFreeze}
         />
         <UnfreezeModal
+          freezeBalance={totalFreeze.balances}
           visible={unFreezeModalVisible}
           onClose={() => this.setState({ unFreezeModalVisible: false })}
           onOk={this.handleUnfreeze}
@@ -330,7 +343,7 @@ class Monitor extends PureComponent {
           title="Freeze amount"
           message="Please, validate your transaction"
           data={freezeTransaction}
-          txDetail={transactionDetail}
+          txDetails={transactionDetail}
           visible={qrcodeVisible}
           onClose={this.onCloseModal}
         />

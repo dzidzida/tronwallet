@@ -17,6 +17,19 @@ export default {
         payload: response.list,
       });
     },
+    // *openSocket(_, { call, put }) {
+    //   const pk = yield call(Client.getPublicKey);
+    //   const socket = openSocket(URL_SOCKET);
+    //   socket.on('payback', data => {
+    //     console.log("SocketPK", pk);
+    //     if (data.uuid === pk) {
+    //       put({
+    //         type: 'setResultVisible',
+    //         payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
+    //       });
+    //     }
+    //   });
+    // },
     *changeModalResult({ payload }, { put }) {
       yield put({
         type: 'setResultVisible',

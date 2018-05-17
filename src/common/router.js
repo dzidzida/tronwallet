@@ -107,7 +107,7 @@ export const getRouterData = app => {
     '/validate': {
       component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
     },
-    '/validate/:pk/:transaction/:timestamp': {
+    '/validate/:pk/:transaction': {
       component: dynamicWrapper(app, ['register'], () => import('../routes/Validate/Validate')),
     },
   };
