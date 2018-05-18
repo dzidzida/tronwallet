@@ -52,9 +52,9 @@ class ApiClient {
   }
 
   async addRef(transaction) {
-    let { blocks: latestBlock } = await this.getBlocks({
+    let {blocks: latestBlock} = await this.getBlocks({
       sort: '-timestamp',
-      limit: 1,
+      limit: 1
     });
 
     latestBlock = latestBlock[0];
@@ -71,7 +71,7 @@ class ApiClient {
     let rawData = transaction.getRawData();
     rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
     rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
-    rawData.setExpiration(latestBlock.timestamp + 60 * 1000);
+    rawData.setExpiration(latestBlock.timestamp + (60 * 1000));
 
     transaction.setRawData(rawData);
     return transaction;
