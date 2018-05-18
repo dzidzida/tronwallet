@@ -35,7 +35,7 @@ class TransactionQRCode extends Component {
     this.setState({ qrcode: null });
   };
 
-  loadUrl = async nextProps => {
+  loadUrl = async (nextProps) => {
     const { txDetails, data } = nextProps;
     const pk = await Client.getPublicKey();
     const validateData = JSON.stringify({
@@ -53,7 +53,7 @@ class TransactionQRCode extends Component {
   openSocket = async () => {
     const pk = await Client.getPublicKey();
     this.socket = openSocket(URL_SOCKET);
-    this.socket.on('payback', data => {
+    this.socket.on('payback', (data) => {
       if (data.uuid === pk) {
         this.onCloseModal();
       }

@@ -27,7 +27,7 @@ export default class Transaction extends Component {
   };
 
   loadTransaction = async () => {
-		const { match } = this.props;
+    const { match } = this.props;
     const { pk, transaction } = match.params;
 
     let error = null;

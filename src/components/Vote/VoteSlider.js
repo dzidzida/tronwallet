@@ -15,7 +15,7 @@ class VoteSlider extends PureComponent {
     this.setState({ maxValue: nextProps.isMax });
   }
 
-  formatter = value => {
+  formatter = (value) => {
     this.setState({ value });
     return value.toLocaleString();
   };

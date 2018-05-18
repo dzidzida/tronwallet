@@ -33,14 +33,14 @@ class Send extends Component {
     this.setState({ modalVisible: false });
   };
 
-  change = e => {
+  change = (e) => {
     const { name, value } = e.target;
     this.setState({
       [name]: value,
     });
   };
 
-  changeAmount = e => {
+  changeAmount = (e) => {
     const priceFormat = e.target.value;
     const price = priceFormat.replace(/,/g, '');
     this.setState({ amount: price });
@@ -78,7 +78,7 @@ class Send extends Component {
     this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
-  format = number => {
+  format = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
   };
   renderOptions = () => {

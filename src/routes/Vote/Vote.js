@@ -31,13 +31,13 @@ class Vote extends Component {
     transaction: '',
     isReset: true,
     loading: true,
+    userVotes: {},
   };
 
   // #region logic
   componentDidMount() {
     this.onLoadData();
     this.onLoadEndTime();
-    this.onLoadTotalVotes();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,12 +49,27 @@ class Vote extends Component {
   }
 
   onLoadData = async () => {
-    const data = await Promise.all([Client.getWitnesses(), Client.getFreeze()]);
+    const data = await Promise.all([
+      Client.getWitnesses(),
+      Client.getFreeze(),
+      Client.getTotalVotes(),
+      Client.getUserVotes(),
+    ]);
 
     const voteList = data[0];
     const frozen = data[1];
+    const totalVotes = data[2];
+    const userVotes = data[3];
     const totalTrx = frozen.total || 0;
-    this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
+
+    this.setState({
+      voteList,
+      totalTrx,
+      totalRemaining: totalTrx,
+      totalVotes,
+      userVotes,
+      loading: false,
+    });
   };
 
   onLoadEndTime = async () => {
@@ -80,7 +95,7 @@ class Vote extends Component {
     this.setState({ modalVisible: false });
   };
 
-  onResetVotes = address => {
+  onResetVotes = (address) => {
     const { voteList, totalTrx } = this.state;
     if (address) {
       delete voteList.find(v => v.address === address).amount;
@@ -91,7 +106,7 @@ class Vote extends Component {
         this.setState({ totalRemaining: totalTrx - totalVotes });
       });
     } else {
-      voteList.filter(v => v.amount).forEach(v => {
+      voteList.filter(v => v.amount).forEach((v) => {
         const vt = v;
         delete vt.amount;
       });
@@ -101,7 +116,7 @@ class Vote extends Component {
 
   onVoteChange = (address, value, max) => {
     const { voteList, totalTrx } = this.state;
-    const findAddressAmount = voteList.find(v => v.address === address).amount
+    const findAddressAmount = voteList.find(v => v.address === address).amount;
 
     if (!max) {
       voteList.find(v => v.address === address).amount = value;
@@ -122,7 +137,7 @@ class Vote extends Component {
   submit = async () => {
     const { voteList } = this.state;
     const votesPrepared = {};
-    voteList.forEach(vote => {
+    voteList.forEach((vote) => {
       if (vote.amount && Number(vote.amount) > 0) {
         const key = vote.address;
         votesPrepared[key] = vote.amount;
@@ -143,12 +158,12 @@ class Vote extends Component {
     }
   };
 
-  handleSearch = async e => {
+  handleSearch = async (e) => {
     const { value } = e.target;
     const { voteList } = this.state;
     if (value) {
       const regex = new RegExp(value, 'i');
-      const votesFilter = voteList.filter(vote => {
+      const votesFilter = voteList.filter((vote) => {
         return vote.address.match(regex) || vote.url.match(regex);
       });
       this.setState({ voteList: votesFilter });
@@ -193,7 +208,7 @@ class Vote extends Component {
 
   renderProgressBar = () => {
     const { totalRemaining, totalTrx } = this.state;
-    const percent = (totalTrx - totalRemaining) / totalTrx * 100;
+    const percent = ((totalTrx - totalRemaining) / totalTrx) * 100;
     if (totalRemaining < 0) {
       return <div className={styles.progressBarDanger} style={{ width: '100%' }} />;
     } else if (totalRemaining === 0) {
@@ -203,9 +218,62 @@ class Vote extends Component {
   };
   // #endregion
 
+  renderVoteList = () => {
+    const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
+
+    return (
+      <List
+        rowKey="id"
+        loading={false}
+        size="large"
+        dataSource={voteList}
+        renderItem={(item, index) => (
+          <List.Item
+            key={item.address}
+            actions={[
+              <div className={styles.listItemRow}>
+                <div style={{ margin: 15 }}>
+                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />
+                </div>
+                <div style={{ margin: 15 }}>
+                  <VoteSlider
+                    onVoteChange={v => this.onVoteChange(item.address, v, false)}
+                    totalTrx={totalTrx}
+                    isReset={isReset}
+                    isMax={item.amount || 0}
+                  />
+                </div>
+                <div className={styles.smallButtonsContainer}>
+                  <Button
+                    style={{ marginBottom: 5 }}
+                    type="primary"
+                    size="small"
+                    onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
+                    disabled={totalRemaining <= 0}
+                    icon="to-top"
+                  >
+                    Máx
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => this.onResetVotes(item.address)}
+                    icon="close-circle-o"
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </div>,
+            ]}
+          >
+            <ListContent index={index + 1} {...item} />
+          </List.Item>
+        )}
+      />
+    );
+  };
+
   render() {
     const {
-      voteList,
       transaction,
       voteError,
       modalVisible,
@@ -213,8 +281,8 @@ class Vote extends Component {
       totalVotes,
       totalRemaining,
       totalTrx,
-      isReset,
       loading,
+      userVotes,
     } = this.state;
 
     if (loading) {
@@ -242,6 +310,8 @@ class Vote extends Component {
                 totalTrx={totalTrx}
                 onSubmit={this.submit}
                 onResetVotes={this.onResetVotes}
+                totalVotes={totalVotes}
+                userVotes={userVotes}
               />
             </Col>
           </Row>
@@ -258,53 +328,7 @@ class Vote extends Component {
           }
         >
           <p>{voteError}</p>
-          <List
-            rowKey="id"
-            loading={false}
-            size="large"
-            dataSource={voteList}
-            renderItem={(item, index) => (
-              <List.Item
-                key={item.address}
-                actions={[
-                  <div className={styles.listItemRow}>
-                    <div style={{ margin: 15 }}>
-                      <ProgressItem votes={Number(item.votes)} total={totalVotes} />
-                    </div>
-                    <div style={{ margin: 15 }}>
-                      <VoteSlider
-                        onVoteChange={v => this.onVoteChange(item.address, v, false)}
-                        totalTrx={totalTrx}
-                        isReset={isReset}
-                        isMax={item.amount || 0}
-                      />
-                    </div>
-                    <div className={styles.smallButtonsContainer}>
-                      <Button
-                        style={{ marginBottom: 5 }}
-                        type="primary"
-                        size="small"
-                        onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
-                        disabled={totalRemaining <= 0}
-                        icon="to-top"
-                      >
-                        Máx
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => this.onResetVotes(item.address)}
-                        icon="close-circle-o"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                  </div>,
-                ]}
-              >
-                <ListContent index={index + 1} {...item} />
-              </List.Item>
-            )}
-          />
+          {this.renderVoteList()}
         </Card>
         <ModalTransaction
           title="Vote"
