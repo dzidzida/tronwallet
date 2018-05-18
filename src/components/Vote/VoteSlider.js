@@ -15,7 +15,7 @@ class VoteSlider extends PureComponent {
     this.setState({ maxValue: nextProps.isMax });
   }
 
-  formatter = value => {
+  formatter = (value) => {
     this.setState({ value });
     return value.toLocaleString();
   };
@@ -28,7 +28,7 @@ class VoteSlider extends PureComponent {
       <div>
         <strong>{this.formatter(value)}</strong>
         <div className={styles.iconWrapper}>
-          <Icon className={styles.anticon} type="frown-o" />
+          <Icon className={styles.anticon} type="meh-o" />
           <Slider
             onAfterChange={onVoteChange}
             onChange={v => this.setState({ value: v, maxValue: v })}

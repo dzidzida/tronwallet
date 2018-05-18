@@ -5,14 +5,17 @@ import moment from 'moment';
 import styles from './TransactionResultModal.less';
 
 class TransactionQRCode extends Component {
-  componentWillReceiveProps(nextProps) {
-    // Only Update values if transaction is successful
-    if (nextProps.transaction && nextProps.transaction.result) {
+  onCloseModal = () => {
+    const { onClose } = this.props;
+    const { result } = this.props.transaction;
+    if (result) {
       this.props.dispatch({
         type: 'user/fetchWalletData',
       });
     }
-  }
+    onClose(); // Closes the tx modal
+  };
+
   renderContracts = () => {
     const { contracts } = this.props.transaction;
     if (!contracts) return;
@@ -36,20 +39,18 @@ class TransactionQRCode extends Component {
   };
 
   render() {
-    const { visible, onClose } = this.props;
+    const { visible } = this.props;
     const { result, timestamp } = this.props.transaction;
     const footerButton = (
-      <button className={styles.button} onClick={onClose}>
+      <button className={styles.button} onClick={this.onCloseModal}>
         {'Ok'}
       </button>
     );
-
     return (
       <Modal
         visible={visible}
         title="Last transaction"
-        onCancel={onClose}
-        onOk={onClose}
+        onCancel={this.onCloseModal}
         footer={footerButton}
       >
         <div>

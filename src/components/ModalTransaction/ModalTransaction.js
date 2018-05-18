@@ -6,7 +6,7 @@ import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 
 const URL_SOCKET = 'https://tronnotifier.now.sh';
-const URL = 'https://secure.tronwallet.me/#/validate';
+const URL = 'https://secure.tronwallet.me/validate';
 
 class TransactionQRCode extends Component {
   state = {
@@ -19,9 +19,10 @@ class TransactionQRCode extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.data != null) {
-      this.loadUrl(nextProps.data);
+      this.loadUrl(nextProps);
     }
   }
+
   componentWillUnmount() {
     if (this.socket) {
       this.socket.close();
@@ -29,12 +30,13 @@ class TransactionQRCode extends Component {
   }
 
   onCloseModal = () => {
-    const { onClose } = this.props; // onClose From Parent component
-    this.setState({ qrcode: null }, onClose());
+    const { onClose } = this.props;
+    onClose(); // onClose From Parent component
+    this.setState({ qrcode: null });
   };
 
-  loadUrl = async (data = 'getty.io') => {
-    const { txDetails } = this.props;
+  loadUrl = async (nextProps) => {
+    const { txDetails, data } = nextProps;
     const pk = await Client.getPublicKey();
     const validateData = JSON.stringify({
       txDetails,
@@ -51,9 +53,8 @@ class TransactionQRCode extends Component {
   openSocket = async () => {
     const pk = await Client.getPublicKey();
     this.socket = openSocket(URL_SOCKET);
-    this.socket.on('payback', data => {
+    this.socket.on('payback', (data) => {
       if (data.uuid === pk) {
-        // this.setState({ transactionResult: data.succeeded }, this.onCloseModal());
         this.onCloseModal();
       }
     });

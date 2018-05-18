@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
+import { Card, Col, List, Row, Button, Icon, Spin, Modal, message } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -19,7 +19,7 @@ class Monitor extends PureComponent {
     tronPriceData: [],
     lastDay: {},
     transactionDetail: {},
-    modalVisible: false,
+    pkModalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
     freezeTransaction: '',
@@ -32,11 +32,19 @@ class Monitor extends PureComponent {
     await this.loadData();
   }
 
-  onOpenModal = () => this.setState({ modalVisible: true });
+  onOpenModal = () => this.setState({ pkModalVisible: true });
+  onClosePkModal = () => this.setState({ pkModalVisible: false });
 
-  onCloseModal = () => this.setState({ modalVisible: false, qrcodeVisible: false });
+  // This  close function from TransactionModal needs to close every modal
+  onCloseQRmodal = () => {
+    this.setState({
+      freezeModalVisible: false,
+      unFreezeModalVisible: false,
+      qrcodeVisible: false,
+    });
+  };
 
-  getLastDayFromTronPriceList = tronPriceList => {
+  getLastDayFromTronPriceList = (tronPriceList) => {
     const lastTronPrice = tronPriceList[tronPriceList.length - 1];
     return {
       total: `${lastTronPrice.close}`,
@@ -46,37 +54,41 @@ class Monitor extends PureComponent {
   };
 
   loadData = async () => {
-    const data = await getTronPrice();
-    const entropy = await Client.getEntropy();
-    const { Data: tronPriceList = [] } = data;
+    try {
+      const data = await getTronPrice();
+      const entropy = await Client.getEntropy();
+      const { Data: tronPriceList = [] } = data;
 
-    if (!tronPriceList.length) {
-      this.setState({ loading: false });
-      return;
+      if (!tronPriceList.length) {
+        this.setState({ loading: false });
+        return;
+      }
+      const tronPriceData = tronPriceList.map(price => ({
+        x: `${moment.unix(price.time).format('YYYY-MM-DD HH:mm')}`,
+        y: price.close,
+      }));
+
+      const lastDay = this.getLastDayFromTronPriceList(tronPriceList);
+      this.setState({
+        tronPriceData,
+        lastDay,
+        loading: false,
+        entropy,
+      });
+    } catch (error) {
+      message.error(error.message);
     }
-    const tronPriceData = tronPriceList.map(price => ({
-      x: `${moment.unix(price.time).format('YYYY-MM-DD HH:mm')}`,
-      y: price.close,
-    }));
-
-    const lastDay = this.getLastDayFromTronPriceList(tronPriceList);
-    this.setState({
-      tronPriceData,
-      lastDay,
-      loading: false,
-      entropy,
-    });
   };
 
-  formatAmount = number => {
+  formatAmount = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
   };
 
-  formatAmountTokens = number => {
+  formatAmountTokens = (number) => {
     return Number(number.toFixed(6)).toLocaleString();
   };
 
-  handleFreeze = async amount => {
+  handleFreeze = async (amount) => {
     const transactionString = await Client.freezeBalance(amount);
     if (transactionString) {
       this.setState({
@@ -186,7 +198,7 @@ class Monitor extends PureComponent {
     const {
       tronPriceData,
       lastDay,
-      modalVisible,
+      pkModalVisible,
       freezeModalVisible,
       unFreezeModalVisible,
       freezeTransaction,
@@ -206,10 +218,11 @@ class Monitor extends PureComponent {
         </div>
       );
     }
+
     return (
       <Fragment>
         <Row gutter={24}>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
               title="TRX PRICE"
               style={{ marginBottom: 24 }}
@@ -225,7 +238,7 @@ class Monitor extends PureComponent {
               <ActiveChart data={tronPriceData} lastDay={lastDay} />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
               title="BALANCE"
               style={{ marginBottom: 30 }}
@@ -245,7 +258,7 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
               title="FROZEN TOKENS"
               style={{ marginBottom: 30 }}
@@ -294,7 +307,7 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
               title="ENTROPY"
               style={{ marginBottom: 30 }}
@@ -358,16 +371,20 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card title="OFFICIAL NEWS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card title="OFFICIAL NEWS" bordered={false}>
               <TwitterTimelineEmbed
                 sourceType="profile"
                 screenName="justinsuntron"
-                options={{ height: 600 }}
+                options={{ height: 900 }}
               />
             </Card>
           </Col>
         </Row>
-        <SetPkModal visible={modalVisible} onClose={this.onCloseModal} loadData={this.loadData} />
+        <SetPkModal
+          visible={pkModalVisible}
+          onClose={this.onClosePkModal}
+          loadData={this.loadData}
+        />
         <FreezeModal
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}
@@ -385,7 +402,7 @@ class Monitor extends PureComponent {
           data={freezeTransaction}
           txDetails={transactionDetail}
           visible={qrcodeVisible}
-          onClose={this.onCloseModal}
+          onClose={this.onCloseQRmodal}
         />
       </Fragment>
     );

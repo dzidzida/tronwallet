@@ -95,11 +95,7 @@ class Vote extends Component {
     this.setState({ modalVisible: false });
   };
 
-  onStartVote = () => {
-    // this.setState({ inVoting: true });
-  };
-
-  onResetVotes = address => {
+  onResetVotes = (address) => {
     const { voteList, totalTrx } = this.state;
     if (address) {
       delete voteList.find(v => v.address === address).amount;
@@ -110,7 +106,7 @@ class Vote extends Component {
         this.setState({ totalRemaining: totalTrx - totalVotes });
       });
     } else {
-      voteList.filter(v => v.amount).forEach(v => {
+      voteList.filter(v => v.amount).forEach((v) => {
         const vt = v;
         delete vt.amount;
       });
@@ -141,7 +137,7 @@ class Vote extends Component {
   submit = async () => {
     const { voteList } = this.state;
     const votesPrepared = {};
-    voteList.forEach(vote => {
+    voteList.forEach((vote) => {
       if (vote.amount && Number(vote.amount) > 0) {
         const key = vote.address;
         votesPrepared[key] = vote.amount;
@@ -162,12 +158,12 @@ class Vote extends Component {
     }
   };
 
-  handleSearch = async e => {
+  handleSearch = async (e) => {
     const { value } = e.target;
     const { voteList } = this.state;
     if (value) {
       const regex = new RegExp(value, 'i');
-      const votesFilter = voteList.filter(vote => {
+      const votesFilter = voteList.filter((vote) => {
         return vote.address.match(regex) || vote.url.match(regex);
       });
       this.setState({ voteList: votesFilter });
@@ -212,7 +208,7 @@ class Vote extends Component {
 
   renderProgressBar = () => {
     const { totalRemaining, totalTrx } = this.state;
-    const percent = (totalTrx - totalRemaining) / totalTrx * 100;
+    const percent = ((totalTrx - totalRemaining) / totalTrx) * 100;
     if (totalRemaining < 0) {
       return <div className={styles.progressBarDanger} style={{ width: '100%' }} />;
     } else if (totalRemaining === 0) {
@@ -311,7 +307,6 @@ class Vote extends Component {
             <Col sm={8} xs={24}>
               <VoteControl
                 totalRemaining={totalRemaining}
-                onStartVote={this.onStartVote}
                 totalTrx={totalTrx}
                 onSubmit={this.submit}
                 onResetVotes={this.onResetVotes}
@@ -340,7 +335,7 @@ class Vote extends Component {
           message="Please, validate your transaction"
           data={transaction}
           visible={modalVisible}
-          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx - totalRemaining }}
+          txDetails={{ Type: 'VOTE', Amount: totalTrx - totalRemaining }}
           onClose={this.onCloseModal}
         />
       </div>

@@ -158,19 +158,19 @@ import { isUrl } from '../utils/utils';
 
 const menuData = [
   {
-    name: 'dashboard',
+    name: 'Dashboard',
     icon: 'dashboard',
     path: 'dashboard',
     children: [],
   },
   {
-    name: 'send',
-    icon: 'form',
+    name: 'Send',
+    icon: 'export',
     path: 'send',
     children: [],
   },
   {
-    name: 'receive',
+    name: 'Receive',
     icon: 'qrcode',
     path: 'receive',
     children: [],
@@ -190,7 +190,7 @@ const menuData = [
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {
-  return data.map(item => {
+  return data.map((item) => {
     let { path } = item;
     if (!isUrl(path)) {
       path = parentPath + item.path;
