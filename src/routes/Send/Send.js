@@ -78,10 +78,9 @@ class Send extends Component {
     this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
-
   format = number => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
-  }
+  };
   renderOptions = () => {
     const { balances } = this.props.userWallet;
     return balances.map(bl => (
@@ -154,7 +153,7 @@ class Send extends Component {
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
-            txDetails={{ To: to, Amount: amount, Type: 'SEND' }}
+            txDetails={{ To: to, Amount: amount * 10, Type: 'SEND' }}
             data={transaction.data}
             visible={modalVisible}
             onClose={this.onCloseModal}
