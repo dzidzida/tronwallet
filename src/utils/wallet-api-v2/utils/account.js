@@ -19,6 +19,6 @@ function generateAccount() {
   };
 }
 
-module.exports = {
+export default {
   generateAccount,
 };

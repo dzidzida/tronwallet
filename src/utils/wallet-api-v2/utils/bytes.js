@@ -67,7 +67,7 @@ function byteArray2hexStr(byteArray) {
   return str;
 }
 
-module.exports = {
+export default {
   byteArray2hexStr,
   hextoString,
   base64DecodeFromString,

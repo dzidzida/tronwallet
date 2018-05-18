@@ -230,7 +230,7 @@ function pkToAddress(privateKey) {
   return getBase58CheckAddress(com_addressBytes);
 }
 
-module.exports = {
+export default {
   signTransaction,
   passwordToAddress,
   genPriKey,

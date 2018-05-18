@@ -17,6 +17,6 @@ function isAddressValid(address) {
   return true;
 }
 
-module.exports = {
+export default {
   isAddressValid,
 };

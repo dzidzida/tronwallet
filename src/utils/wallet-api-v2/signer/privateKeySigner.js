@@ -10,4 +10,4 @@ class PrivateKeySigner {
   }
 }
 
-module.exports = PrivateKeySigner;
+export default PrivateKeySigner;

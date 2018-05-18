@@ -206,7 +206,7 @@ function buildUnfreezeBalance(address) {
   );
 }
 
-module.exports = {
+export default {
   buildTransferTransaction,
   buildAccountUpdate,
   buildAssetParticipate,

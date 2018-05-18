@@ -38,7 +38,7 @@ function byteArrayToLong(/*byte[]*/ byteArray) {
 
 class ApiClient {
   constructor() {
-    this.apiUrl = process.env.API_URL;
+    this.apiUrl = 'https://api.tronscan.org';
     this.signer = null;
   }
 
@@ -71,6 +71,7 @@ class ApiClient {
     let rawData = transaction.getRawData();
     rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
     rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
+    rawData.setExpiration(latestBlock.timestamp + 60 * 1000);
 
     transaction.setRawData(rawData);
     return transaction;
@@ -357,6 +358,4 @@ class ApiClient {
   }
 }
 
-module.exports = {
-  ApiClient,
-};
+export default ApiClient;

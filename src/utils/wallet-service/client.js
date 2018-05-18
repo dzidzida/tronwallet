@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-import HttpClient from './../wallet-api-v1/client/http';
+import ApiClient from './../wallet-api-v2/client/explorer';
 import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './utils/bytes';
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
@@ -16,7 +16,7 @@ import {
 } from './utils/transaction';
 
 const TRON_URL = 'https://tronscan.io';
-const Client = new HttpClient();
+const explorer = new ApiClient();
 
 export const ONE_TRX = 1000000;
 
@@ -31,7 +31,7 @@ class ClientWallet {
     const owner = await this.getPublicKey();
     let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
 
-    transaction = await Client.addRef(transaction);
+    transaction = await explorer.addRef(transaction);
     const transactionBytes = transaction.serializeBinary();
     const transactionString = byteArray2hexStr(transactionBytes);
     return transactionString;
@@ -183,7 +183,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildVote(owner, votes);
-      transaction = await Client.addRef(transaction);
+      transaction = await explorer.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       console.warn(transactionString);
@@ -197,7 +197,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildFreezeBalance(owner, amount * ONE_TRX, 3);
-      transaction = await Client.addRef(transaction);
+      transaction = await explorer.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
@@ -210,7 +210,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildUnfreezeBalance(owner);
-      transaction = await Client.addRef(transaction);
+      transaction = await explorer.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
