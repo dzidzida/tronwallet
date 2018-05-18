@@ -110,9 +110,9 @@ class Vote extends Component {
     if (!max) {
       voteList.find(v => v.address === address).amount = value;
     } else if (findAddressAmount) {
-        voteList.find(v => v.address === address).amount += value;
+      voteList.find(v => v.address === address).amount += value;
     } else {
-        voteList.find(v => v.address === address).amount = value;
+      voteList.find(v => v.address === address).amount = value;
     }
 
     this.setState({ voteList, isReset: false }, () => {
@@ -316,7 +316,7 @@ class Vote extends Component {
           message="Please, validate your transaction"
           data={transaction}
           visible={modalVisible}
-          txDetails={{ Type: 'VOTE', TotalVotes: totalTrx - totalRemaining }}
+          txDetails={{ Type: 'VOTE', Amount: totalTrx - totalRemaining }}
           onClose={this.onCloseModal}
         />
       </div>
