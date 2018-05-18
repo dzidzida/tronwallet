@@ -27,20 +27,18 @@ export default class Transaction extends Component {
   };
 
   loadTransaction = async () => {
-    const route = window.location.hash.split('/');
-    const userpk = route[2];
-    const transaction = route[3].split('?')[0];
-    // const time = route[4];
+		const { match } = this.props;
+    const { pk, transaction } = match.params;
 
     let error = null;
-    if (!userpk || !transaction) {
+    if (!pk || !transaction) {
       this.setState({ error: 'Missing data, please try again' });
       return;
     }
     try {
       if (transaction) {
         const { success, code } = await Client.submitTransaction(transaction);
-        this.postResult(success, userpk, transaction);
+        this.postResult(success, pk, transaction);
         if (!success) error = ValidateCodes[code] || code;
 
         this.setState({ success, error });
