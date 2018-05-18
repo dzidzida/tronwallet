@@ -1,6 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 import ApiClient from './../wallet-api-v2/client/explorer';
+import HttpClient from './../wallet-api-v1/client/http';
 import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './utils/bytes';
 import { Account, Transaction } from './protocol/core/Tron_pb';
 import { WitnessList, AssetIssueList } from './protocol/api/api_pb';
@@ -17,6 +18,7 @@ import {
 
 const TRON_URL = 'https://tronscan.io';
 const explorer = new ApiClient();
+const client = new HttpClient();
 
 export const ONE_TRX = 1000000;
 
