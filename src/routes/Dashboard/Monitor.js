@@ -227,46 +227,6 @@ class Monitor extends PureComponent {
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
-              title="ENTROPY"
-              style={{ marginBottom: 30 }}
-              bordered={false}
-              extra={
-                <CopyToClipboard text={this.formatAmount(balance)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
-              }
-            >
-              <ChartCard
-                bordered={false}
-                title="TRX "
-                total={this.formatAmount(entropy)}
-                footer={<span>{tronAccount}</span>}
-                contentHeight={46}
-              />
-            </Card>
-          </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card
-              title="TRON POWER"
-              style={{ marginBottom: 30 }}
-              bordered={false}
-              extra={
-                <CopyToClipboard text={this.formatAmount(balance)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
-              }
-            >
-              <ChartCard
-                bordered={false}
-                title="TRX "
-                total={this.formatAmount(balance)}
-                footer={<span>{tronAccount}</span>}
-                contentHeight={46}
-              />
-            </Card>
-          </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card
               title="BALANCE"
               style={{ marginBottom: 30 }}
               bordered={false}
@@ -285,8 +245,6 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-        </Row>
-        <Row gutter={24}>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
               title="FROZEN TOKENS"
@@ -316,7 +274,7 @@ class Monitor extends PureComponent {
             >
               <ChartCard
                 bordered={false}
-                title="Amount"
+                title="Tron Power"
                 total={
                   <span style={{ fontSize: 26 }}>
                     {this.formatAmountTokens(totalFreeze.total || 0)}
@@ -334,6 +292,33 @@ class Monitor extends PureComponent {
                   ) : null
                 }
               />
+            </Card>
+          </Col>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+            <Card
+              title="ENTROPY"
+              style={{ marginBottom: 30 }}
+              bordered={false}
+              extra={
+                <CopyToClipboard text={this.formatAmount(entropy)}>
+                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
+                </CopyToClipboard>
+              }
+            >
+              <ChartCard
+                bordered={false}
+                title="TRX "
+                total={this.formatAmount(entropy)}
+                footer={<span>{tronAccount}</span>}
+                contentHeight={46}
+              />
+            </Card>
+          </Col>
+        </Row>
+        <Row gutter={24}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
+            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
+              {this.renderTokens()}
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
@@ -367,14 +352,7 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
-              {this.renderTokens()}
-            </Card>
-          </Col>
-          <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card title="TRANSACTIONS" style={{ marginBottom: 16 }} bordered={false}>
               {this.renderTransactions()}
             </Card>
