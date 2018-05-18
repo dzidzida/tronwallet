@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Affix } from 'antd';
+import _ from 'lodash';
 import styles from './index.less';
 import voteStyles from '../../routes/Vote/Vote.less';
 
@@ -44,7 +45,7 @@ class VoteControl extends Component {
   };
 
   renderSubmit = () => {
-    const { totalRemaining, onResetVotes } = this.props;
+    const { totalRemaining, onResetVotes, totalVotes, userVotes } = this.props;
     const { affix } = this.state;
     const affixStyle = affix
       ? { position: 'absolute', backgroundColor: '#ffffff', padding: 50 }
@@ -66,6 +67,13 @@ class VoteControl extends Component {
             </Button>
             {this.renderSubmitButton()}
           </div>
+          {!totalVotes && _.isEmpty(userVotes) ? (
+            <div>
+              <a href="/" style={{ fontSize: 12 }}>
+                No votes available found.<br />Please, freeze tokens on dashboard before vote
+              </a>
+            </div>
+          ) : null}
         </div>
       </Affix>
     );

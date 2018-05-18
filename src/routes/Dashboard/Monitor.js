@@ -25,6 +25,7 @@ class Monitor extends PureComponent {
     freezeTransaction: '',
     qrcodeVisible: false,
     loading: true,
+    entropy: 0,
   };
 
   async componentDidMount() {
@@ -46,6 +47,7 @@ class Monitor extends PureComponent {
 
   loadData = async () => {
     const data = await getTronPrice();
+    const entropy = await Client.getEntropy();
     const { Data: tronPriceList = [] } = data;
 
     if (!tronPriceList.length) {
@@ -62,6 +64,7 @@ class Monitor extends PureComponent {
       tronPriceData,
       lastDay,
       loading: false,
+      entropy,
     });
   };
 
@@ -115,18 +118,26 @@ class Monitor extends PureComponent {
   };
 
   renderTokens = () => {
-    const { balances } = this.props.userWallet;
-    return balances.map(bl => (
-      <List.Item key={bl.name + bl.balance}>
-        <List.Item.Meta title={<span>{bl.name}</span>} />
-        <div>{this.formatAmount(bl.balance)}</div>
+    const { balances, transactionsData } = this.props.userWallet;
+    if (balances && transactionsData.transactions.length) {
+      return balances.map(bl => (
+        <List.Item key={bl.name + bl.balance}>
+          <List.Item.Meta title={<span>{bl.name}</span>} />
+          <div>{this.formatAmount(bl.balance)}</div>
+        </List.Item>
+      ));
+    }
+
+    return (
+      <List.Item>
+        <List.Item.Meta title="No tokens found" />
       </List.Item>
-    ));
+    );
   };
 
   renderTransactions = () => {
     const { transactionsData } = this.props.userWallet;
-    if (transactionsData.transactions) {
+    if (transactionsData.transactions.length) {
       return transactionsData.transactions.map(tr => (
         <List.Item key={tr.timestamp}>
           <div className={styles.itemRow}>
@@ -161,6 +172,14 @@ class Monitor extends PureComponent {
         </List.Item>
       ));
     }
+
+    return (
+      <List.Item>
+        <div className={styles.itemRow}>
+          <List.Item.Meta title="No transactions found" />
+        </div>
+      </List.Item>
+    );
   };
 
   render() {
@@ -174,6 +193,7 @@ class Monitor extends PureComponent {
       qrcodeVisible,
       loading,
       transactionDetail,
+      entropy,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze } = this.props.userWallet;
@@ -207,7 +227,27 @@ class Monitor extends PureComponent {
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
-              title="BALANCE"
+              title="ENTROPY"
+              style={{ marginBottom: 30 }}
+              bordered={false}
+              extra={
+                <CopyToClipboard text={this.formatAmount(balance)}>
+                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
+                </CopyToClipboard>
+              }
+            >
+              <ChartCard
+                bordered={false}
+                title="TRX "
+                total={this.formatAmount(entropy)}
+                footer={<span>{tronAccount}</span>}
+                contentHeight={46}
+              />
+            </Card>
+          </Col>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+            <Card
+              title="TRON POWER"
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
@@ -225,6 +265,28 @@ class Monitor extends PureComponent {
               />
             </Card>
           </Col>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
+            <Card
+              title="BALANCE"
+              style={{ marginBottom: 30 }}
+              bordered={false}
+              extra={
+                <CopyToClipboard text={this.formatAmount(balance)}>
+                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
+                </CopyToClipboard>
+              }
+            >
+              <ChartCard
+                bordered={false}
+                title="TRX"
+                total={Number(balance) ? this.formatAmount(balance) : 'No balance found'}
+                footer={<span>{tronAccount}</span>}
+                contentHeight={46}
+              />
+            </Card>
+          </Col>
+        </Row>
+        <Row gutter={24}>
           <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
             <Card
               title="FROZEN TOKENS"

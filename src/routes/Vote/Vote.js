@@ -31,13 +31,13 @@ class Vote extends Component {
     transaction: '',
     isReset: true,
     loading: true,
+    userVotes: {},
   };
 
   // #region logic
   componentDidMount() {
     this.onLoadData();
     this.onLoadEndTime();
-    this.onLoadTotalVotes();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,12 +49,27 @@ class Vote extends Component {
   }
 
   onLoadData = async () => {
-    const data = await Promise.all([Client.getWitnesses(), Client.getFreeze()]);
+    const data = await Promise.all([
+      Client.getWitnesses(),
+      Client.getFreeze(),
+      Client.getTotalVotes(),
+      Client.getUserVotes(),
+    ]);
 
     const voteList = data[0];
     const frozen = data[1];
+    const totalVotes = data[2];
+    const userVotes = data[3];
     const totalTrx = frozen.total || 0;
-    this.setState({ voteList, totalTrx, totalRemaining: totalTrx, loading: false });
+
+    this.setState({
+      voteList,
+      totalTrx,
+      totalRemaining: totalTrx,
+      totalVotes,
+      userVotes,
+      loading: false,
+    });
   };
 
   onLoadEndTime = async () => {
@@ -105,14 +120,14 @@ class Vote extends Component {
 
   onVoteChange = (address, value, max) => {
     const { voteList, totalTrx } = this.state;
-    const findAddressAmount = voteList.find(v => v.address === address).amount
+    const findAddressAmount = voteList.find(v => v.address === address).amount;
 
     if (!max) {
       voteList.find(v => v.address === address).amount = value;
     } else if (findAddressAmount) {
-        voteList.find(v => v.address === address).amount += value;
+      voteList.find(v => v.address === address).amount += value;
     } else {
-        voteList.find(v => v.address === address).amount = value;
+      voteList.find(v => v.address === address).amount = value;
     }
 
     this.setState({ voteList, isReset: false }, () => {
@@ -207,9 +222,62 @@ class Vote extends Component {
   };
   // #endregion
 
+  renderVoteList = () => {
+    const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
+
+    return (
+      <List
+        rowKey="id"
+        loading={false}
+        size="large"
+        dataSource={voteList}
+        renderItem={(item, index) => (
+          <List.Item
+            key={item.address}
+            actions={[
+              <div className={styles.listItemRow}>
+                <div style={{ margin: 15 }}>
+                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />
+                </div>
+                <div style={{ margin: 15 }}>
+                  <VoteSlider
+                    onVoteChange={v => this.onVoteChange(item.address, v, false)}
+                    totalTrx={totalTrx}
+                    isReset={isReset}
+                    isMax={item.amount || 0}
+                  />
+                </div>
+                <div className={styles.smallButtonsContainer}>
+                  <Button
+                    style={{ marginBottom: 5 }}
+                    type="primary"
+                    size="small"
+                    onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
+                    disabled={totalRemaining <= 0}
+                    icon="to-top"
+                  >
+                    Máx
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => this.onResetVotes(item.address)}
+                    icon="close-circle-o"
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </div>,
+            ]}
+          >
+            <ListContent index={index + 1} {...item} />
+          </List.Item>
+        )}
+      />
+    );
+  };
+
   render() {
     const {
-      voteList,
       transaction,
       voteError,
       modalVisible,
@@ -217,8 +285,8 @@ class Vote extends Component {
       totalVotes,
       totalRemaining,
       totalTrx,
-      isReset,
       loading,
+      userVotes,
     } = this.state;
 
     if (loading) {
@@ -247,6 +315,8 @@ class Vote extends Component {
                 totalTrx={totalTrx}
                 onSubmit={this.submit}
                 onResetVotes={this.onResetVotes}
+                totalVotes={totalVotes}
+                userVotes={userVotes}
               />
             </Col>
           </Row>
@@ -263,53 +333,7 @@ class Vote extends Component {
           }
         >
           <p>{voteError}</p>
-          <List
-            rowKey="id"
-            loading={false}
-            size="large"
-            dataSource={voteList}
-            renderItem={(item, index) => (
-              <List.Item
-                key={item.address}
-                actions={[
-                  <div className={styles.listItemRow}>
-                    <div style={{ margin: 15 }}>
-                      <ProgressItem votes={Number(item.votes)} total={totalVotes} />
-                    </div>
-                    <div style={{ margin: 15 }}>
-                      <VoteSlider
-                        onVoteChange={v => this.onVoteChange(item.address, v, false)}
-                        totalTrx={totalTrx}
-                        isReset={isReset}
-                        isMax={item.amount || 0}
-                      />
-                    </div>
-                    <div className={styles.smallButtonsContainer}>
-                      <Button
-                        style={{ marginBottom: 5 }}
-                        type="primary"
-                        size="small"
-                        onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
-                        disabled={totalRemaining <= 0}
-                        icon="to-top"
-                      >
-                        Máx
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => this.onResetVotes(item.address)}
-                        icon="close-circle-o"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                  </div>,
-                ]}
-              >
-                <ListContent index={index + 1} {...item} />
-              </List.Item>
-            )}
-          />
+          {this.renderVoteList()}
         </Card>
         <ModalTransaction
           title="Vote"

@@ -178,6 +178,25 @@ class ClientWallet {
     return { ...frozen, total: frozen.total / ONE_TRX };
   }
 
+  async getTotalVotes() {
+    const { data } = await axios.get(`${this.api}/vote/current-cycle`);
+    const totalVotes = data.total_votes;
+    return totalVotes;
+  }
+
+  async getEntropy() {
+    const owner = await this.getPublicKey();
+    const { data: { entropy } } = await axios.get(`${this.api}/account/${owner}`);
+    return entropy;
+  }
+
+  async getUserVotes() {
+    const owner = await this.getPublicKey();
+    const { data: { votes } } = await axios.get(`${this.api}/account/${owner}/votes`);
+    // console.log('USER VOTES: ', data);
+    return votes;
+  }
+
   async voteForWitnesses(votes) {
     try {
       const owner = await this.getPublicKey();
