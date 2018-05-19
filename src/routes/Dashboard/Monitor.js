@@ -156,15 +156,15 @@ class Monitor extends PureComponent {
             <List.Item.Meta
               title={
                 <div className={styles.address}>
-                  <small>From: {tr.transferFromAddress}</small>
-                  <small>To: {tr.transferToAddress}</small>
+                  <div>From: {tr.transferFromAddress}</div>
+                  <div>To: {tr.transferToAddress}</div>
                 </div>
               }
               description={
                 <div className={styles.address}>
-                  <small className={styles.itemFont}>
+                  <div className={styles.itemFont}>
                     {new Date(tr.timestamp).getHours()} hours ago
-                  </small>
+                  </div>
                 </div>
               }
             />
@@ -361,7 +361,7 @@ class Monitor extends PureComponent {
             >
               <ChartCard
                 bordered={false}
-                title="TRX "
+                title="TRX"
                 total={this.formatAmount(entropy)}
                 footer={<span>{tronAccount}</span>}
                 contentHeight={46}
