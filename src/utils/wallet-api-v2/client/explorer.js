@@ -61,11 +61,10 @@ class ApiClient {
     let hashBytes = hexStr2byteArray(latestBlockHash);
 
     let generateBlockId = [...numBytes.slice(0, 8), ...hashBytes.slice(8, hashBytes.length - 1)];
-		console.log('latestBlock.timestamp',latestBlock.timestamp)
     let rawData = transaction.getRawData();
     rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
     rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
-    rawData.setExpiration(latestBlock.timestamp + (120 * 1000));
+    rawData.setExpiration(latestBlock.timestamp + (600 * 1000));
 
     transaction.setRawData(rawData);
     return transaction;
