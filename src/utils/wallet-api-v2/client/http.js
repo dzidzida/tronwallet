@@ -1,24 +1,20 @@
-const xhr = require('axios');
-const deserializeTransaction = require('../protocol/serializer').deserializeTransaction;
-const { base64DecodeFromString, byteArray2hexStr, bytesToString } = require('../utils/bytes');
-const { Block, Transaction, Account } = require('../protocol/core/Tron_pb');
-const {
-  AccountList,
-  NumberMessage,
-  WitnessList,
-  AssetIssueList,
-} = require('../protocol/api/api_pb');
-const { TransferContract } = require('../protocol/core/Contract_pb');
-const qs = require('qs');
-const hexStr2byteArray = require('../lib/code').hexStr2byteArray;
-const stringToBytes = require('../lib/code').stringToBytes;
-const { getBase58CheckAddress, signTransaction, pkToAddress } = require('../utils/crypto');
+const xhr = require("axios");
+const deserializeTransaction = require("../protocol/serializer").deserializeTransaction;
+const {base64DecodeFromString, byteArray2hexStr, bytesToString} = require("../utils/bytes");
+const {Block, Transaction, Account} = require("../protocol/core/Tron_pb");
+const {AccountList, NumberMessage, WitnessList, AssetIssueList} = require("../protocol/api/api_pb");
+const {TransferContract} = require("../protocol/core/Contract_pb");
+const qs = require("qs");
+const hexStr2byteArray = require("../lib/code").hexStr2byteArray;
+const stringToBytes = require("../lib/code").stringToBytes;
+const { getBase58CheckAddress, signTransaction, pkToAddress } = require("../utils/crypto");
 
 const ONE_TRX = 1000000;
 
 class HttpClient {
+
   constructor(options = {}) {
-    this.url = options.url || `https://tronscan.io`;
+    this.url = options.url || `https://api.tronscan.org`;
     this.signer = null;
   }
 
@@ -28,7 +24,7 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getNodes() {
-    let { data } = await xhr.get(`${this.url}/nodeList`);
+    let {data} = await xhr.get(`${this.url}/nodeList`);
     return JSON.parse(data);
   }
   /**
@@ -37,25 +33,15 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getLatestBlock() {
-    let { data } = await xhr.get(`${this.url}/getBlockToView`);
+
+    let {data} = await xhr.get(`${this.url}/getBlockToView`);
     let currentBlock = base64DecodeFromString(data);
     let block = Block.deserializeBinary(currentBlock);
 
     return {
-      number: block
-        .getBlockHeader()
-        .getRawData()
-        .getNumber(),
-      witnessId: block
-        .getBlockHeader()
-        .getRawData()
-        .getWitnessId(),
-      parentHash: byteArray2hexStr(
-        block
-          .getBlockHeader()
-          .getRawData()
-          .getParenthash()
-      ),
+      number: block.getBlockHeader().getRawData().getNumber(),
+      witnessId: block.getBlockHeader().getRawData().getWitnessId(),
+      parentHash: byteArray2hexStr(block.getBlockHeader().getRawData().getParenthash()),
     };
   }
 
@@ -65,7 +51,7 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getBlockByNum(blockNumber) {
-    let { data } = await xhr.get(`${this.url}/getBlockByNumToView?num=${blockNumber}`);
+    let {data} = await xhr.get(`${this.url}/getBlockByNumToView?num=${blockNumber}`);
     let currentBlock = base64DecodeFromString(data);
     let blockData = Block.deserializeBinary(currentBlock);
 
@@ -79,28 +65,10 @@ class HttpClient {
 
     return {
       size: recentBlock.length,
-      parentHash: byteArray2hexStr(
-        blockData
-          .getBlockHeader()
-          .getRawData()
-          .getParenthash()
-      ),
-      number: blockData
-        .getBlockHeader()
-        .getRawData()
-        .getNumber(),
-      witnessAddress: getBase58CheckAddress(
-        Array.from(
-          blockData
-            .getBlockHeader()
-            .getRawData()
-            .getWitnessAddress()
-        )
-      ),
-      time: blockData
-        .getBlockHeader()
-        .getRawData()
-        .getTimestamp(),
+      parentHash: byteArray2hexStr(blockData.getBlockHeader().getRawData().getParenthash()),
+      number: blockData.getBlockHeader().getRawData().getNumber(),
+      witnessAddress: getBase58CheckAddress(Array.from(blockData.getBlockHeader().getRawData().getWitnessAddress())),
+      time: blockData.getBlockHeader().getRawData().getTimestamp(),
       transactionsCount: blockData.getTransactionsList().length,
       contractType: Transaction.Contract.ContractType,
       transactions,
@@ -112,7 +80,7 @@ class HttpClient {
    * @returns {Promise<number>}
    */
   async getTotalNumberOfTransactions() {
-    let { data } = await xhr.get(`${this.url}/getTotalTransaction`);
+    let {data} = await xhr.get(`${this.url}/getTotalTransaction`);
     let totalTransaction = base64DecodeFromString(data);
     let totalData = NumberMessage.deserializeBinary(totalTransaction);
     return totalData.getNum();
@@ -123,7 +91,8 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getAccountList() {
-    let { data } = await xhr.get(`${this.url}/accountList`);
+
+    let {data} = await xhr.get(`${this.url}/accountList`);
 
     let bytesAccountList = base64DecodeFromString(data);
     let account = AccountList.deserializeBinary(bytesAccountList);
@@ -152,13 +121,14 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getWitnesses() {
-    let { data } = await xhr.get(`${this.url}/witnessList`);
+    let {data} = await xhr.get(`${this.url}/witnessList`);
 
     let bytesWitnessList = base64DecodeFromString(data);
     let witness = WitnessList.deserializeBinary(bytesWitnessList);
     let witnessList = witness.getWitnessesList();
 
     return witnessList.map(witness => {
+
       return {
         address: getBase58CheckAddress(Array.from(witness.getAddress())),
         url: witness.getUrl(),
@@ -176,7 +146,7 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getAssetIssueList() {
-    let { data } = await xhr.get(`${this.url}/getAssetIssueList`);
+    let {data} = await xhr.get(`${this.url}/getAssetIssueList`);
 
     let assetIssueListObj = AssetIssueList.deserializeBinary(base64DecodeFromString(data));
     return assetIssueListObj.getAssetissueList().map(asset => {
@@ -201,12 +171,9 @@ class HttpClient {
    * @returns {Promise<*>}
    */
   async getAccountBalances(address) {
-    let { data } = await xhr.post(
-      `${this.url}/queryAccount`,
-      qs.stringify({
-        address,
-      })
-    );
+    let {data} = await xhr.post(`${this.url}/queryAccount`, qs.stringify({
+      address,
+    }));
 
     let bytesAccountInfo = base64DecodeFromString(data);
     let accountInfo = Account.deserializeBinary(bytesAccountInfo);
@@ -214,18 +181,16 @@ class HttpClient {
     let trxBalance = accountInfo.getBalance();
     let trxBalanceNum = (trxBalance / ONE_TRX).toFixed(6);
 
-    let balances = [
-      {
-        name: 'TRX',
-        balance: trxBalanceNum,
-      },
-    ];
+    let balances = [{
+      name: 'TRX',
+      balance: trxBalanceNum
+    }];
 
     for (let asset of Object.keys(assetMap)) {
       balances.push({
         name: assetMap[asset][0],
         balance: assetMap[asset][1],
-      });
+      })
     }
 
     return balances;
@@ -239,7 +204,7 @@ class HttpClient {
    * @returns {Promise<void>}
    */
   async voteForWitnesses(password, votes) {
-    let { data } = await xhr.post(`${this.url}/createVoteWitnessToView`, {
+    let {data} = await xhr.post(`${this.url}/createVoteWitnessToView`, {
       owner: pkToAddress(password),
       list: votes,
     });
@@ -256,13 +221,11 @@ class HttpClient {
    * @returns {Promise<void>}
    */
   async applyForDelegate(password, url) {
-    let { data } = await xhr.post(
-      `${this.url}/createWitnessToView`,
-      qs.stringify({
+    let {data} = await xhr
+      .post(`${this.url}/createWitnessToView`, qs.stringify({
         address: pkToAddress(password),
         onwerUrl: url, // TODO yes this is spelled wrong :(
-      })
-    );
+      }));
 
     return await this.signTransaction(password, data);
   }
@@ -274,12 +237,9 @@ class HttpClient {
     let transactionBytes = transactionSigned.serializeBinary();
     let transactionString = byteArray2hexStr(transactionBytes);
 
-    let { data: transData } = await xhr.post(
-      `${this.url}/transactionFromView`,
-      qs.stringify({
-        transactionData: transactionString,
-      })
-    );
+    let {data: transData} = await xhr.post(`${this.url}/transactionFromView`, qs.stringify({
+      transactionData: transactionString,
+    }));
 
     return transData;
   }
@@ -294,27 +254,22 @@ class HttpClient {
    * @returns {Promise<void>}
    */
   async send(password, token, to, amount) {
+
     if (token.toUpperCase() === 'TRX') {
-      let { data } = await xhr.post(
-        `${this.url}/sendCoinToView`,
-        qs.stringify({
-          Address: pkToAddress(password),
-          toAddress: to,
-          Amount: amount,
-        })
-      );
+      let {data} = await xhr.post(`${this.url}/sendCoinToView`, qs.stringify({
+        Address: pkToAddress(password),
+        toAddress: to,
+        Amount: amount
+      }));
 
       return await this.signTransaction(password, data);
     } else {
-      let { data } = await xhr.post(
-        `${this.url}/TransferAssetToView`,
-        qs.stringify({
-          assetName: token,
-          Address: pkToAddress(password),
-          toAddress: to,
-          Amount: amount / ONE_TRX,
-        })
-      );
+      let {data} = await xhr.post(`${this.url}/TransferAssetToView`, qs.stringify({
+        assetName: token,
+        Address: pkToAddress(password),
+        toAddress: to,
+        Amount: amount / ONE_TRX,
+      }));
 
       return await this.signTransaction(password, data);
     }
@@ -326,9 +281,7 @@ class HttpClient {
    * @returns {Promise<void>}
    */
   async createToken(password, config) {
-    let { data } = await xhr.post(
-      `${this.url}/createAssetIssueToView`,
-      qs.stringify({
+      let {data} = await xhr.post(`${this.url}/createAssetIssueToView`, qs.stringify({
         name: config.name,
         totalSupply: config.totalSupply,
         num: config.num,
@@ -338,25 +291,21 @@ class HttpClient {
         description: config.description,
         url: config.url,
         ownerAddress: pkToAddress(password),
-      })
-    );
+      }));
 
     return await this.signTransaction(password, data);
   }
 
   async participateAsset(password, config) {
-    let { data } = await xhr.post(
-      `${this.url}/ParticipateAssetIssueToView`,
-      qs.stringify({
-        name: byteArray2hexStr(stringToBytes(config.name)),
-        ownerAddress: pkToAddress(password),
-        toAddress: config.issuerAddress,
-        amount: config.amount,
-      })
-    );
+    let {data} = await xhr.post(`${this.url}/ParticipateAssetIssueToView`, qs.stringify({
+      name: byteArray2hexStr(stringToBytes(config.name)),
+      ownerAddress: pkToAddress(password),
+      toAddress: config.issuerAddress,
+      amount: config.amount,
+    }));
 
     return await this.signTransaction(password, data);
   }
 }
 
-export default HttpClient;
+module.exports = HttpClient;

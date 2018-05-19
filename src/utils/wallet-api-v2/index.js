@@ -1,5 +1,1 @@
-const HttpClient = require('./client/http');
-
-module.exports = {
-  HttpClient,
-};
+export const HttpClient = require("./client/http");

@@ -5,7 +5,7 @@ for (var i = 0; i < ALPHABET.length; i++) {
 }
 var BASE = 58;
 
-function encode58(buffer) {
+export function encode58(buffer) {
   if (buffer.length === 0) return '';
 
   var i,
@@ -42,7 +42,7 @@ function encode58(buffer) {
     .join('');
 }
 
-function decode58(string) {
+export function decode58(string) {
   if (string.length === 0) return [];
 
   var i,
@@ -75,8 +75,3 @@ function decode58(string) {
 
   return bytes.reverse();
 }
-
-module.exports = {
-  encode58,
-  decode58,
-};

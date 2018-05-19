@@ -180,9 +180,7 @@ function serialize_protocol_ParticipateAssetIssueContract(arg) {
 }
 
 function deserialize_protocol_ParticipateAssetIssueContract(buffer_arg) {
-  return core_Contract_pb.ParticipateAssetIssueContract.deserializeBinary(
-    new Uint8Array(buffer_arg)
-  );
+  return core_Contract_pb.ParticipateAssetIssueContract.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_protocol_Return(arg) {
@@ -317,7 +315,8 @@ function deserialize_protocol_WitnessUpdateContract(buffer_arg) {
   return core_Contract_pb.WitnessUpdateContract.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-var WalletService = (exports.WalletService = {
+
+var WalletService = exports.WalletService = {
   getAccount: {
     path: '/protocol.Wallet/GetAccount',
     requestStream: false,
@@ -604,10 +603,10 @@ var WalletService = (exports.WalletService = {
     responseSerialize: serialize_protocol_Transaction,
     responseDeserialize: deserialize_protocol_Transaction,
   },
-});
+};
 
 exports.WalletClient = grpc.makeGenericClientConstructor(WalletService);
-var WalletSolidityService = (exports.WalletSolidityService = {
+var WalletSolidityService = exports.WalletSolidityService = {
   getAccount: {
     path: '/protocol.WalletSolidity/GetAccount',
     requestStream: false,
@@ -763,11 +762,11 @@ var WalletSolidityService = (exports.WalletSolidityService = {
     responseSerialize: serialize_protocol_TransactionList,
     responseDeserialize: deserialize_protocol_TransactionList,
   },
-});
+};
 
 exports.WalletSolidityClient = grpc.makeGenericClientConstructor(WalletSolidityService);
 // the api of tron's db
-var DatabaseService = (exports.DatabaseService = {
+var DatabaseService = exports.DatabaseService = {
   // for tapos
   getBlockReference: {
     path: '/protocol.Database/getBlockReference',
@@ -813,10 +812,11 @@ var DatabaseService = (exports.DatabaseService = {
     responseSerialize: serialize_protocol_Block,
     responseDeserialize: deserialize_protocol_Block,
   },
-});
+};
 
 exports.DatabaseClient = grpc.makeGenericClientConstructor(DatabaseService);
 // the api of tron's network such as node list.
-var NetworkService = (exports.NetworkService = {});
+var NetworkService = exports.NetworkService = {
+};
 
 exports.NetworkClient = grpc.makeGenericClientConstructor(NetworkService);

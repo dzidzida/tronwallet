@@ -1,11 +1,13 @@
-const { EmptyMessage, NumberMessage } = require('../protocol/api/api_pb');
+
+const {EmptyMessage, NumberMessage} = require("../protocol/api/api_pb");
 
 class GrpcClient {
+
   constructor(options) {
     this.hostname = options.hostname;
     this.port = options.port;
 
-    const { WalletClient } = require('../protocol/api/api_grpc_pb');
+    const {WalletClient} = require("../protocol/api/api_grpc_pb");
     const caller = require('grpc-caller');
 
     /**
@@ -20,7 +22,8 @@ class GrpcClient {
    * @returns {Promise<*>}
    */
   async getWitnesses() {
-    return await this.api.listWitnesses(new EmptyMessage()).then(x => x.getWitnessesList());
+    return await this.api.listWitnesses(new EmptyMessage())
+      .then(x => x.getWitnessesList());
   }
 
   /**
@@ -29,7 +32,8 @@ class GrpcClient {
    * @returns {Promise<*>}
    */
   async getNodes() {
-    return await this.api.listNodes(new EmptyMessage()).then(x => x.getNodesList());
+    return await this.api.listNodes(new EmptyMessage())
+      .then(x => x.getNodesList());
   }
 
   /**
@@ -38,8 +42,10 @@ class GrpcClient {
    * @returns {Promise<*>}
    */
   async getAccounts() {
-    return await this.api.listAccounts(new EmptyMessage()).then(x => x.getAccountsList());
+    return await this.api.listAccounts(new EmptyMessage())
+      .then(x => x.getAccountsList());
   }
+
 
   /**
    * Retrieves a block by the given number
@@ -52,6 +58,7 @@ class GrpcClient {
     message.setNum(number);
     return await this.api.getBlockByNum(message);
   }
+
 }
 
 module.exports = GrpcClient;

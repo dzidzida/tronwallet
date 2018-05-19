@@ -1,42 +1,35 @@
-const xhr = require('axios');
+const xhr = require("axios");
 const {
-  buildTransferTransaction,
-  buildVote,
-  buildAssetParticipate,
-  buildFreezeBalance,
-  buildAssetIssue,
-  buildUnfreezeBalance,
-  buildAccountUpdate,
-  buildWitnessUpdate,
-  buildWithdrawBalance,
-  buildWitnessCreate,
-} = require('../utils/transactionBuilder');
-const { hexStr2byteArray } = require('../lib/code');
-const PrivateKeySigner = require('../signer/privateKeySigner');
+  buildTransferTransaction, buildVote, buildAssetParticipate, buildFreezeBalance, buildAssetIssue,
+  buildUnfreezeBalance, buildAccountUpdate, buildWitnessUpdate, buildWithdrawBalance, buildWitnessCreate
+} = require("../utils/transactionBuilder");
+const {hexStr2byteArray} = require("../lib/code");
+const PrivateKeySigner = require("../signer/privateKeySigner");
 
-function longToByteArray(/*long*/ long) {
+export function longToByteArray(/*long*/long) {
   // we want to represent the input as a 8-bytes array
   var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
 
-  for (var index = 0; index < byteArray.length; index++) {
+  for ( var index = 0; index < byteArray.length; index ++ ) {
     var byte = long & 0xff;
-    byteArray[index] = byte;
-    long = (long - byte) / 256;
+    byteArray [ index ] = byte;
+    long = (long - byte) / 256 ;
   }
 
   return byteArray;
 }
 
-function byteArrayToLong(/*byte[]*/ byteArray) {
+export function byteArrayToLong(/*byte[]*/byteArray) {
   var value = 0;
-  for (var i = byteArray.length - 1; i >= 0; i--) {
-    value = value * 256 + byteArray[i];
+  for ( var i = byteArray.length - 1; i >= 0; i--) {
+    value = (value * 256) + byteArray[i];
   }
 
   return value;
 }
 
 class ApiClient {
+
   constructor() {
     this.apiUrl = 'https://api.tronscan.org';
     this.signer = null;
@@ -48,10 +41,11 @@ class ApiClient {
 
   send(token, from, to, amount) {
     let transaction = buildTransferTransaction(token, from, to, amount);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   async addRef(transaction) {
+
     let {blocks: latestBlock} = await this.getBlocks({
       sort: '-timestamp',
       limit: 1
@@ -67,11 +61,11 @@ class ApiClient {
     let hashBytes = hexStr2byteArray(latestBlockHash);
 
     let generateBlockId = [...numBytes.slice(0, 8), ...hashBytes.slice(8, hashBytes.length - 1)];
-
+		console.log('latestBlock.timestamp',latestBlock.timestamp)
     let rawData = transaction.getRawData();
     rawData.setRefBlockHash(Uint8Array.from(generateBlockId.slice(8, 16)));
     rawData.setRefBlockBytes(Uint8Array.from(numBytes.slice(6, 8)));
-    rawData.setExpiration(latestBlock.timestamp + (60 * 1000));
+    rawData.setExpiration(latestBlock.timestamp + (120 * 1000));
 
     transaction.setRawData(rawData);
     return transaction;
@@ -80,8 +74,8 @@ class ApiClient {
   async sendTransaction(pk, transaction) {
     transaction = await this.addRef(transaction);
     let privateKeySigner = this.signer || new PrivateKeySigner(pk);
-    let { hex } = await privateKeySigner.signTransaction(transaction);
-    let { data } = await xhr.post(`${this.apiUrl}/api/transaction`, {
+    let {hex} = await privateKeySigner.signTransaction(transaction);
+    let {data} = await xhr.post(`${this.apiUrl}/api/transaction`, {
       transaction: hex,
     });
 
@@ -89,7 +83,7 @@ class ApiClient {
   }
 
   async sendTransactionRaw(transactionHex) {
-    let { data } = await xhr.post(`${this.apiUrl}/api/transaction`, {
+    let {data} = await xhr.post(`${this.apiUrl}/api/transaction`, {
       transaction: transactionHex,
     });
 
@@ -98,59 +92,56 @@ class ApiClient {
 
   updateAccountName(address, name) {
     let transaction = buildAccountUpdate(address, name);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   updateWitnessUrl(address, url) {
     let transaction = buildWitnessUpdate(address, url);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   withdrawBalance(address) {
     let transaction = buildWithdrawBalance(address);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   freezeBalance(address, amount, duration) {
     let transaction = buildFreezeBalance(address, amount, duration);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   unfreezeBalance(address, amount, duration) {
     let transaction = buildUnfreezeBalance(address);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   applyForDelegate(address, url) {
     let transaction = buildWitnessCreate(address, url);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   voteForWitnesses(address, votes) {
     let transaction = buildVote(address, votes);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   participateAsset(address, issuerAddress, token, amount) {
     let transaction = buildAssetParticipate(address, issuerAddress, token, amount);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   createToken(options) {
-    console.log('create token', options);
+    console.log("create token", options);
     let transaction = buildAssetIssue(options);
-    return pk => this.sendTransaction(pk, transaction);
+    return (pk) => this.sendTransaction(pk, transaction);
   }
 
   async getBlocks(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/block`, {
-      params: Object.assign(
-        {
-          sort: '-number',
-          limit: 10,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/block`, {
+      params: Object.assign({
+        sort: '-number',
+        limit: 10,
+      }, options),
     });
 
     return {
@@ -160,14 +151,11 @@ class ApiClient {
   }
 
   async getTransactions(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/transaction`, {
-      params: Object.assign(
-        {
-          sort: '-timestamp',
-          limit: 50,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/transaction`, {
+      params: Object.assign({
+        sort: '-timestamp',
+        limit: 50,
+      }, options)
     });
 
     return {
@@ -177,7 +165,7 @@ class ApiClient {
   }
 
   async getBlockByNumber(number) {
-    let { blocks } = await this.getBlocks({
+    let {blocks} = await this.getBlocks({
       limit: 1,
       number,
     });
@@ -186,7 +174,7 @@ class ApiClient {
   }
 
   async getBlockByHash(hash) {
-    let { blocks } = await this.getBlocks({
+    let {blocks} = await this.getBlocks({
       limit: 1,
       hash,
     });
@@ -195,19 +183,16 @@ class ApiClient {
   }
 
   async getTransactionByHash(hash) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/transaction/${hash}`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/transaction/${hash}`);
     return data;
   }
 
   async getAccounts(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account`, {
-      params: Object.assign(
-        {
-          sort: '-balance',
-          limit: 50,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/account`, {
+      params: Object.assign({
+        sort: '-balance',
+        limit: 50,
+      }, options)
     });
 
     return {
@@ -217,14 +202,11 @@ class ApiClient {
   }
 
   async getVotes(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/vote`, {
-      params: Object.assign(
-        {
-          sort: '-timestamp',
-          limit: 50,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/vote`, {
+      params: Object.assign({
+        sort: '-timestamp',
+        limit: 50,
+      }, options)
     });
 
     return {
@@ -233,19 +215,21 @@ class ApiClient {
     };
   }
 
+
   async getAccountByAddress(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}`);
     return data;
   }
 
   async getVotesForCurrentCycle() {
-    let { data } = await xhr.get(`${this.apiUrl}/api/vote/current-cycle`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/vote/current-cycle`);
     return data;
   }
 
   async getTransactionStats(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/transaction/stats`, {
-      params: Object.assign({}, options),
+    let {data} = await xhr.get(`${this.apiUrl}/api/transaction/stats`, {
+      params: Object.assign({
+      }, options)
     });
 
     return {
@@ -254,8 +238,10 @@ class ApiClient {
   }
 
   async getBlockStats(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/block/stats`, {
-      params: Object.assign({}, options),
+    let {data} = await xhr.get(`${this.apiUrl}/api/block/stats`, {
+      params: Object.assign({
+
+      }, options)
     });
 
     return {
@@ -264,56 +250,50 @@ class ApiClient {
   }
 
   async getAddress(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}`);
     return data;
   }
 
   async getAddressMedia(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}/media`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}/media`);
     return data;
   }
 
   async getAddressStats(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}/stats`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}/stats`);
     return data;
   }
 
   async getTokens(options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/token`, {
-      params: Object.assign(
-        {
-          sort: '-name',
-          limit: 50,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/token`, {
+      params: Object.assign({
+        sort: '-name',
+        limit: 50,
+      }, options)
     });
 
     return {
       tokens: data.data,
       total: data.total,
-    };
+    }
   }
 
   async getAccountVotes(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}/votes`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}/votes`);
     return data;
   }
 
   async getToken(name) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/token/${name}`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/token/${name}`);
     return data;
   }
 
   async getTokenHolders(name, options = {}) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/token/${name}/address`, {
-      params: Object.assign(
-        {
-          sort: '-balance',
-          limit: 50,
-        },
-        options
-      ),
+    let {data} = await xhr.get(`${this.apiUrl}/api/token/${name}/address`, {
+      params: Object.assign({
+        sort: '-balance',
+        limit: 50,
+      }, options)
     });
 
     return {
@@ -323,7 +303,7 @@ class ApiClient {
   }
 
   async getWitnesses() {
-    let { data } = await xhr.get(`${this.apiUrl}/api/witness`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/witness`);
 
     return {
       witnesses: data,
@@ -332,7 +312,7 @@ class ApiClient {
   }
 
   async getNodeLocations() {
-    let { data } = await xhr.get(`${this.apiUrl}/api/nodemap`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/nodemap`);
 
     return {
       nodes: data,
@@ -341,21 +321,21 @@ class ApiClient {
   }
 
   async getAccountBalances(address) {
-    let { data } = await xhr.get(`${this.apiUrl}/api/account/${address}/balance`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/account/${address}/balance`);
     return data;
   }
 
   async getMarkets() {
-    let { data } = await xhr.get(`${this.apiUrl}/api/market/markets`);
+    let {data} = await xhr.get(`${this.apiUrl}/api/market/markets`);
     return data;
   }
 
   async readTransaction(transactionHex) {
-    let { data } = await xhr.post(`${this.apiUrl}/api/transaction?dry-run`, {
+    let {data} = await xhr.post(`${this.apiUrl}/api/transaction?dry-run`, {
       transaction: transactionHex,
     });
     return data;
   }
 }
 
-export default ApiClient;
+export default ApiClient

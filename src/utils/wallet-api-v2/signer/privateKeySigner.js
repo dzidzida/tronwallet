@@ -1,4 +1,5 @@
-const { signTransaction } = require('../utils/crypto');
+const {signTransaction} = require("../utils/crypto");
+
 
 class PrivateKeySigner {
   constructor(privateKey) {
