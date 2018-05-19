@@ -4,7 +4,7 @@ import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
-import isAddressValid from '../../utils/wallet-api-v2/utils/address';
+import { isAddressValid } from '../../utils/wallet-api-v2/utils/address';
 import { maskPrice } from '../../utils/mask';
 
 class Send extends Component {
