@@ -302,7 +302,14 @@ class Monitor extends PureComponent {
                         'dddd, MMMM Do YYYY'
                       )}
                     />
-                  ) : null
+                  ) : (
+										<Field
+										label=""
+										value={moment(new Date(totalFreeze.balances[0].expires)).format(
+											'dddd, MMMM Do YYYY'
+										)}
+									/>
+									)
                 }
               />
             </Card>
