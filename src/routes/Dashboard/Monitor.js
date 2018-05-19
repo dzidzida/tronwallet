@@ -305,7 +305,7 @@ class Monitor extends PureComponent {
                   ) : (
 										<Field
 										label=""
-										value={moment(new Date(totalFreeze.balances[0].expires)).format(
+										value={moment(new Date()).format(
 											'dddd, MMMM Do YYYY'
 										)}
 									/>
