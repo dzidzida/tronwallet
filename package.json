@@ -9,7 +9,6 @@
     "start:no-proxy": "cross-env NO_PROXY=true ESLINT=none roadhog dev",
     "prebuild": "npm version patch",
     "build": "cross-env ESLINT=none roadhog build",
-    "postbuild": "aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths \"/index.html\"",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "cross-env ANALYZE=true roadhog build",
     "lint:style": "stylelint \"src/**/*.less\" --syntax less",
