@@ -32,7 +32,7 @@ class VoteSlider extends PureComponent {
           <Slider
             onAfterChange={onVoteChange}
             onChange={v => this.setState({ value: v, maxValue: v })}
-            step={10}
+            step={1}
             value={maxValue || value}
             max={totalTrx}
             tipFormatter={this.formatter}
