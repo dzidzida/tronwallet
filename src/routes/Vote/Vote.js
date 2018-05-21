@@ -50,16 +50,14 @@ class Vote extends Component {
 
   onLoadData = async () => {
     const data = await Promise.all([
-      Client.getWitnesses(),
-      Client.getFreeze(),
       Client.getTotalVotes(),
+      Client.getFreeze(),
       Client.getUserVotes(),
     ]);
-
-    const voteList = data[0];
+    const voteList = data[0].candidates || 0;
+    const totalVotes = data[0].totalVotes || 0;
     const frozen = data[1];
-    const totalVotes = data[2];
-    const userVotes = data[3];
+    const userVotes = data[2];
     const totalTrx = frozen.total || 0;
 
     this.setState({
