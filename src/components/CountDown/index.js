@@ -40,7 +40,7 @@ class CountDown extends Component {
 
   timer = 0;
   interval = 1000;
-  initTime = props => {
+  initTime = (props) => {
     let lastTime = 0;
     let targetTime = 0;
     try {
@@ -61,7 +61,7 @@ class CountDown extends Component {
   // defaultFormat = time => (
   //  <span>{moment(time).format('hh:mm:ss')}</span>
   // );
-  defaultFormat = time => {
+  defaultFormat = (time) => {
     const hours = 60 * 60 * 1000;
     const minutes = 60 * 1000;
 

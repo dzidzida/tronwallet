@@ -25,7 +25,7 @@ export default {
     //     if (data.uuid === pk) {
     //       put({
     //         type: 'setResultVisible',
-    //         payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
+    //  payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
     //       });
     //     }
     //   });

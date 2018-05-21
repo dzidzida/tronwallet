@@ -30,14 +30,14 @@ export default class HeaderSearch extends PureComponent {
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
-  onKeyDown = e => {
+  onKeyDown = (e) => {
     if (e.key === 'Enter') {
       this.timeout = setTimeout(() => {
         this.props.onPressEnter(this.state.value); // Fix duplicate onPressEnter
       }, 0);
     }
   };
-  onChange = value => {
+  onChange = (value) => {
     this.setState({ value });
     if (this.props.onChange) {
       this.props.onChange();
@@ -74,7 +74,7 @@ export default class HeaderSearch extends PureComponent {
         >
           <Input
             placeholder={placeholder}
-            ref={node => {
+            ref={(node) => {
               this.input = node;
             }}
             onKeyDown={this.onKeyDown}

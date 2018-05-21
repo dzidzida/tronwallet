@@ -24,14 +24,14 @@ class Create extends PureComponent {
   onCloseModal = () => {
     this.setState({ modalVisible: false });
   };
-  change = e => {
+  change = (e) => {
     const { name, value, checked } = e.target;
     this.setState({
       [name]: name === 'acceptTerms' ? checked : value,
     });
   };
 
-  submit = async e => {
+  submit = async (e) => {
     e.preventDefault();
     const form = this.state;
     const { transaction } = this.state;

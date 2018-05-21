@@ -33,7 +33,7 @@ const getValue = obj =>
 const statusMap = ['default', 'processing', 'success', 'error'];
 const status = ['关闭', '运行中', '已上线', '异常'];
 
-const CreateForm = Form.create()(props => {
+const CreateForm = Form.create()((props) => {
   const { modalVisible, form, handleAdd, handleModalVisible } = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
@@ -122,7 +122,7 @@ export default class TableList extends PureComponent {
     });
   };
 
-  handleMenuClick = e => {
+  handleMenuClick = (e) => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
 
@@ -147,13 +147,13 @@ export default class TableList extends PureComponent {
     }
   };
 
-  handleSelectRows = rows => {
+  handleSelectRows = (rows) => {
     this.setState({
       selectedRows: rows,
     });
   };
 
-  handleSearch = e => {
+  handleSearch = (e) => {
     e.preventDefault();
 
     const { dispatch, form } = this.props;
@@ -177,13 +177,13 @@ export default class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = (flag) => {
     this.setState({
       modalVisible: !!flag,
     });
   };
 
-  handleAdd = fields => {
+  handleAdd = (fields) => {
     this.props.dispatch({
       type: 'rule/add',
       payload: {

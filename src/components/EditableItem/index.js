@@ -7,7 +7,7 @@ export default class EditableItem extends PureComponent {
     value: this.props.value,
     editable: false,
   };
-  handleChange = e => {
+  handleChange = (e) => {
     const { value } = e.target;
     this.setState({ value });
   };

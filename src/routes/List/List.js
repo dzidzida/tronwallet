@@ -7,7 +7,7 @@ import { getRoutes } from '../../utils/utils';
 
 @connect()
 export default class SearchList extends Component {
-  handleTabChange = key => {
+  handleTabChange = (key) => {
     const { dispatch, match } = this.props;
     switch (key) {
       case 'articles':

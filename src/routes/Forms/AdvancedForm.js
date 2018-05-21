@@ -94,13 +94,13 @@ class AdvancedForm extends PureComponent {
       if (!errors || errorCount === 0) {
         return null;
       }
-      const scrollToField = fieldKey => {
+      const scrollToField = (fieldKey) => {
         const labelNode = document.querySelector(`label[for="${fieldKey}"]`);
         if (labelNode) {
           labelNode.scrollIntoView(true);
         }
       };
-      const errorList = Object.keys(errors).map(key => {
+      const errorList = Object.keys(errors).map((key) => {
         if (!errors[key]) {
           return null;
         }

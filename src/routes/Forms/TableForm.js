@@ -214,7 +214,7 @@ export default class TableForm extends PureComponent {
           columns={columns}
           dataSource={this.state.data}
           pagination={false}
-          rowClassName={record => {
+          rowClassName={(record) => {
             return record.editable ? styles.editable : '';
           }}
         />

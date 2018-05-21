@@ -65,7 +65,7 @@ export default class CardList extends PureComponent {
             grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
             dataSource={['', ...list]}
             renderItem={item =>
-              item ? (
+              (item ? (
                 <List.Item key={item.id}>
                   <Card hoverable className={styles.card} actions={[<a>操作一</a>, <a>操作二</a>]}>
                     <Card.Meta
@@ -85,7 +85,7 @@ export default class CardList extends PureComponent {
                     <Icon type="plus" /> 新增产品
                   </Button>
                 </List.Item>
-              )
+              ))
             }
           />
         </div>

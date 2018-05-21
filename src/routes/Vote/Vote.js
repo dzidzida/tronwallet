@@ -220,53 +220,57 @@ class Vote extends Component {
     const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
 
     return (
-      <List
-        rowKey="id"
-        loading={false}
-        size="large"
-        dataSource={voteList}
-        renderItem={(item, index) => (
-          <List.Item
-            key={item.address}
-            actions={[
-              <div className={styles.listItemRow}>
-                <div style={{ margin: 15 }}>
-                  <ProgressItem votes={Number(item.votes)} total={totalVotes} />
-                </div>
-                <div style={{ margin: 15 }}>
-                  <VoteSlider
-                    onVoteChange={v => this.onVoteChange(item.address, v, false)}
-                    totalTrx={totalTrx}
-                    isReset={isReset}
-                    isMax={item.amount || 0}
-                  />
-                </div>
-                <div className={styles.smallButtonsContainer}>
-                  <Button
-                    style={{ marginBottom: 5 }}
-                    type="primary"
-                    size="small"
-                    onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
-                    disabled={totalRemaining <= 0}
-                    icon="to-top"
-                  >
-                    Máx
-                  </Button>
-                  <Button
-                    size="small"
-                    onClick={() => this.onResetVotes(item.address)}
-                    icon="close-circle-o"
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </div>,
-            ]}
-          >
-            <ListContent index={index + 1} {...item} />
-          </List.Item>
-        )}
-      />
+      <div className={styles.wrapperVoteList}>
+        <List
+          rowKey="id"
+          loading={false}
+          size="large"
+          dataSource={voteList}
+          renderItem={(item, index) => (
+            <List.Item
+              key={item.address}
+              actions={[
+                <div className={styles.listItemRow}>
+                  <div style={{ margin: 15 }}>
+                    <ProgressItem votes={Number(item.votes)} total={totalVotes} />
+                  </div>
+                  <div style={{ margin: 15 }}>
+                    <VoteSlider
+                      onVoteChange={v => this.onVoteChange(item.address, v, false)}
+                      totalTrx={totalTrx}
+                      isReset={isReset}
+                      isMax={item.amount || 0}
+                    />
+                  </div>
+                  <div className={styles.smallButtonsContainer}>
+                    <Button
+                      className={styles.smallButtons}
+                      style={{ marginBottom: 5 }}
+                      type="primary"
+                      size="small"
+                      onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
+                      disabled={totalRemaining <= 0}
+                      icon="to-top"
+                    >
+                      Máx
+                    </Button>
+                    <Button
+                      className={styles.smallButtons}
+                      size="small"
+                      onClick={() => this.onResetVotes(item.address)}
+                      icon="close-circle-o"
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>,
+              ]}
+            >
+              <ListContent index={index + 1} {...item} />
+            </List.Item>
+          )}
+        />
+      </div>
     );
   };
 
@@ -322,7 +326,11 @@ class Vote extends Component {
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
           extra={
-            <Input placeholder="Search vote" onChange={this.handleSearch} style={{ width: 400 }} />
+            <Input
+              placeholder="Search vote"
+              onChange={this.handleSearch}
+              className={styles.searchVote}
+            />
           }
         >
           <p>{voteError}</p>

@@ -276,7 +276,63 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  width: 100%;
+  max-width: 100%;
+}
+
+.searchVote {
+  width: 400px;
+}
+
+.wrapperVoteList {
+  position: relative;
+}
+
+@media (max-width: 1350px) {
+  .wrapperVoteList {
+    :global {
+      .ant-list-item {
+        flex-direction: row;
+      }
+    }
+  }
+  .listItemRow {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
+  .smallButtonsContainer {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+  }
+  .smallButtons {
+    margin: 5px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .wrapperVoteList {
+    :global {
+      .ant-list-item {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  .listItemRow {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
 }
 
 @media (max-width: 800px) {
@@ -286,6 +342,9 @@ button:disabled {
   .voteCol {
     width: 100%;
     margin: 0 auto;
+  }
+  .searchVote {
+    width: 100%;
   }
 }
 
