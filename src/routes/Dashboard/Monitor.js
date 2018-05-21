@@ -275,7 +275,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={Number(balance) ? this.formatAmount(balance) : 'No balance found'}
+                total={Number(balance) ? this.formatAmount(balance) : 'Account not funded'}
                 footer={<small>{tronAccount}</small>}
                 contentHeight={46}
               />
