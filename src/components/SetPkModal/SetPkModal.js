@@ -79,8 +79,8 @@ class TransactionQRCode extends Component {
         <h3 style={{ fontWeight: '700', color: 'red' }}>{this.state.error}</h3>
         <h4 style={{ textAlign: 'center' }}>You can get your public key using Tron Vault</h4>
         <div className={styles.footerModal}>
-          <img onClick={() => window.open(ANDROID_URL)} src={logoAndroid} width="150" alt="ios" />
-          <img onClick={() => window.open(IOS_URL)} src={logoiOS} width="150" alt="android" />
+          <a href={ANDROID_URL}><img src={logoAndroid} width="150" alt="android" /></a>
+          <a href={IOS_URL}><img src={logoiOS} width="150" alt="ios" /></a>
         </div>
       </Modal>
     );
