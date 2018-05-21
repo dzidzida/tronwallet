@@ -15,14 +15,12 @@ import {
   buildUnfreezeBalance,
 } from './../wallet-api-v2/utils/transactionBuilder';
 
-const TRON_URL = 'https://tronscan.io';
 const explorer = new ApiClient();
 
 export const ONE_TRX = 1000000;
 
 class ClientWallet {
   constructor(opt = null) {
-    this.url = opt || TRON_URL;
     this.api = 'https://api.tronscan.org/api';
   }
 
@@ -112,47 +110,53 @@ class ClientWallet {
 
   async getBalances() {
     const owner = await this.getPublicKey();
-    const { data } = await axios.post(
-      `${this.url}/queryAccount`,
-      qs.stringify({
-        address: owner,
-      })
-    );
-
-    const bytesAccountInfo = base64DecodeFromString(data);
-    const accountInfo = Account.deserializeBinary(bytesAccountInfo);
-    const assetMap = accountInfo.getAssetMap().toArray();
-    const trxBalance = accountInfo.getBalance();
-    const trxBalanceNum = trxBalance.toFixed(5);
-
-    const balances = [
-      {
-        name: 'TRX',
-        balance: trxBalanceNum,
-      },
-    ];
-
-    for (const asset of Object.keys(assetMap)) {
-      balances.push({
-        name: assetMap[asset][0],
-        balance: assetMap[asset][1],
-      });
-    }
-
+    const { data: { balances } } = await axios.get(`${this.api}/account/${owner}`);
     return balances;
   }
 
-  async participateToken(config) {
-    const owner = await this.getPublicKey();
-    const body = qs.stringify({
-      name: byteArray2hexStr(stringToBytes(config.name)),
-      ownerAddress: owner,
-      toAddress: config.ownerAddress,
-      amount: config.amount * config.trxNum,
-    });
-    const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
-    return data;
-  }
+  // async getBalances() {
+  //   const owner = await this.getPublicKey();
+  //   const { data } = await axios.post(
+  //     `${this.url}/queryAccount`,
+  //     qs.stringify({
+  //       address: owner,
+  //     })
+  //   );
+
+  //   const bytesAccountInfo = base64DecodeFromString(data);
+  //   const accountInfo = Account.deserializeBinary(bytesAccountInfo);
+  //   const assetMap = accountInfo.getAssetMap().toArray();
+  //   const trxBalance = accountInfo.getBalance();
+  //   const trxBalanceNum = trxBalance.toFixed(5);
+
+  //   const balances = [
+  //     {
+  //       name: 'TRX',
+  //       balance: trxBalanceNum,
+  //     },
+  //   ];
+
+  //   for (const asset of Object.keys(assetMap)) {
+  //     balances.push({
+  //       name: assetMap[asset][0],
+  //       balance: assetMap[asset][1],
+  //     });
+  //   }
+
+  //   return balances;
+  // }
+
+  // async participateToken(config) {
+  //   const owner = await this.getPublicKey();
+  //   const body = qs.stringify({
+  //     name: byteArray2hexStr(stringToBytes(config.name)),
+  //     ownerAddress: owner,
+  //     toAddress: config.ownerAddress,
+  //     amount: config.amount * config.trxNum,
+  //   });
+  //   const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
+  //   return data;
+  // }
 
 
   async submitTransaction(tx) {
@@ -182,7 +186,8 @@ class ClientWallet {
   async getTotalVotes() {
     const { data } = await axios.get(`${this.api}/vote/current-cycle`);
     const totalVotes = data.total_votes;
-    return totalVotes;
+    const candidates = data.candidates;
+    return { totalVotes, candidates };
   }
 
   async getEntropy() {
