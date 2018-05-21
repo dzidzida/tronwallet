@@ -113,5 +113,25 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "standard": {
+    "globals": [
+      "fetch",
+      "getComputedStyle",
+      "Image",
+      "localStorage",
+      "cancelAnimationFrame",
+      "requestAnimationFrame",
+      "location",
+      "src/components/SiderMenu/index.js"
+    ],
+    "ignore": [
+      "node_modules/**",
+      "src/utils/**"
+    ],
+    "parser": "babel-eslint",
+    "envs": [
+      "jest"
+    ]
+  }
 }
