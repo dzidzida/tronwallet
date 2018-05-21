@@ -33,37 +33,45 @@ export default {
       });
     },
     *fetchWalletData(_, { call, put }) {
-      yield put({
-        type: 'dataUserLoading',
-        loadingWallet: true,
-      });
-      const data = yield call(() =>
-        Promise.all([
-          Client.getBalances(),
-          Client.getPublicKey(),
-          Client.getTransactionList(),
-          Client.getFreeze(),
-        ])
-      );
+      try {
+        yield put({
+          type: 'dataUserLoading',
+          loadingWallet: true,
+        });
+        const data = yield call(() =>
+          Promise.all([
+            Client.getBalances(),
+            Client.getPublicKey(),
+            Client.getTransactionList(),
+            Client.getFreeze(),
+          ])
+        );
 
-      const balances = data[0];
-      const tronAccount = data[1];
-      const { balance } = balances.find(b => b.name === 'TRX');
-      const transactionsData = data[2];
-      const frozen = data[3];
+        const balances = data[0];
+        const tronAccount = data[1];
+        const { balance } = balances.find(b => b.name === 'TRX');
+        const transactionsData = data[2];
+        const frozen = data[3];
 
-      const userWalletData = {
-        balance,
-        balances,
-        tronAccount,
-        transactionsData,
-        totalFreeze: frozen,
-      };
-      yield put({
-        type: 'updateDataUser',
-        payload: userWalletData,
-        loadingWallet: false,
-      });
+        const userWalletData = {
+          balance,
+          balances,
+          tronAccount,
+          transactionsData,
+          totalFreeze: frozen,
+        };
+        yield put({
+          type: 'updateDataUser',
+          payload: userWalletData,
+          loadingWallet: false,
+        });
+      } catch (error) {
+        yield put({
+          type: 'updateDataUser',
+          payload: false,
+          loadingWallet: false,
+        });
+      }
     },
   },
 

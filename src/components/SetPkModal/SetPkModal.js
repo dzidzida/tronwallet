@@ -12,11 +12,10 @@ class TransactionQRCode extends Component {
 
   putUser = async () => {
     const { pk } = this.state;
-    const { onClose, loadData } = this.props;
+    const { onClose } = this.props;
     try {
       if (pk) {
         await setUserPk(pk);
-        loadData();
         this.props.dispatch({
           type: 'user/fetchWalletData',
         });

@@ -78,7 +78,7 @@ class Monitor extends PureComponent {
     } catch (error) {
       message.error(error.message);
     }
-  };
+  }
 
   formatAmount = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
@@ -177,7 +177,7 @@ class Monitor extends PureComponent {
                   <Icon type="caret-down" style={{ marginLeft: 5, color: 'red' }} />
                 ) : (
                   <Icon type="caret-up" style={{ marginLeft: 5, color: 'green' }} />
-                )}
+                  )}
               </small>
             </div>
           </div>
@@ -215,6 +215,20 @@ class Monitor extends PureComponent {
       return (
         <div className={styles.loading}>
           <Spin size="large" />
+        </div>
+      );
+    }
+
+    if (!this.props.userWallet) {
+      return (
+        <div className={styles.loading}>
+          <Button
+            type="primary"
+            size="large"
+            icon="reload"
+            onClick={() => this.props.dispatch({ type: 'user/fetchWalletData' })}
+          >Refresh Page
+          </Button>
         </div>
       );
     }
@@ -303,13 +317,13 @@ class Monitor extends PureComponent {
                       )}
                     />
                   ) : (
-										<Field
-										label=""
-										value={moment(new Date()).format(
-											'dddd, MMMM Do YYYY'
-										)}
-									/>
-									)
+                    <Field
+                      label=""
+                      value={moment(new Date()).format(
+                          'dddd, MMMM Do YYYY'
+                        )}
+                    />
+                    )
                 }
               />
             </Card>
@@ -343,13 +357,13 @@ class Monitor extends PureComponent {
                 footer={<Field label={moment(new Date()).format('dddd, MMMM Do YYYY')} />}
                 contentHeight={46}
               />
-            </Card>						
+            </Card>
           </Col>
         </Row>
         <Row gutter={24}>
-				
+
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-					<Card
+            <Card
               title="ENTROPY"
               style={{ marginBottom: 30 }}
               bordered={false}
