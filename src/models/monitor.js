@@ -6,6 +6,7 @@ export default {
   state: {
     tags: [],
     isResultVisible: false,
+    isPkVisible: false,
     transaction: {},
   },
 
@@ -17,24 +18,17 @@ export default {
         payload: response.list,
       });
     },
-    // *openSocket(_, { call, put }) {
-    //   const pk = yield call(Client.getPublicKey);
-    //   const socket = openSocket(URL_SOCKET);
-    //   socket.on('payback', data => {
-    //     console.log("SocketPK", pk);
-    //     if (data.uuid === pk) {
-    //       put({
-    //         type: 'setResultVisible',
-    //  payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
-    //       });
-    //     }
-    //   });
-    // },
     *changeModalResult({ payload }, { put }) {
       yield put({
         type: 'setResultVisible',
         visible: payload.visible,
         transaction: payload.transaction,
+      });
+    },
+    *changeModalPk({ payload }, { put }) {
+      yield put({
+        type: 'setPkVibible',
+        visible: payload.visible,
       });
     },
   },
@@ -51,6 +45,12 @@ export default {
         ...state,
         isResultVisible: action.visible,
         transaction: action.transaction,
+      };
+    },
+    setPkVibible(state, action) {
+      return {
+        ...state,
+        isPkVisible: action.visible,
       };
     },
   },

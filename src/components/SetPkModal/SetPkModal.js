@@ -10,17 +10,23 @@ class TransactionQRCode extends Component {
     error: null,
   };
 
+  onCloseModal = () => {
+    const { onClose } = this.props;
+    this.props.dispatch({
+      type: 'monitor/changePkModal',
+      payload: { visible: false },
+    });
+    onClose();
+  }
   putUser = async () => {
     const { pk } = this.state;
-    const { onClose, loadData } = this.props;
     try {
       if (pk) {
         await setUserPk(pk);
-        loadData();
         this.props.dispatch({
           type: 'user/fetchWalletData',
         });
-        onClose();
+        this.onCloseModal();
       } else {
         throw new Error();
       }

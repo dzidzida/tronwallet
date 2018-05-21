@@ -98,7 +98,6 @@ class BasicLayout extends React.PureComponent {
   };
   state = {
     isMobile,
-    modalVisible: false,
   };
   getChildContext() {
     const { location, routerData } = this.props;
@@ -122,10 +121,6 @@ class BasicLayout extends React.PureComponent {
     this.props.dispatch({
       type: 'user/fetchCurrent',
     });
-
-    this.props.dispatch({
-      type: 'user/fetchWalletData',
-    });
   }
 
   componentWillUnmount() {
@@ -140,7 +135,10 @@ class BasicLayout extends React.PureComponent {
   };
 
   onCloseModal = () => {
-    this.setState({ modalVisible: false });
+    this.props.dispatch({
+      type: 'monitor/changeModalPk',
+      payload: { visible: false },
+    });
   };
 
   getPageTitle() {
@@ -184,7 +182,14 @@ class BasicLayout extends React.PureComponent {
   checkUserAttr = async () => {
     const usrAttr = await getUserAttributes();
     if (!usrAttr['custom:publickey']) {
-      this.setState({ modalVisible: true });
+      this.props.dispatch({
+        type: 'monitor/changeModalPk',
+        payload: { visible: true },
+      });
+    } else {
+      this.props.dispatch({
+        type: 'user/fetchWalletData',
+      });
     }
   };
 
@@ -243,6 +248,7 @@ class BasicLayout extends React.PureComponent {
       match,
       location,
       isResultVisible,
+      isPkVisible,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
     const layout = (
@@ -275,7 +281,7 @@ class BasicLayout extends React.PureComponent {
             />
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
+            <SetPkModal visible={isPkVisible} onClose={this.onCloseModal} />
             <TransactionResultModal
               visible={isResultVisible}
               onClose={this.onCloseTransactionModal}
@@ -353,4 +359,5 @@ export default connect(({ user, global, loading, monitor }) => ({
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
   isResultVisible: monitor.isResultVisible,
+  isPkVisible: monitor.isPkVisible,
 }))(BasicLayout);
