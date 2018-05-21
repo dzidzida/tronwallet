@@ -1,31 +1,45 @@
 import React, { Component } from 'react';
 import { Modal } from 'antd';
 import { connect } from 'dva';
+import logoAndroid from '../../assets/logo-android.svg';
+import logoiOS from '../../assets/logo-ios.svg';
 import styles from './SetPkModal.less';
 import { setUserPk } from '../../services/api';
+import { isAddressValid } from '../../utils/wallet-api-v2/utils/address';
+import Client from '../../utils/wallet-service/client';
 
 class TransactionQRCode extends Component {
   state = {
-    pk: null,
+    newPk: null,
     error: null,
+    currentPk: null,
   };
 
+  componentDidMount() {
+    this.loadUserPk();
+  }
+
   onCloseModal = () => {
-    const { onClose } = this.props;
+    const { currentPk } = this.state;
+    if (!currentPk) {
+      this.setState({ error: 'You need to set a public key first' });
+      return;
+    }
     this.props.dispatch({
-      type: 'monitor/changePkModal',
+      type: 'monitor/changeModalPk',
       payload: { visible: false },
     });
-    onClose();
   }
+
   putUser = async () => {
-    const { pk } = this.state;
+    const { newPk } = this.state;
     try {
-      if (pk) {
-        await setUserPk(pk);
+      if (isAddressValid(newPk)) {
+        await setUserPk(newPk);
         this.props.dispatch({
           type: 'user/fetchWalletData',
         });
+        this.setState({ currentPk: newPk });
         this.onCloseModal();
       } else {
         throw new Error();
@@ -35,8 +49,14 @@ class TransactionQRCode extends Component {
     }
   };
 
+  loadUserPk = async () => {
+    const currentPk = await Client.getPublicKey();
+    this.setState({ currentPk });
+  }
+
+
   render() {
-    const { visible, onClose } = this.props;
+    const { visible } = this.props;
     const footerButton = (
       <button className={styles.button} onClick={this.putUser}>
         {'Ok'}
@@ -44,16 +64,21 @@ class TransactionQRCode extends Component {
     );
 
     return (
-      <Modal visible={visible} footer={footerButton} onCancel={onClose}>
+      <Modal visible={visible} footer={footerButton} onCancel={this.onCloseModal}>
         <h3>Set your public key</h3>
         <input
           className={styles.formControl}
-          onChange={e => this.setState({ pk: e.target.value })}
+          onChange={e => this.setState({ newPk: e.target.value, error: null })}
           type="text"
           name="pk"
           id="pk"
           placeholder="Insert your public key"
         />
+        <h4 style={{ textAlign: 'center' }}>You can get your public key using Tron Vault</h4>
+        <div className={styles.footerModal}>
+          <img src={logoAndroid} width="150" alt="ios" />
+          <img src={logoiOS} width="150" alt="android" />
+        </div>
         <h3 style={{ fontWeight: 'bold', color: 'red' }}>{this.state.error}</h3>
       </Modal>
     );

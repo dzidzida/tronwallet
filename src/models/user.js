@@ -7,13 +7,14 @@ export default {
   state: {
     list: [],
     currentUser: {},
-    loadingWallet: true,
+    loadingWallet: false,
     userWalletData: {
       balance: null,
       balances: [],
       tronAccount: null,
       transactionsData: null,
       totalFreeze: {},
+      entropy: 0,
     },
   },
 
@@ -44,6 +45,7 @@ export default {
             Client.getPublicKey(),
             Client.getTransactionList(),
             Client.getFreeze(),
+            Client.getEntropy(),
           ])
         );
 
@@ -52,6 +54,7 @@ export default {
         const { balance } = balances.find(b => b.name === 'TRX');
         const transactionsData = data[2];
         const frozen = data[3];
+        const entropy = data[4];
 
         const userWalletData = {
           balance,
@@ -59,6 +62,7 @@ export default {
           tronAccount,
           transactionsData,
           totalFreeze: frozen,
+          entropy,
         };
         yield put({
           type: 'updateDataUser',
