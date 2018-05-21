@@ -15,10 +15,12 @@ export const signIn = async (email, password) => {
   }
 };
 
-export const confirmSignIn = async (user, totpCode, code) =>
-  totpCode
-    ? Auth.verifyTotpToken(user, code)
-    : Auth.confirmSignIn(user, code, 'SOFTWARE_TOKEN_MFA');
+export const confirmSignIn = async (user, totpCode, code) => {
+  if (totpCode) {
+    return Auth.verifyTotpToken(user, code);
+  }
+  return Auth.confirmSignIn(user, code, 'SOFTWARE_TOKEN_MFA');
+}
 
 export const signOut = async () => Auth.signOut();
 

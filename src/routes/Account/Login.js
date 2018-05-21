@@ -81,6 +81,7 @@ class Login extends PureComponent {
   confirmSignIn = async () => {
     const { totpCode, user, code, pk } = this.state;
     const { dispatch } = this.props;
+
     try {
       await confirmSignIn(user, totpCode, code);
       // Confirmed sign successfully
@@ -134,7 +135,7 @@ class Login extends PureComponent {
     let body;
     if (totpCode) {
       body = (
-        <>
+        <div>
           <p>
             Please, link your account with some TOTP authenticator using this QRCode (We recommend
             Google Authenticator). You wont be able to log into your account without a six digit
@@ -152,11 +153,11 @@ class Login extends PureComponent {
             id="code"
             placeholder="Insert code provided by the authenticator"
           />
-        </>
+        </div>
       );
     } else {
       body = (
-        <>
+        <div>
           <h3>Please, type the code provided by your authenticator to login</h3>
           <input
             className={styles.formControl}
@@ -165,7 +166,7 @@ class Login extends PureComponent {
             name="code"
             id="code"
           />
-        </>
+        </div>
       );
     }
     return (
