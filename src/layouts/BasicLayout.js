@@ -134,12 +134,6 @@ class BasicLayout extends React.PureComponent {
     });
   };
 
-  onCloseModal = () => {
-    this.props.dispatch({
-      type: 'monitor/changeModalPk',
-      payload: { visible: false },
-    });
-  };
 
   getPageTitle() {
     const { routerData, location } = this.props;
@@ -281,7 +275,7 @@ class BasicLayout extends React.PureComponent {
             />
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <SetPkModal visible={isPkVisible} onClose={this.onCloseModal} />
+            <SetPkModal visible={isPkVisible} />
             <TransactionResultModal
               visible={isResultVisible}
               onClose={this.onCloseTransactionModal}

@@ -23,8 +23,7 @@ class Monitor extends PureComponent {
     freezeTransaction: '',
     qrcodeVisible: false,
     loading: true,
-    loadingError: false,
-    entropy: 0,
+    loadDataError: false,
   };
 
   async componentDidMount() {
@@ -62,13 +61,8 @@ class Monitor extends PureComponent {
   };
 
   loadData = async () => {
-    // bad rquest fix
-    const userpk = await Client.getPublicKey();
-    if (!userpk) return;
-
     try {
       const data = await getTronPrice();
-      const entropy = await Client.getEntropy();
       const { Data: tronPriceList = [] } = data;
 
       if (!tronPriceList.length) {
@@ -85,10 +79,9 @@ class Monitor extends PureComponent {
         tronPriceData,
         lastDay,
         loading: false,
-        entropy,
       });
     } catch (error) {
-      this.setState({ loadingError: true });
+      this.setState({ loadDataError: true, loading: false });
     }
   }
 
@@ -215,12 +208,16 @@ class Monitor extends PureComponent {
       qrcodeVisible,
       loading,
       transactionDetail,
-      entropy,
-      loadingError,
+      loadDataError,
     } = this.state;
 
-    const { balance, tronAccount, totalFreeze } = this.props.userWallet;
+    const { balance, tronAccount, totalFreeze, entropy } = this.props.userWallet;
     const { loadingWallet } = this.props.user;
+
+
+    if (!tronAccount && !loading && !loadingWallet) {
+      return <div />;
+    }
 
     if (loading || loadingWallet) {
       return (
@@ -229,9 +226,8 @@ class Monitor extends PureComponent {
         </div>
       );
     }
-
     // Something wrong while getting the api
-    if (!this.props.userWallet || loadingError) {
+    if (!this.props.userWallet || loadDataError) {
       return (
         <div className={styles.loading}>
           <Button
@@ -244,6 +240,7 @@ class Monitor extends PureComponent {
         </div>
       );
     }
+
 
     return (
       <Fragment>
