@@ -8,6 +8,8 @@ import { setUserPk } from '../../services/api';
 import { isAddressValid } from '../../utils/wallet-api-v2/utils/address';
 import Client from '../../utils/wallet-service/client';
 
+const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.tronmobile';
+const IOS_URL = 'https://itunes.apple.com/us/app/tronvault/id1380161153?ls=1&mt=8';
 class TransactionQRCode extends Component {
   state = {
     newPk: null,
@@ -74,12 +76,12 @@ class TransactionQRCode extends Component {
           id="pk"
           placeholder="Insert your public key"
         />
+        <h3 style={{ fontWeight: '700', color: 'red' }}>{this.state.error}</h3>
         <h4 style={{ textAlign: 'center' }}>You can get your public key using Tron Vault</h4>
         <div className={styles.footerModal}>
-          <img src={logoAndroid} width="150" alt="ios" />
-          <img src={logoiOS} width="150" alt="android" />
+          <a href={ANDROID_URL}><img src={logoAndroid} width="150" alt="android" /></a>
+          <a href={IOS_URL}><img src={logoiOS} width="150" alt="ios" /></a>
         </div>
-        <h3 style={{ fontWeight: 'bold', color: 'red' }}>{this.state.error}</h3>
       </Modal>
     );
   }
