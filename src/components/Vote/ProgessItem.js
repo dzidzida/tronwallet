@@ -3,8 +3,8 @@ import { Progress } from 'antd';
 
 import styles from './index.less';
 
-const ProgressItem = props => {
-  const percent = Math.floor(props.votes * 100 / props.total);
+const ProgressItem = (props) => {
+  const percent = Math.floor((props.votes * 100) / props.total);
   return (
     <div className={styles.actionContainer}>
       <strong>{Number(props.votes).toLocaleString()}</strong>

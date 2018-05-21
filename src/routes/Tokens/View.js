@@ -24,14 +24,14 @@ class View extends PureComponent {
     this.loadTokens();
   }
 
-  onChange = e => {
+  onChange = (e) => {
     const { name, value, type, checked } = e.target;
     this.setState({
       [name]: type === 'checkbox' ? checked : value,
     });
   };
 
-  onClick = token => {
+  onClick = (token) => {
     this.setState({
       currentToken: token,
       amount: 0,
@@ -43,7 +43,7 @@ class View extends PureComponent {
     this.setState({ modalVisible: false });
   };
 
-  submit = async e => {
+  submit = async (e) => {
     e.preventDefault();
     const { currentToken, amount, transaction } = this.state;
     this.setState({ transaction: { ...transaction, loading: true } });
@@ -72,11 +72,11 @@ class View extends PureComponent {
     this.setState({ tokenList });
   };
 
-  selectToken = tokenId => {
+  selectToken = (tokenId) => {
     this.setState({ currentToken: tokenId });
   };
 
-  renderParticipateButton = token => {
+  renderParticipateButton = (token) => {
     if (moment(token.startTime).isAfter() || moment(token.endTime).isBefore()) {
       return (
         <button disabled className={styles.close}>
@@ -92,7 +92,7 @@ class View extends PureComponent {
     }
   };
 
-  renderCollapse = ownerAddress => {
+  renderCollapse = (ownerAddress) => {
     const { currentToken, amount, acceptTerms } = this.state;
     const { loading } = this.state.transaction;
     if (currentToken && currentToken.ownerAddress === ownerAddress) {
@@ -133,7 +133,7 @@ class View extends PureComponent {
               />
               <span className={styles.checkboxText}>
                 I&#39;ve confirmed to spend{' '}
-                <b>{(amount * currentToken.price / ONE_TRX).toFixed(5)} TRX</b> on token
+                <b>{((amount * currentToken.price) / ONE_TRX).toFixed(5)} TRX</b> on token
                 distribution, and get a total of{' '}
                 <b>
                   {amount} {currentToken.name}
@@ -158,7 +158,7 @@ class View extends PureComponent {
   };
 
   renderToken = () => {
-    return this.state.tokenList.map(token => {
+    return this.state.tokenList.map((token) => {
       return (
         <Fragment key={token.name}>
           <tr>

@@ -71,7 +71,7 @@ class Login extends PureComponent {
     const { pk } = this.state;
     if (pk.length !== 64) return false;
   };
-  change = e => {
+  change = (e) => {
     const { name, value } = e.target;
     this.setState({
       [name]: value,

@@ -8,7 +8,7 @@ class FreezeModal extends Component {
     terms: false,
   };
 
-  onCheck = e => {
+  onCheck = (e) => {
     const { checked } = e.target;
     this.setState({ terms: checked });
   };

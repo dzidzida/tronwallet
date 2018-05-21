@@ -26,7 +26,7 @@ class CowntDownInfo extends Component {
     return new Date(endTimeInMilis - currentDateInMilis);
   };
 
-  isTimeover = dateTimeRemaining => {
+  isTimeover = (dateTimeRemaining) => {
     const hours = dateTimeRemaining.getUTCHours();
     const minutes = dateTimeRemaining.getUTCMinutes();
     const seconds = dateTimeRemaining.getUTCSeconds();
@@ -47,7 +47,7 @@ class CowntDownInfo extends Component {
     );
   };
 
-  formatDate = dateTime => {
+  formatDate = (dateTime) => {
     if (!dateTime) {
       return '00:00:00';
     }

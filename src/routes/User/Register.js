@@ -76,7 +76,7 @@ export default class Register extends Component {
     return 'poor';
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields({ force: true }, (err, values) => {
       if (!err) {
@@ -91,7 +91,7 @@ export default class Register extends Component {
     });
   };
 
-  handleConfirmBlur = e => {
+  handleConfirmBlur = (e) => {
     const { value } = e.target;
     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   };
@@ -133,7 +133,7 @@ export default class Register extends Component {
     }
   };
 
-  changePrefix = value => {
+  changePrefix = (value) => {
     this.setState({
       prefix: value,
     });
