@@ -10,7 +10,10 @@ const ListContent = ({ index, url, address }) => (
         <ItemIndex index={index} />
       </Col>
       <Col sm={8} xs={24}>
-        <List.Item.Meta title={<a href="#">{url}</a>} description={<span className={styles.address}>{address}</span>} />
+        <List.Item.Meta
+          title={<a href="#">{url}</a>}
+          description={<span className={styles.address}>{address}</span>}
+        />
       </Col>
     </Row>
   </div>
