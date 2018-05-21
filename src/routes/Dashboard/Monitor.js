@@ -168,7 +168,6 @@ class Monitor extends PureComponent {
                 </div>
               }
             />
-
             <div>
               <small className={styles.itemFont}>
                 {this.formatAmount(tr.amount)}
@@ -267,7 +266,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX"
                 total={Number(balance) ? this.formatAmount(balance) : 'No balance found'}
-                footer={<span>{tronAccount}</span>}
+                footer={<small>{tronAccount}</small>}
                 contentHeight={46}
               />
             </Card>
@@ -377,7 +376,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX"
                 total={this.formatAmount(entropy)}
-                footer={<span>{tronAccount}</span>}
+                footer={<small>{tronAccount}</small>}
                 contentHeight={46}
               />
             </Card>
