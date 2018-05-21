@@ -245,6 +245,7 @@ class Vote extends Component {
                 </div>
                 <div className={styles.smallButtonsContainer}>
                   <Button
+                    className={styles.smallButtons}
                     style={{ marginBottom: 5 }}
                     type="primary"
                     size="small"
@@ -255,6 +256,7 @@ class Vote extends Component {
                     Máx
                   </Button>
                   <Button
+                    className={styles.smallButtons}
                     size="small"
                     onClick={() => this.onResetVotes(item.address)}
                     icon="close-circle-o"
@@ -324,7 +326,7 @@ class Vote extends Component {
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
           extra={
-            <Input placeholder="Search vote" onChange={this.handleSearch} style={{ width: 400 }} />
+            <Input placeholder="Search vote" onChange={this.handleSearch} className={styles.searchVote} />
           }
         >
           <p>{voteError}</p>
