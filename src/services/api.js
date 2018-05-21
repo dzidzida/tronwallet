@@ -1,6 +1,7 @@
 import { stringify } from 'qs';
 import { Auth } from 'aws-amplify';
 import request from '../utils/request';
+
 // framework default apis
 export const signIn = async (email, password) => {
   try {
@@ -65,14 +66,23 @@ export const setUserPk = async (publickey) => {
 };
 
 export const getUserAttributes = async () => {
-  const authenticatedUser = await Auth.currentAuthenticatedUser();
-  const userAttributes = await Auth.userAttributes(authenticatedUser);
-  const user = {};
+  try {
+    const authenticatedUser = await Auth.currentAuthenticatedUser();
+    const userAttributes = await Auth.userAttributes(authenticatedUser);
+    const user = {};
 
-  for (const attribute of userAttributes) {
-    user[attribute.Name] = attribute.Value;
+    for (const attribute of userAttributes) {
+      user[attribute.Name] = attribute.Value;
+    }
+    return user;
+
+  } catch (error) {
+    console.log(error)
+    if (error.code === 'UserNotFoundException') {
+      localStorage.clear();
+      location.reload();
+    }
   }
-  return user;
 };
 
 //= ============================================
