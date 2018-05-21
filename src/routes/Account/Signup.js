@@ -53,7 +53,7 @@ class Signup extends PureComponent {
     }
   };
 
-  change = e => {
+  change = (e) => {
     const { name, value } = e.target;
     this.setState({
       [name]: value,

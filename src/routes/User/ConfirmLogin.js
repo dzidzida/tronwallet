@@ -43,7 +43,7 @@ export default class ConfirmLogin extends Component {
     clearInterval(this.interval);
   }
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     const { code } = this.state;
     const { user } = this.props.login;

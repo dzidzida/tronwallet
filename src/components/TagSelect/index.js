@@ -25,7 +25,7 @@ class TagSelect extends Component {
     }
   }
 
-  onChange = value => {
+  onChange = (value) => {
     const { onChange } = this.props;
     if (!('value' in this.props)) {
       this.setState({ value });
@@ -35,7 +35,7 @@ class TagSelect extends Component {
     }
   };
 
-  onSelectAll = checked => {
+  onSelectAll = (checked) => {
     let checkedTags = [];
     if (checked) {
       checkedTags = this.getAllTags();
@@ -70,7 +70,7 @@ class TagSelect extends Component {
     });
   };
 
-  isTagSelectOption = node => {
+  isTagSelectOption = (node) => {
     return (
       node &&
       node.type &&
@@ -94,7 +94,7 @@ class TagSelect extends Component {
           全部
         </CheckableTag>
         {value &&
-          React.Children.map(children, child => {
+          React.Children.map(children, (child) => {
             if (this.isTagSelectOption(child)) {
               return React.cloneElement(child, {
                 key: `tag-select-${child.props.value}`,

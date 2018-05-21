@@ -17,7 +17,7 @@ export default class LoginPage extends Component {
     autoLogin: true,
   };
 
-  onTabChange = type => {
+  onTabChange = (type) => {
     this.setState({ type });
   };
 
@@ -34,13 +34,13 @@ export default class LoginPage extends Component {
     }
   };
 
-  changeAutoLogin = e => {
+  changeAutoLogin = (e) => {
     this.setState({
       autoLogin: e.target.checked,
     });
   };
 
-  renderMessage = content => {
+  renderMessage = (content) => {
     return <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />;
   };
 

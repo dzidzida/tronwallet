@@ -39,7 +39,7 @@ class TagCloud extends Component {
     this.renderChart();
   };
 
-  saveRootRef = node => {
+  saveRootRef = (node) => {
     this.root = node;
   };
 

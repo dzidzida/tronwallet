@@ -8,7 +8,7 @@ import map from './map';
 const FormItem = Form.Item;
 
 function generator({ defaultProps, defaultRules, type }) {
-  return WrappedComponent => {
+  return (WrappedComponent) => {
     return class BasicComponent extends Component {
       static contextTypes = {
         form: PropTypes.object,
@@ -93,7 +93,7 @@ function generator({ defaultProps, defaultRules, type }) {
 }
 
 const LoginItem = {};
-Object.keys(map).forEach(item => {
+Object.keys(map).forEach((item) => {
   LoginItem[item] = generator({
     defaultProps: map[item].props,
     defaultRules: map[item].rules,

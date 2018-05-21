@@ -10,7 +10,7 @@ class VoteInput extends Component {
     min: 0,
   };
 
-  onChange = value => {
+  onChange = (value) => {
     this.props.onChange(value);
   };
 

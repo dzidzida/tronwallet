@@ -11,7 +11,7 @@ import styles from './Applications.less';
 const { Option } = Select;
 const FormItem = Form.Item;
 
-const formatWan = val => {
+const formatWan = (val) => {
   const v = val * 1;
   if (!v || isNaN(v)) return '';
 
@@ -48,7 +48,7 @@ export default class FilterCardList extends PureComponent {
     const { form, dispatch } = this.props;
     // setTimeout 用于保证获取表单值是在所有表单字段更新完毕的时候
     setTimeout(() => {
-      form.validateFields(err => {
+      form.validateFields((err) => {
         if (!err) {
           // eslint-disable-next-line
           dispatch({

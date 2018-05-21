@@ -20,7 +20,7 @@ export const confirmSignIn = async (user, totpCode, code) => {
     return Auth.verifyTotpToken(user, code);
   }
   return Auth.confirmSignIn(user, code, 'SOFTWARE_TOKEN_MFA');
-}
+};
 
 export const signOut = async () => Auth.signOut();
 
@@ -49,15 +49,15 @@ export const changePassword = async () => {
   }
 };
 
-export const forgotPassword = async email => {
+export const forgotPassword = async (email) => {
   return Auth.forgotPassword(email);
 };
 
-export const confirmForgotPassword = async (email, code, newPassword ) => {
+export const confirmForgotPassword = async (email, code, newPassword) => {
   return Auth.forgotPasswordSubmit(email, code, newPassword);
 };
 
-export const setUserPk = async publickey => {
+export const setUserPk = async (publickey) => {
   const user = await Auth.currentAuthenticatedUser();
   return Auth.updateUserAttributes(user, {
     'custom:publickey': publickey,
