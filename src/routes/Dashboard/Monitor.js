@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon, Spin, Modal, message } from 'antd';
+import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -8,7 +8,6 @@ import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
-import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
@@ -19,12 +18,12 @@ class Monitor extends PureComponent {
     tronPriceData: [],
     lastDay: {},
     transactionDetail: {},
-    pkModalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
     freezeTransaction: '',
     qrcodeVisible: false,
     loading: true,
+    loadingError: false,
     entropy: 0,
   };
 
@@ -32,9 +31,18 @@ class Monitor extends PureComponent {
     await this.loadData();
   }
 
-  onOpenModal = () => this.setState({ pkModalVisible: true });
-  onClosePkModal = () => this.setState({ pkModalVisible: false });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user.loadingWallet) {
+      this.loadData();
+    }
+  }
 
+  onOpenPkModal = () => {
+    this.props.dispatch({
+      type: 'monitor/changeModalPk',
+      payload: { visible: true },
+    });
+  }
   // This  close function from TransactionModal needs to close every modal
   onCloseQRmodal = () => {
     this.setState({
@@ -54,6 +62,10 @@ class Monitor extends PureComponent {
   };
 
   loadData = async () => {
+    // bad rquest fix
+    const userpk = await Client.getPublicKey();
+    if (!userpk) return;
+
     try {
       const data = await getTronPrice();
       const entropy = await Client.getEntropy();
@@ -76,7 +88,7 @@ class Monitor extends PureComponent {
         entropy,
       });
     } catch (error) {
-      message.error(error.message);
+      this.setState({ loadingError: true });
     }
   }
 
@@ -197,7 +209,6 @@ class Monitor extends PureComponent {
     const {
       tronPriceData,
       lastDay,
-      pkModalVisible,
       freezeModalVisible,
       unFreezeModalVisible,
       freezeTransaction,
@@ -205,11 +216,12 @@ class Monitor extends PureComponent {
       loading,
       transactionDetail,
       entropy,
+      loadingError,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze } = this.props.userWallet;
-
     const { loadingWallet } = this.props.user;
+
     if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
@@ -218,14 +230,15 @@ class Monitor extends PureComponent {
       );
     }
 
-    if (!this.props.userWallet) {
+    // Something wrong while getting the api
+    if (!this.props.userWallet || loadingError) {
       return (
         <div className={styles.loading}>
           <Button
             type="primary"
             size="large"
             icon="reload"
-            onClick={() => this.props.dispatch({ type: 'user/fetchWalletData' })}
+            onClick={() => window.location.reload()}
           >Refresh Page
           </Button>
         </div>
@@ -340,7 +353,7 @@ class Monitor extends PureComponent {
                     ghost
                     icon="edit"
                     shape="circle"
-                    onClick={this.onOpenModal}
+                    onClick={this.onOpenPkModal}
                   />
                   {'    '}
                   <CopyToClipboard text={tronAccount}>
@@ -399,11 +412,6 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
         </Row>
-        <SetPkModal
-          visible={pkModalVisible}
-          onClose={this.onClosePkModal}
-          loadData={this.loadData}
-        />
         <FreezeModal
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}

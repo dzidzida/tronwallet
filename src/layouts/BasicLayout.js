@@ -31,14 +31,14 @@ const URL_SOCKET = 'https://tronnotifier.now.sh';
  * 根据菜单取得重定向地址.
  */
 const redirectData = [];
-const getRedirect = item => {
+const getRedirect = (item) => {
   if (item && item.children) {
     if (item.children[0] && item.children[0].path) {
       redirectData.push({
         from: `${item.path}`,
         to: `${item.children[0].path}`,
       });
-      item.children.forEach(children => {
+      item.children.forEach((children) => {
         getRedirect(children);
       });
     }
@@ -87,7 +87,7 @@ const query = {
 };
 
 let isMobile;
-enquireScreen(b => {
+enquireScreen((b) => {
   isMobile = b;
 });
 
@@ -98,7 +98,6 @@ class BasicLayout extends React.PureComponent {
   };
   state = {
     isMobile,
-    modalVisible: false,
   };
   getChildContext() {
     const { location, routerData } = this.props;
@@ -114,17 +113,13 @@ class BasicLayout extends React.PureComponent {
   componentDidMount() {
     this.checkUserAttr();
 
-    this.enquireHandler = enquireScreen(mobile => {
+    this.enquireHandler = enquireScreen((mobile) => {
       this.setState({
         isMobile: mobile,
       });
     });
     this.props.dispatch({
       type: 'user/fetchCurrent',
-    });
-
-    this.props.dispatch({
-      type: 'user/fetchWalletData',
     });
   }
 
@@ -140,7 +135,10 @@ class BasicLayout extends React.PureComponent {
   };
 
   onCloseModal = () => {
-    this.setState({ modalVisible: false });
+    this.props.dispatch({
+      type: 'monitor/changeModalPk',
+      payload: { visible: false },
+    });
   };
 
   getPageTitle() {
@@ -149,7 +147,7 @@ class BasicLayout extends React.PureComponent {
     let title = 'TronWallet';
     let currRouterData = null;
     // match params path
-    Object.keys(routerData).forEach(key => {
+    Object.keys(routerData).forEach((key) => {
       if (pathToRegexp(key).test(pathname)) {
         currRouterData = routerData[key];
       }
@@ -184,7 +182,14 @@ class BasicLayout extends React.PureComponent {
   checkUserAttr = async () => {
     const usrAttr = await getUserAttributes();
     if (!usrAttr['custom:publickey']) {
-      this.setState({ modalVisible: true });
+      this.props.dispatch({
+        type: 'monitor/changeModalPk',
+        payload: { visible: true },
+      });
+    } else {
+      this.props.dispatch({
+        type: 'user/fetchWalletData',
+      });
     }
   };
 
@@ -192,7 +197,7 @@ class BasicLayout extends React.PureComponent {
     const { dispatch } = this.props;
     const pk = await Client.getPublicKey();
     this.socket = openSocket(URL_SOCKET);
-    this.socket.on('payback', data => {
+    this.socket.on('payback', (data) => {
       if (data.uuid === pk) {
         dispatch({
           type: 'monitor/changeModalResult',
@@ -202,13 +207,13 @@ class BasicLayout extends React.PureComponent {
     });
   };
 
-  handleMenuCollapse = collapsed => {
+  handleMenuCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: collapsed,
     });
   };
-  handleNoticeClear = type => {
+  handleNoticeClear = (type) => {
     message.success(`清空了${type}`);
     this.props.dispatch({
       type: 'global/clearNotices',
@@ -226,7 +231,7 @@ class BasicLayout extends React.PureComponent {
       });
     }
   };
-  handleNoticeVisibleChange = visible => {
+  handleNoticeVisibleChange = (visible) => {
     if (visible) {
       this.props.dispatch({
         type: 'global/fetchNotices',
@@ -243,6 +248,7 @@ class BasicLayout extends React.PureComponent {
       match,
       location,
       isResultVisible,
+      isPkVisible,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
     const layout = (
@@ -275,7 +281,7 @@ class BasicLayout extends React.PureComponent {
             />
           </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
-            <SetPkModal visible={this.state.modalVisible} onClose={this.onCloseModal} />
+            <SetPkModal visible={isPkVisible} onClose={this.onCloseModal} />
             <TransactionResultModal
               visible={isResultVisible}
               onClose={this.onCloseTransactionModal}
@@ -353,4 +359,5 @@ export default connect(({ user, global, loading, monitor }) => ({
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
   isResultVisible: monitor.isResultVisible,
+  isPkVisible: monitor.isPkVisible,
 }))(BasicLayout);
