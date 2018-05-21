@@ -68,7 +68,7 @@ class TransactionQRCode extends Component {
     return (
       <Modal visible={visible} footer={footerButton} onCancel={this.onCloseModal}>
         <h3>Configure Your TRON Account Address (public key)</h3>
-        <br/>
+        <br />
         <input
           className={styles.formControl}
           onChange={e => this.setState({ newPk: e.target.value, error: null })}
@@ -78,15 +78,15 @@ class TransactionQRCode extends Component {
           placeholder="Paste your public key here"
         />
         <h3 style={{ fontWeight: '700', color: 'red' }}>{this.state.error}</h3>
-        <br/>
+        <br />
         <h3 style={{ textAlign: 'center' }}>You can create a new TRON account address using TronVault. Download now!</h3>
         <h3 style={{ textAlign: 'center' }}>Available for iOS and Android.</h3>
-        <br/>
+        <br />
         <div className={styles.footerModal}>
           <a href={ANDROID_URL} target="_blank"><img src={logoAndroid} width="200" alt="android" /></a>
           <a href={IOS_URL} target="_blank"><img src={logoiOS} width="200" alt="ios" /></a>
         </div>
-        <br/>
+        <br />
         <p className={styles.footerModal}>Available only for TRON Testnet.</p>
       </Modal>
     );
