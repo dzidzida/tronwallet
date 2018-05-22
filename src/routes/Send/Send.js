@@ -11,7 +11,7 @@ class Send extends Component {
   state = {
     to: null,
     amount: '0.0000',
-    token: '',
+    token: 'TRX',
     modalVisible: false,
     transaction: {
       loading: false,
@@ -81,6 +81,7 @@ class Send extends Component {
   format = (number) => {
     return Number((number).toFixed(3)).toLocaleString();
   };
+
   renderOptions = () => {
     const { balances } = this.props.userWallet;
     return balances.map(bl => (
