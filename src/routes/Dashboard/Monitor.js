@@ -144,7 +144,7 @@ class Monitor extends PureComponent {
       return balances.map(bl => (
         <List.Item key={bl.name + bl.balance}>
           <List.Item.Meta title={<span>{bl.name}</span>} />
-          <div>{this.formatAmount(bl.balance)}</div>
+          <div>{this.formatBalance(bl.balance)}</div>
         </List.Item>
       ));
     }
