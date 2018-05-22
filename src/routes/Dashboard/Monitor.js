@@ -89,6 +89,10 @@ class Monitor extends PureComponent {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
   };
 
+  formatBalance = (number) => {
+    return Number((number).toFixed(3)).toLocaleString();
+  };
+
   formatAmountTokens = (number) => {
     return Number(number.toFixed(6)).toLocaleString();
   };
@@ -267,7 +271,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatAmount(balance)}>
+                <CopyToClipboard text={this.formatBalance(balance)}>
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
               }
@@ -275,7 +279,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={Number(balance) ? this.formatAmount(balance) : 'Account not funded'}
+                total={Number(balance) ? this.formatBalance(balance) : 'Account not funded'}
                 footer={<small>{tronAccount}</small>}
                 contentHeight={46}
               />

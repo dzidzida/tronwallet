@@ -79,7 +79,7 @@ class Send extends Component {
   };
 
   format = (number) => {
-    return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+    return Number((number).toFixed(3)).toLocaleString();
   };
   renderOptions = () => {
     const { balances } = this.props.userWallet;

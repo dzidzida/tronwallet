@@ -114,51 +114,6 @@ class ClientWallet {
     return balances;
   }
 
-  // async getBalances() {
-  //   const owner = await this.getPublicKey();
-  //   const { data } = await axios.post(
-  //     `${this.url}/queryAccount`,
-  //     qs.stringify({
-  //       address: owner,
-  //     })
-  //   );
-
-  //   const bytesAccountInfo = base64DecodeFromString(data);
-  //   const accountInfo = Account.deserializeBinary(bytesAccountInfo);
-  //   const assetMap = accountInfo.getAssetMap().toArray();
-  //   const trxBalance = accountInfo.getBalance();
-  //   const trxBalanceNum = trxBalance.toFixed(5);
-
-  //   const balances = [
-  //     {
-  //       name: 'TRX',
-  //       balance: trxBalanceNum,
-  //     },
-  //   ];
-
-  //   for (const asset of Object.keys(assetMap)) {
-  //     balances.push({
-  //       name: assetMap[asset][0],
-  //       balance: assetMap[asset][1],
-  //     });
-  //   }
-
-  //   return balances;
-  // }
-
-  // async participateToken(config) {
-  //   const owner = await this.getPublicKey();
-  //   const body = qs.stringify({
-  //     name: byteArray2hexStr(stringToBytes(config.name)),
-  //     ownerAddress: owner,
-  //     toAddress: config.ownerAddress,
-  //     amount: config.amount * config.trxNum,
-  //   });
-  //   const { data } = await axios.post(`${this.url}/ParticipateAssetIssueToView`, body);
-  //   return data;
-  // }
-
-
   async submitTransaction(tx) {
     const { data } = await axios.post(
       `${this.api}/transaction`,
@@ -216,10 +171,9 @@ class ClientWallet {
       transaction = await explorer.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
-      console.warn(transactionString);
       return transactionString;
     } catch (error) {
-      console.warn(error);
+      console.log(error);
     }
   }
 
