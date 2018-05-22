@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import { Divider, Button, Icon } from 'antd';
+import { Divider, Button, Icon, Spin } from 'antd';
 import * as QRCode from 'qrcode';
+import { connect } from 'dva';
 import styles from './Receive.less';
+import Client from '../../utils/wallet-service/client';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 class Receive extends Component {
   state = {
-    address: '27cLJRHL9mb9fvAi4e7vUrArqGXSyafn4eN',
+    userPublicKey: '',
     qrcode: '',
+    loading: false,
+    errorQRCode: false,
   };
 
   componentDidMount() {
@@ -15,11 +19,13 @@ class Receive extends Component {
   }
 
   loadUrl = async () => {
+    this.setState({ loading: true });
     try {
-      const qrcode = await QRCode.toDataURL(this.state.address);
-      this.setState({ qrcode });
+      const userPublicKey = await Client.getPublicKey();
+      const qrcode = await QRCode.toDataURL(userPublicKey);
+      this.setState({ qrcode, userPublicKey, loading: false });
     } catch (error) {
-      // console.log('>>>', error);
+      this.setState({ errorQRCode: error, loading: false });
     }
   };
 
@@ -34,6 +40,7 @@ class Receive extends Component {
   };
 
   render() {
+    const { errorQRCode, loading } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -41,14 +48,25 @@ class Receive extends Component {
         </div>
         <div className={styles.cardContent}>
           <p>Send TRX to the following address</p>
-          <CopyToClipboard text={this.state.address} />
+          <CopyToClipboard text={this.state.userPublicKey} />
           <Divider />
           <span>Or scan this QR code on a mobile device</span>
-          <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />
+          {loading && <Spin size="medium" />}
+          {errorQRCode && (
+            <Button
+              type="primary"
+              size="large"
+              icon="reload"
+              onClick={() => this.loadUrl()}
+            >Refresh QRCode
+            </Button>)}
+          {!loading && !errorQRCode && <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />}
         </div>
       </div>
     );
   }
 }
 
-export default Receive;
+export default connect(({ user }) => ({
+  userPublicKey: user.userWalletData.tronAccount,
+}))(Receive);
