@@ -85,6 +85,12 @@ class Monitor extends PureComponent {
     }
   }
 
+  fetchWalletData = async () => {
+    this.props.dispatch({
+      type: 'user/fetchWalletData',
+    });
+  }
+
   formatAmount = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
   };
@@ -271,9 +277,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatBalance(balance)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
               }
             >
               <ChartCard
@@ -381,9 +385,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatAmount(entropy)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
               }
             >
               <ChartCard
@@ -394,12 +396,26 @@ class Monitor extends PureComponent {
                 contentHeight={46}
               />
             </Card>
-            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card
+              title="TOKENS"
+              style={{ marginBottom: 16 }}
+              bordered={false}
+              extra={
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
+              }
+            >
               {this.renderTokens()}
             </Card>
           </Col>
           <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card title="TRANSACTIONS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card
+              title="TRANSACTIONS"
+              style={{ marginBottom: 16 }}
+              bordered={false}
+              extra={
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
+              }
+            >
               {this.renderTransactions()}
             </Card>
           </Col>
