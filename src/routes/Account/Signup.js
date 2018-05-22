@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Modal, Button, Tooltip, Icon } from 'antd';
+import { Modal, Button, Tooltip, Icon, message } from 'antd';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
 import styles from './Signup.less';
@@ -48,6 +48,7 @@ class Signup extends PureComponent {
       setAuthority('user');
       reloadAuthorized();
       this.props.dispatch(routerRedux.push('/user/login'));
+      message.success('Account confirmed with success! Log in to enter.');
     } catch (error) {
       this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
