@@ -23,13 +23,13 @@ class TransactionQRCode extends Component {
     for (const ctr in contracts[0]) {
       if (ctr === 'amount') {
         contractsElements.push(
-          <h3>
+          <h3 key={ctr}>
             {ctr} : {contracts[0][ctr] / 1000000}
           </h3>
         );
       } else {
         contractsElements.push(
-          <h3>
+          <h3 key={ctr}>
             {ctr} : {contracts[0][ctr]}
           </h3>
         );
@@ -54,18 +54,15 @@ class TransactionQRCode extends Component {
         footer={footerButton}
       >
         <div>
-          <h2>
-            Your last transaction was
-            {result ? (
-              <strong className={styles.success}> successful</strong>
-            ) : (
-              <strong className={styles.fail}> not successful</strong>
-            )}
-          </h2>
+          {visible && (
+            <h2> Your last transaction was
+              {result ? (<strong className={styles.success}> successful</strong>)
+                : (<strong className={styles.fail}> not successful</strong>)}
+            </h2>)}
           <p>{moment(timestamp / 1000000).format('MM/DD/YYYY HH:MM:SS')}</p>
         </div>
         <div>{this.renderContracts()}</div>
-      </Modal>
+      </Modal >
     );
   }
 }

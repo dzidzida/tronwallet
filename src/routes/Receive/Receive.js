@@ -51,7 +51,7 @@ class Receive extends Component {
           <CopyToClipboard text={this.state.userPublicKey} />
           <Divider />
           <span>Or scan this QR code on a mobile device</span>
-          {loading && <Spin size="medium" />}
+          {loading && <Spin size="small" />}
           {errorQRCode && (
             <Button
               type="primary"
