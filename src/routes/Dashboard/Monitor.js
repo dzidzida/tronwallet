@@ -271,6 +271,7 @@ class Monitor extends PureComponent {
                     icon="close"
                     shape="circle"
                     onClick={() => this.setState({ unFreezeModalVisible: true })}
+                    disabled={balance === 0}
                   />
                   {'  '}
                   <Button
@@ -280,6 +281,7 @@ class Monitor extends PureComponent {
                     shape="circle"
                     ghost
                     onClick={() => this.setState({ freezeModalVisible: true })}
+                    disabled={balance === 0}
                   />
                 </Fragment>
               }
