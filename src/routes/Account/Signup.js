@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Modal, Button, Tooltip, Icon } from 'antd';
+import { Modal, Button, Tooltip, Icon, message } from 'antd';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
 import styles from './Signup.less';
@@ -48,6 +48,7 @@ class Signup extends PureComponent {
       setAuthority('user');
       reloadAuthorized();
       this.props.dispatch(routerRedux.push('/user/login'));
+      message.success('Account confirmed with success! Log in to enter.');
     } catch (error) {
       this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
@@ -77,21 +78,14 @@ class Signup extends PureComponent {
     const { modalVisible, email, confirmSignupError } = this.state;
     return (
       <Modal
-        title="Confirm signup"
+        title="Confirm Signup"
         visible={modalVisible}
         onOk={this.confirmSignup}
         onCancel={() => this.setState({ modalVisible: false })}
       >
-        <h3>Email</h3>
-        <input
-          className={styles.formControl}
-          value={email}
-          onChange={this.change}
-          type="email"
-          name="email"
-          id="emailConfirmed"
-        />
-        <h3>Code</h3>
+        <h3>We have sent you an email with the account verification code. Please type it to confirm your registration.</h3>
+        <br/>
+        <h3>Verification Code:</h3>
         <input
           className={styles.formControl}
           onChange={this.change}

@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon, Spin, Modal, message } from 'antd';
+import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -8,7 +8,6 @@ import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getTronPrice } from '../../services/api';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
-import SetPkModal from '../../components/SetPkModal/SetPkModal';
 import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
@@ -19,22 +18,30 @@ class Monitor extends PureComponent {
     tronPriceData: [],
     lastDay: {},
     transactionDetail: {},
-    pkModalVisible: false,
     freezeModalVisible: false,
     unFreezeModalVisible: false,
     freezeTransaction: '',
     qrcodeVisible: false,
     loading: true,
-    entropy: 0,
+    loadDataError: false,
   };
 
   async componentDidMount() {
     await this.loadData();
   }
 
-  onOpenModal = () => this.setState({ pkModalVisible: true });
-  onClosePkModal = () => this.setState({ pkModalVisible: false });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user.loadingWallet) {
+      this.loadData();
+    }
+  }
 
+  onOpenPkModal = () => {
+    this.props.dispatch({
+      type: 'monitor/changeModalPk',
+      payload: { visible: true },
+    });
+  }
   // This  close function from TransactionModal needs to close every modal
   onCloseQRmodal = () => {
     this.setState({
@@ -56,7 +63,6 @@ class Monitor extends PureComponent {
   loadData = async () => {
     try {
       const data = await getTronPrice();
-      const entropy = await Client.getEntropy();
       const { Data: tronPriceList = [] } = data;
 
       if (!tronPriceList.length) {
@@ -73,15 +79,24 @@ class Monitor extends PureComponent {
         tronPriceData,
         lastDay,
         loading: false,
-        entropy,
       });
     } catch (error) {
-      message.error(error.message);
+      this.setState({ loadDataError: true, loading: false });
     }
-  };
+  }
+
+  fetchWalletData = async () => {
+    this.props.dispatch({
+      type: 'user/fetchWalletData',
+    });
+  }
 
   formatAmount = (number) => {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+  };
+
+  formatBalance = (number) => {
+    return Number((number).toFixed(3)).toLocaleString();
   };
 
   formatAmountTokens = (number) => {
@@ -135,7 +150,7 @@ class Monitor extends PureComponent {
       return balances.map(bl => (
         <List.Item key={bl.name + bl.balance}>
           <List.Item.Meta title={<span>{bl.name}</span>} />
-          <div>{this.formatAmount(bl.balance)}</div>
+          <div>{this.formatBalance(bl.balance)}</div>
         </List.Item>
       ));
     }
@@ -176,7 +191,7 @@ class Monitor extends PureComponent {
                   <Icon type="caret-down" style={{ marginLeft: 5, color: 'red' }} />
                 ) : (
                   <Icon type="caret-up" style={{ marginLeft: 5, color: 'green' }} />
-                )}
+                  )}
               </small>
             </div>
           </div>
@@ -197,19 +212,23 @@ class Monitor extends PureComponent {
     const {
       tronPriceData,
       lastDay,
-      pkModalVisible,
       freezeModalVisible,
       unFreezeModalVisible,
       freezeTransaction,
       qrcodeVisible,
       loading,
       transactionDetail,
-      entropy,
+      loadDataError,
     } = this.state;
 
-    const { balance, tronAccount, totalFreeze } = this.props.userWallet;
-
+    const { balance, tronAccount, totalFreeze, entropy } = this.props.userWallet;
     const { loadingWallet } = this.props.user;
+
+
+    if (!tronAccount && !loading && !loadingWallet) {
+      return <div />;
+    }
+
     if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
@@ -217,6 +236,21 @@ class Monitor extends PureComponent {
         </div>
       );
     }
+    // Something wrong while getting the api
+    if (!this.props.userWallet || loadDataError) {
+      return (
+        <div className={styles.loading}>
+          <Button
+            type="primary"
+            size="large"
+            icon="reload"
+            onClick={() => window.location.reload()}
+          >Refresh Page
+          </Button>
+        </div>
+      );
+    }
+
 
     return (
       <Fragment>
@@ -243,15 +277,13 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatAmount(balance)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
               }
             >
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={Number(balance) ? this.formatAmount(balance) : 'No balance found'}
+                total={Number(balance) ? this.formatBalance(balance) : 'Account not funded'}
                 footer={<small>{tronAccount}</small>}
                 contentHeight={46}
               />
@@ -307,10 +339,10 @@ class Monitor extends PureComponent {
                     <Field
                       label=""
                       value={moment(new Date()).format(
-                        'dddd, MMMM Do YYYY'
-                      )}
+                          'dddd, MMMM Do YYYY'
+                        )}
                     />
-                  )
+                    )
                 }
               />
             </Card>
@@ -328,7 +360,7 @@ class Monitor extends PureComponent {
                     ghost
                     icon="edit"
                     shape="circle"
-                    onClick={this.onOpenModal}
+                    onClick={this.onOpenPkModal}
                   />
                   {'    '}
                   <CopyToClipboard text={tronAccount}>
@@ -355,9 +387,7 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <CopyToClipboard text={this.formatAmount(entropy)}>
-                  <Button type="primary" size="default" icon="copy" shape="circle" ghost />
-                </CopyToClipboard>
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
               }
             >
               <ChartCard
@@ -368,12 +398,26 @@ class Monitor extends PureComponent {
                 contentHeight={46}
               />
             </Card>
-            <Card title="TOKENS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card
+              title="TOKENS"
+              style={{ marginBottom: 16 }}
+              bordered={false}
+              extra={
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
+              }
+            >
               {this.renderTokens()}
             </Card>
           </Col>
           <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 16 }}>
-            <Card title="TRANSACTIONS" style={{ marginBottom: 16 }} bordered={false}>
+            <Card
+              title="TRANSACTIONS"
+              style={{ marginBottom: 16 }}
+              bordered={false}
+              extra={
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
+              }
+            >
               {this.renderTransactions()}
             </Card>
           </Col>
@@ -387,11 +431,6 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
         </Row>
-        <SetPkModal
-          visible={pkModalVisible}
-          onClose={this.onClosePkModal}
-          loadData={this.loadData}
-        />
         <FreezeModal
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}

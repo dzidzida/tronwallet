@@ -10,8 +10,8 @@ import { maskPrice } from '../../utils/mask';
 class Send extends Component {
   state = {
     to: null,
-    amount: '0.0000',
-    token: '',
+    amount: undefined,
+    token: 'TRX',
     modalVisible: false,
     transaction: {
       loading: false,
@@ -20,14 +20,6 @@ class Send extends Component {
       error: null,
     },
   };
-
-  componentWillReceiveProps(nextProps) {
-    const { balances } = nextProps.userWallet;
-    const { token } = this.state;
-    if (balances.length && token === '') {
-      this.setState({ token: balances[0].name });
-    }
-  }
 
   onCloseModal = () => {
     this.setState({ modalVisible: false });
@@ -41,9 +33,8 @@ class Send extends Component {
   };
 
   changeAmount = (e) => {
-    const priceFormat = e.target.value;
-    const price = priceFormat.replace(/,/g, '');
-    this.setState({ amount: price });
+    const amount = e.target.value;
+    this.setState({ amount });
   };
 
   isToValid = () => {
@@ -52,20 +43,30 @@ class Send extends Component {
   };
 
   isAmountValid = () => {
-    const { amount } = this.state;
-    const accountAmount = 100000;
-    if (amount === '0.0000') return true;
-    if (amount > 0 && amount <= accountAmount) return true;
-    if (Number(amount) === 0 || amount === '') return false;
+    const { balances } = this.props.userWallet;
+    if (balances) {
+      const { amount, token } = this.state;
+      const currentToken = balances.find((elm) => {
+        if (elm.name !== token) return false;
+        return true;
+      });
+
+      if (currentToken && currentToken.balance) {
+        const maxAmount = currentToken.balance;
+        if (amount === undefined) return true;
+        if (amount > 0 && amount <= maxAmount) return true;
+        if (Number(amount) === 0 || amount === '') return false;
+      }
+      return false;
+    }
 
     return false;
   };
 
   handleSend = async () => {
     const { amount, transaction, to, token } = this.state;
-    const amountFormatted = amount * 10;
     this.setState({ transaction: { ...transaction, loading: true } });
-    const TransactionData = await Client.send({ to, token, amount: amountFormatted });
+    const TransactionData = await Client.send({ to, token, amount });
     const updatedTransaction = { ...transaction };
 
     if (TransactionData) {
@@ -79,8 +80,9 @@ class Send extends Component {
   };
 
   format = (number) => {
-    return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
+    return Number((number).toFixed(3)).toLocaleString();
   };
+
   renderOptions = () => {
     const { balances } = this.props.userWallet;
     return balances.map(bl => (
@@ -124,11 +126,10 @@ class Send extends Component {
             <input
               className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
               onChange={this.changeAmount}
-              value={maskPrice(this.state.amount)}
+              value={this.state.amount}
               type="text"
               name="amount"
               id="amount"
-              placeholder="0.0000"
             />
             <div className={styles.invalid}>
               {!amountValid && 'Insufficient tokens or invalid amount'}

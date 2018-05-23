@@ -1,6 +1,6 @@
 {
   "name": "ant-design-pro",
-  "version": "1.5.30",
+  "version": "1.5.42",
   "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "start:no-proxy": "cross-env NO_PROXY=true ESLINT=none roadhog dev",
     "prebuild": "npm version patch",
     "build": "cross-env ESLINT=none roadhog build",
+    "postbuild": "aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths \"/index.html\"",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "cross-env ANALYZE=true roadhog build",
     "lint:style": "stylelint \"src/**/*.less\" --syntax less",
@@ -113,5 +114,25 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "standard": {
+    "globals": [
+      "fetch",
+      "getComputedStyle",
+      "Image",
+      "localStorage",
+      "cancelAnimationFrame",
+      "requestAnimationFrame",
+      "location",
+      "src/components/SiderMenu/index.js"
+    ],
+    "ignore": [
+      "node_modules/**",
+      "src/utils/**"
+    ],
+    "parser": "babel-eslint",
+    "envs": [
+      "jest"
+    ]
+  }
 }

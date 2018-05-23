@@ -141,9 +141,13 @@ class Login extends PureComponent {
             Google Authenticator). You wont be able to log into your account without a six digit
             code from some authenticator.
           </p>
-          <img src={qrcode} alt="QRCode Authenticator" width={200} />
-          <h3>Save this secret link for future references</h3>
+          <div style={{textAlign: 'center'}}>
+            <img src={qrcode} alt="QRCode Authenticator" width={200} />
+          </div>
+          <br/>
+          <h3>Save this code for future references.</h3>
           <CopyToClipboard text={totpCode} />
+          <br/>
           <h3>Authenticator Code</h3>
           <input
             className={styles.formControl}
