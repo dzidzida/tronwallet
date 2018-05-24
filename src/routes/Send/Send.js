@@ -94,9 +94,12 @@ class Send extends Component {
 
   render() {
     const { transaction, to, amount, modalVisible } = this.state;
+    const { balances } = this.props.userWallet;
     const amountValid = this.isAmountValid();
     const toValid = this.isToValid();
     const canSend = toValid && amountValid && to !== null && amount > 0;
+    const trxBalance = balances.find(b => b.name === 'TRX').balance;
+
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -138,7 +141,7 @@ class Send extends Component {
             </div>
             <h3 className={styles.messageError}>{transaction.error}</h3>
             <Button
-              disabled={transaction.loading || !canSend}
+              disabled={transaction.loading || !canSend || trxBalance === 0}
               type="primary"
               onClick={this.handleSend}
               className={[

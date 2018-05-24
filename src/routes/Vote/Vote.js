@@ -32,6 +32,7 @@ class Vote extends Component {
     isReset: true,
     loading: true,
     userVotes: {},
+    balance: 0,
   };
 
   // #region logic
@@ -54,6 +55,7 @@ class Vote extends Component {
       Client.getFreeze(),
       Client.getUserVotes(),
     ]);
+    const { balance } = this.props.userWallet;
     const voteList = data[0].candidates || 0;
     const totalVotes = data[0].totalVotes || 0;
     const frozen = data[1];
@@ -61,6 +63,7 @@ class Vote extends Component {
     const totalTrx = frozen.total || 0;
 
     this.setState({
+      balance,
       voteList,
       totalTrx,
       totalRemaining: totalTrx,
@@ -285,6 +288,7 @@ class Vote extends Component {
       totalTrx,
       loading,
       userVotes,
+      balance,
     } = this.state;
 
     if (loading) {
@@ -314,6 +318,7 @@ class Vote extends Component {
                 onResetVotes={this.onResetVotes}
                 totalVotes={totalVotes}
                 userVotes={userVotes}
+                balance={balance}
               />
             </Col>
           </Row>

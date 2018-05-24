@@ -4,7 +4,7 @@ import styles from './FreezeModal.less';
 
 class FreezeModal extends Component {
   state = {
-    amount: undefined,
+    amount: 0,
     terms: false,
   };
 
@@ -37,7 +37,7 @@ class FreezeModal extends Component {
         <div className={styles.checkBoxContainer}>
           <input onChange={this.onCheck} type="checkbox" name="acceptTerms" checked={terms} />
           <span className={styles.checkboxText}>
-            I confirm to freeze <b>{amount} TRX</b> for at least of 3 days
+            I confirm to freeze <b>{Number(amount)} TRX</b> for at least of 3 days
           </span>
         </div>
       </Modal>

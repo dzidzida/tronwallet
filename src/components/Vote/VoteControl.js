@@ -23,9 +23,9 @@ class VoteControl extends Component {
   onChangeAffix = affix => this.setState({ affix });
 
   renderSubmitButton = () => {
-    const { totalRemaining, totalTrx, onSubmit } = this.props;
+    const { totalRemaining, totalTrx, onSubmit, balance } = this.props;
 
-    if (totalRemaining < 0) {
+    if (totalRemaining < 0 || !balance) {
       return (
         <Button type="primary" disabled>
           SUBMIT
