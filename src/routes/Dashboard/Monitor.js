@@ -188,9 +188,9 @@ class Monitor extends PureComponent {
                 {this.formatAmount(tr.amount)}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
-                  <Icon type="caret-down" style={{ marginLeft: 5, color: 'red' }} />
+                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 17, color: 'red' }} />
                 ) : (
-                  <Icon type="caret-up" style={{ marginLeft: 5, color: 'green' }} />
+                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 17, color: 'green' }} />
                   )}
               </small>
             </div>
@@ -284,7 +284,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX"
                 total={Number(balance) ? this.formatBalance(balance) : 'Account not funded'}
-                footer={<small>{tronAccount}</small>}
+                footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
             </Card>
@@ -321,11 +321,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Tron Power"
-                total={
-                  <span style={{ fontSize: 26 }}>
-                    {this.formatAmountTokens(totalFreeze.total || 0)}
-                  </span>
-                }
+                total={this.formatAmountTokens(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (
@@ -394,7 +390,7 @@ class Monitor extends PureComponent {
                 bordered={false}
                 title="TRX"
                 total={this.formatAmount(entropy)}
-                footer={<small>{tronAccount}</small>}
+                footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
             </Card>
