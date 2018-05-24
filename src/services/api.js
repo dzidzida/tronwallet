@@ -67,8 +67,13 @@ export const setUserPk = async (publickey) => {
 
 export const getUserAttributes = async () => {
   try {
-    const user = await Auth.currentAuthenticatedUser();
-    return user.attributes;
+    const authenticatedUser = await Auth.currentAuthenticatedUser();
+    const userAttributes = await Auth.userAttributes(authenticatedUser);
+    const user = {};
+    for (const attribute of userAttributes) {
+      user[attribute.Name] = attribute.Value;
+    }
+    return user;
   } catch (error) {
     console.log(error)
     if (error.code === 'UserNotFoundException' || error === 'not authenticated') {
