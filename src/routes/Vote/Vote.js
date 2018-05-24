@@ -4,7 +4,6 @@ import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
-import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
 import ListContent from './../../components/Vote/ListContent';

@@ -2,6 +2,7 @@ import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
+import uuid from 'uuid/v4';
 import { connect } from 'dva';
 import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
@@ -162,7 +163,7 @@ class Monitor extends PureComponent {
     const { transactionsData } = this.props.userWallet;
     if (transactionsData.transactions.length) {
       return transactionsData.transactions.map(tr => (
-        <List.Item key={tr.timestamp}>
+        <List.Item key={`${tr.timestamp}-${uuid()}`}>
           <div className={styles.itemRow}>
             <List.Item.Meta
               title={
@@ -174,21 +175,22 @@ class Monitor extends PureComponent {
               description={
                 <div className={styles.address}>
                   <div className={styles.itemFont}>
-                    {new Date(tr.timestamp).getHours()} hours ago
+                    {moment(tr.timestamp).fromNow()}
                   </div>
                 </div>
               }
             />
             <div>
-              <small className={styles.itemFont}>
+              <div className={styles.itemFont}>
                 {this.formatAmount(tr.amount)}
+                {' '}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
-                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 17, color: 'red' }} />
+                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
                 ) : (
-                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 17, color: 'green' }} />
+                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
                   )}
-              </small>
+              </div>
             </div>
           </div>
         </List.Item>
