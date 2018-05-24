@@ -70,7 +70,7 @@ export const getUserAttributes = async () => {
     const user = await Auth.currentAuthenticatedUser();
     return user.attributes;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if (error.code === 'UserNotFoundException' || error === 'not authenticated') {
       localStorage.clear();
       location.reload();
