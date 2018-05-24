@@ -44,24 +44,24 @@ export default {
             Client.getBalances(),
             Client.getPublicKey(),
             Client.getTransactionList(),
-            Client.getFreeze(),
-            Client.getEntropy(),
           ])
         );
-
-        const balances = data[0];
+        
+        const account = data[0];
         const tronAccount = data[1];
-        const { balance } = balances.find(b => b.name === 'TRX');
         const transactionsData = data[2];
-        const frozen = data[3];
-        const entropy = data[4];
+
+        const balance = account.balance 
+        const balances = account.balances
+        const totalFreeze = account.frozen.total;
+        const entropy = account.entropy;
 
         const userWalletData = {
           balance,
           balances,
           tronAccount,
           transactionsData,
-          totalFreeze: frozen,
+          totalFreeze,
           entropy,
         };
         yield put({

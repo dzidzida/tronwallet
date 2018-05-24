@@ -110,8 +110,8 @@ class ClientWallet {
 
   async getBalances() {
     const owner = await this.getPublicKey();
-    const { data: { balances } } = await axios.get(`${this.api}/account/${owner}`);
-    return balances;
+    const { data } = await axios.get(`${this.api}/account/${owner}`);
+    return data;
   }
 
   async submitTransaction(tx) {

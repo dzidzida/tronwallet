@@ -4,9 +4,13 @@ import styles from './FreezeModal.less';
 
 class FreezeModal extends Component {
   state = {
-    amount: 0,
+    amount: undefined,
     terms: false,
   };
+
+  componentWilMount() {
+    this.setState({ amount: undefined })
+  }
 
   onCheck = (e) => {
     const { checked } = e.target;
