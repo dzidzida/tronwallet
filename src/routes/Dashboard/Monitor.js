@@ -95,10 +95,6 @@ class Monitor extends PureComponent {
     return Number((number / ONE_TRX).toFixed(6)).toLocaleString();
   };
 
-  formatBalance = (number) => {
-    return Number((number).toFixed(3)).toLocaleString();
-  };
-
   formatAmountTokens = (number) => {
     return Number(number.toFixed(6)).toLocaleString();
   };
@@ -150,7 +146,7 @@ class Monitor extends PureComponent {
       return balances.map(bl => (
         <List.Item key={bl.name + bl.balance}>
           <List.Item.Meta title={<span>{bl.name}</span>} />
-          <div>{this.formatBalance(bl.balance)}</div>
+          <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
       ));
     }
@@ -283,7 +279,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={Number(balance) ? this.formatBalance(balance) : 'Account not funded'}
+                total={Number(balance) ? this.formatAmount(balance) : '0'}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />

@@ -41,7 +41,7 @@ class FreezeModal extends Component {
         <div className={styles.checkBoxContainer}>
           <input onChange={this.onCheck} type="checkbox" name="acceptTerms" checked={terms} />
           <span className={styles.checkboxText}>
-            I confirm to freeze <b>{Number(amount)} TRX</b> for at least of 3 days
+            I confirm to freeze <b>{Number(amount || 0)} TRX</b> for at least of 3 days
           </span>
         </div>
       </Modal>
