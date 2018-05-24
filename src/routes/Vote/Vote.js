@@ -254,7 +254,6 @@ class Vote extends Component {
                       defaultValue={0}
                       placeholder="0"
                       value={item.amount}
-                      disabled={totalRemaining <= 0}
                       formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                       onChange={v => this.onVoteChange(item.address, v, false)}
                     />
@@ -266,7 +265,6 @@ class Vote extends Component {
                       type="primary"
                       size="small"
                       onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
-                      disabled={totalRemaining <= 0}
                       icon="to-top"
                     >
                       Máx
