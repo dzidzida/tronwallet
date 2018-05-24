@@ -45,7 +45,7 @@ class TransactionQRCode extends Component {
       pk,
       token: 'tron-wallet-getty',
     });
-    //console.log('Sending this data', validateData);
+    // console.log('Sending this data', validateData);
     const qrcode = await QRCode.toDataURL(validateData);
     this.setState({ qrcode });
   };

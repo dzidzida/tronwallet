@@ -104,10 +104,10 @@ class Monitor extends PureComponent {
   };
 
   handleFreeze = async (amount) => {
-    const transactionString = await Client.freezeBalance(amount);
+    const transactionString = await Client.freezeBalance(Number(amount));
     if (transactionString) {
       this.setState({
-        transactionDetail: { Type: 'FREEZE', Amount: amount },
+        transactionDetail: { Type: 'FREEZE', Amount: Number(amount) },
         freezeTransaction: transactionString,
         qrcodeVisible: true,
         freezeModalVisible: false,
