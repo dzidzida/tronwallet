@@ -8,14 +8,14 @@ class FreezeModal extends Component {
     terms: false,
   };
 
-  componentWilMount() {
-    this.setState({ amount: undefined })
-  }
-
   onCheck = (e) => {
     const { checked } = e.target;
     this.setState({ terms: checked });
   };
+
+  componentWilMount() {
+    this.setState({ amount: undefined });
+  }
 
   render() {
     const { visible, onClose, onOk } = this.props;
