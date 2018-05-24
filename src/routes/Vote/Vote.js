@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Card, Row, Col, List, Spin, Input, Button, InputNumber } from 'antd';
 import { connect } from 'dva';
+import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
@@ -55,7 +56,7 @@ class Vote extends Component {
       Client.getUserVotes(),
     ]);
     const { balance } = this.props.userWallet;
-    const voteList = data[0].candidates || 0;
+    const voteList = _.orderBy(data[0].candidates, ['votes', 'url'], ['desc', 'asc']) || 0;
     const totalVotes = data[0].totalVotes || 0;
     const frozen = data[1];
     const userVotes = data[2];
@@ -249,7 +250,7 @@ class Vote extends Component {
                     <InputNumber
                       min={0}
                       max={totalTrx}
-                      step={500}
+                      step={10}
                       defaultValue={0}
                       placeholder="0"
                       value={item.amount}
