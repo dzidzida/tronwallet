@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input, Button } from 'antd';
+import { Card, Row, Col, List, Spin, Input, Button, InputNumber } from 'antd';
 import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
@@ -10,7 +10,7 @@ import CowntDownInfo from './CowntDownInfo';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-import VoteSlider from './../../components/Vote/VoteSlider';
+// import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -29,7 +29,7 @@ class Vote extends Component {
     endTime: null,
     totalVotes: 0,
     transaction: '',
-    isReset: true,
+    // isReset: true,
     loading: true,
     userVotes: {},
     balance: 0,
@@ -100,7 +100,8 @@ class Vote extends Component {
     const { voteList, totalTrx } = this.state;
     if (address) {
       delete voteList.find(v => v.address === address).amount;
-      this.setState({ voteList, isReset: true }, () => {
+      // this.setState({ voteList, isReset: true }, () => {
+      this.setState({ voteList }, () => {
         const totalVotes = this.state.voteList.reduce((prev, vote) => {
           return Number(prev) + Number(vote.amount || 0);
         }, 0);
@@ -111,7 +112,8 @@ class Vote extends Component {
         const vt = v;
         delete vt.amount;
       });
-      this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+      // this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
+      this.setState({ voteList, totalRemaining: totalTrx });
     }
   };
 
@@ -127,7 +129,8 @@ class Vote extends Component {
       voteList.find(v => v.address === address).amount = value;
     }
 
-    this.setState({ voteList, isReset: false }, () => {
+    // this.setState({ voteList, isReset: false }, () => {
+    this.setState({ voteList }, () => {
       const totalVotes = this.state.voteList.reduce((prev, vote) => {
         return Number(prev) + Number(vote.amount || 0);
       }, 0);
@@ -220,7 +223,7 @@ class Vote extends Component {
   // #endregion
 
   renderVoteList = () => {
-    const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
+    const { voteList, totalVotes, totalRemaining, totalTrx } = this.state;
 
     return (
       <div className={styles.wrapperVoteList}>
@@ -238,11 +241,22 @@ class Vote extends Component {
                     <ProgressItem votes={Number(item.votes)} total={totalVotes} />
                   </div>
                   <div style={{ margin: 15 }}>
-                    <VoteSlider
+                    {/* <VoteSlider
                       onVoteChange={v => this.onVoteChange(item.address, v, false)}
                       totalTrx={totalTrx}
                       isReset={isReset}
                       isMax={item.amount || 0}
+                    /> */}
+                    <InputNumber
+                      min={0}
+                      max={totalTrx}
+                      step={500}
+                      defaultValue={0}
+                      placeholder="0"
+                      value={item.amount}
+                      disabled={totalRemaining <= 0}
+                      formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      onChange={v => this.onVoteChange(item.address, v, false)}
                     />
                   </div>
                   <div className={styles.smallButtonsContainer}>
