@@ -2,6 +2,7 @@ import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
+import uuid from 'uuid/v4';
 import { connect } from 'dva';
 import React, { Fragment, PureComponent } from 'react';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
@@ -144,7 +145,7 @@ class Monitor extends PureComponent {
     const { balances, transactionsData } = this.props.userWallet;
     if (balances && transactionsData.transactions.length) {
       return balances.map(bl => (
-        <List.Item key={bl.name + bl.balance}>
+        <List.Item key={`${bl.name}-${bl.balance}` }>
           <List.Item.Meta title={<span>{bl.name}</span>} />
           <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
@@ -162,7 +163,7 @@ class Monitor extends PureComponent {
     const { transactionsData } = this.props.userWallet;
     if (transactionsData.transactions.length) {
       return transactionsData.transactions.map(tr => (
-        <List.Item key={tr.timestamp}>
+        <List.Item key={`${tr.timestamp}-${uuid()}`}>
           <div className={styles.itemRow}>
             <List.Item.Meta
               title={
@@ -174,21 +175,26 @@ class Monitor extends PureComponent {
               description={
                 <div className={styles.address}>
                   <div className={styles.itemFont}>
-                    {new Date(tr.timestamp).getHours()} hours ago
+                    {moment(tr.timestamp).fromNow()}
                   </div>
                 </div>
               }
             />
             <div>
-              <small className={styles.itemFont}>
-                {this.formatAmount(tr.amount)}
+              <div className={styles.itemFont}>
+                {tr.transferFromAddress === transactionsData.owner ? (
+                  `-${this.formatAmount(tr.amount)}`
+                ) : (
+                  `+${this.formatAmount(tr.amount)}`
+                )}
+                {' '}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
-                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 17, color: 'red' }} />
+                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
                 ) : (
-                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 17, color: 'green' }} />
-                  )}
-              </small>
+                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
+                )}
+              </div>
             </div>
           </div>
         </List.Item>
@@ -317,7 +323,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Tron Power"
-                total={this.formatAmountTokens(totalFreeze.total || 0)}
+                total={this.formatAmount(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (

@@ -1,9 +1,8 @@
 import axios from 'axios';
 import qs from 'qs';
-import ApiClient from './../wallet-api-v2/client/explorer';
+import Client from './../wallet-api-v2/client/http';
 import { base64DecodeFromString, byteArray2hexStr, bytesToString } from './../wallet-api-v2/utils/bytes';
-import { Account, Transaction } from './../wallet-api-v2/protocol/core/Tron_pb';
-import { WitnessList, AssetIssueList } from './../wallet-api-v2/protocol/api/api_pb';
+import { Account, Transaction, WitnessList, AssetIssueList } from './../wallet-api-v2/protocol/core/Tron_pb';
 import { stringToBytes } from './../wallet-api-v2/lib/code';
 import { getBase58CheckAddress } from './../wallet-api-v2/utils/crypto';
 import deserializeTransaction from './../wallet-api-v2/protocol/serializer';
@@ -15,7 +14,7 @@ import {
   buildUnfreezeBalance,
 } from './../wallet-api-v2/utils/transactionBuilder';
 
-const explorer = new ApiClient();
+const client = new Client();
 
 export const ONE_TRX = 1000000;
 
@@ -29,7 +28,7 @@ class ClientWallet {
     const owner = await this.getPublicKey();
     let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
 
-    transaction = await explorer.addRef(transaction);
+    transaction = await client.addRef(transaction);
     const transactionBytes = transaction.serializeBinary();
     const transactionString = byteArray2hexStr(transactionBytes);
     return transactionString;
@@ -168,7 +167,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildVote(owner, votes);
-      transaction = await explorer.addRef(transaction);
+      transaction = await client.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
@@ -181,7 +180,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildFreezeBalance(owner, amount * ONE_TRX, 3);
-      transaction = await explorer.addRef(transaction);
+      transaction = await client.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
@@ -194,7 +193,7 @@ class ClientWallet {
     try {
       const owner = await this.getPublicKey();
       let transaction = buildUnfreezeBalance(owner);
-      transaction = await explorer.addRef(transaction);
+      transaction = await client.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
       return transactionString;
