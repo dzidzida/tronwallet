@@ -182,14 +182,18 @@ class Monitor extends PureComponent {
             />
             <div>
               <div className={styles.itemFont}>
-                {this.formatAmount(tr.amount)}
+                {tr.transferFromAddress === transactionsData.owner ? (
+                  `-${this.formatAmount(tr.amount)}`
+                ) : (
+                  `+${this.formatAmount(tr.amount)}`
+                )}
                 {' '}
                 {tr.tokenName}
                 {tr.transferFromAddress === transactionsData.owner ? (
                   <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
                 ) : (
                   <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
-                  )}
+                )}
               </div>
             </div>
           </div>
@@ -319,7 +323,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="Tron Power"
-                total={this.formatAmountTokens(totalFreeze.total || 0)}
+                total={this.formatAmount(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
                   totalFreeze.balances && totalFreeze.balances.length ? (
