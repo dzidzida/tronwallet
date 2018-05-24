@@ -144,7 +144,7 @@ class Monitor extends PureComponent {
     const { balances, transactionsData } = this.props.userWallet;
     if (balances && transactionsData.transactions.length) {
       return balances.map(bl => (
-        <List.Item key={bl.name + bl.balance}>
+        <List.Item key={`${bl.name}-${bl.balance}` }>
           <List.Item.Meta title={<span>{bl.name}</span>} />
           <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
