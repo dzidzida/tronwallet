@@ -12,15 +12,13 @@ class Send extends Component {
     amount: undefined,
     token: 'TRX',
     modalVisible: false,
-    transaction: {
-      loading: false,
-      status: false,
-      qrcode: null,
-      error: null,
-    },
+    transactionData: null,
+    error: null,
   };
 
   onCloseModal = () => {
+    this.inputAmount.value = '';
+    this.inputTo.value = '';
     this.setState({ modalVisible: false });
   };
 
@@ -43,7 +41,7 @@ class Send extends Component {
 
   isAmountValid = () => {
     const { balances } = this.props.userWallet;
-    if (balances) {
+    if (balances && balances.length) {
       const { amount, token } = this.state;
       const currentToken = balances.find((elm) => {
         if (elm.name !== token) return false;
@@ -59,23 +57,18 @@ class Send extends Component {
       return false;
     }
 
-    return false;
+    return true;
   };
 
   handleSend = async () => {
-    const { amount, transaction, to, token } = this.state;
-    this.setState({ transaction: { ...transaction, loading: true } });
-    const TransactionData = await Client.send({ to, token, amount });
-    const updatedTransaction = { ...transaction };
-
-    if (TransactionData) {
-      updatedTransaction.data = TransactionData;
-    } else {
-      updatedTransaction.error = 'Something wrong with the Transaction';
+    const { amount, to, token } = this.state;
+    this.setState({ loading: true });
+    try {
+      const transactionData = await Client.send({ to, token, amount });
+      this.setState({ modalVisible: true, transactionData, loading: false });
+    } catch (error) {
+      this.setState({ error: error.message });
     }
-
-    updatedTransaction.loading = false;
-    this.setState({ transaction: updatedTransaction, modalVisible: true });
   };
 
   format = (number) => {
@@ -92,13 +85,13 @@ class Send extends Component {
   };
 
   render() {
-    const { transaction, to, amount, modalVisible } = this.state;
+    const { to, amount, modalVisible, error, transactionData, loading } = this.state;
+    const { loadingWallet } = this.props;
     const { balances } = this.props.userWallet;
     const amountValid = this.isAmountValid();
     const toValid = this.isToValid();
     const canSend = toValid && amountValid && to !== null && amount > 0;
     const trx = balances.find(b => b.name === 'TRX');
-
     const trxBalance = trx ? trx.balance : 0;
 
     return (
@@ -110,6 +103,7 @@ class Send extends Component {
           <div className={styles.form}>
             <h3>To</h3>
             <input
+              ref={(el) => { this.inputTo = el; }}
               className={[styles.formControl, toValid ? null : styles.invalidInput].join(' ')}
               onChange={this.change}
               type="text"
@@ -120,14 +114,14 @@ class Send extends Component {
             <h3>Token</h3>
             <div className={styles.selectWrapper}>
               <select name="token" onChange={this.change} className={styles.selectBox}>
-                {this.renderOptions()}
+                {!loadingWallet && this.renderOptions()}
               </select>
             </div>
             <h3>Amount</h3>
             <input
+              ref={(el) => { this.inputAmount = el; }}
               className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
               onChange={this.changeAmount}
-              value={this.state.amount}
               type="text"
               name="amount"
               id="amount"
@@ -140,26 +134,26 @@ class Send extends Component {
                 Only enter valid TRON wallet address. Incorrect addresses can lead to TRX loss.
               </h2>
             </div>
-            <h3 className={styles.messageError}>{transaction.error}</h3>
+            <h3 className={styles.messageError}>{error}</h3>
             <Button
-              disabled={transaction.loading || !canSend || trxBalance === 0}
+              disabled={loadingWallet || !canSend || trxBalance === 0}
               type="primary"
               onClick={this.handleSend}
               className={[
                 styles.button,
-                !canSend || transaction.loading ? styles.disabled : null,
+                !canSend || loadingWallet ? styles.disabled : null,
               ].join(' ')}
               icon="check-circle-o"
-              loading={transaction.loading}
+              loading={loadingWallet || loading}
             >
-              {transaction.loading ? 'Processing transaction' : 'Send'}
+              {loadingWallet ? 'Loading data' : 'Send'}
             </Button>
           </div>
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
             txDetails={{ To: to, Amount: amount, Type: 'SEND' }}
-            data={transaction.data}
+            data={transactionData}
             visible={modalVisible}
             onClose={this.onCloseModal}
           />
@@ -170,6 +164,6 @@ class Send extends Component {
 }
 
 export default connect(({ user }) => ({
-  loadWallet: user.loadWallet,
+  loadingWallet: user.loadingWallet,
   userWallet: user.userWalletData,
 }))(Send);
