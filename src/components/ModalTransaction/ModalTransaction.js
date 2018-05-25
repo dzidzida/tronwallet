@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Modal, Spin } from 'antd';
+import { Modal, Spin, Icon } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import QrReader from 'react-qr-reader';
@@ -43,7 +43,15 @@ class TransactionQRCode extends Component {
         type: 'user/fetchWalletData',
       });
     }
-    this.setState({ error: null }, onClose());
+    this.setState({
+      transactionQRCode: '',
+      stage: 0,
+      signedTransaction: {},
+      loadingScreen: false,
+      success: false,
+      submitted: false,
+      error: null,
+    }, onClose());
   };
 
 
@@ -62,6 +70,7 @@ class TransactionQRCode extends Component {
     this.setState({ transactionQRCode, stage: 0 });
   };
 
+  goBack = () => this.setState({ stage: this.state.stage - 1 });
 
   handleScanTransaction = (data) => {
     if (data) {
@@ -151,6 +160,10 @@ class TransactionQRCode extends Component {
                 onScan={this.handleScanTransaction}
                 style={{ width: '110%', alignSelf: 'center' }}
               />
+              <div style={{ marginTop: '20px' }}>
+                <Icon onClick={this.goBack} style={{ fontSize: '3rem' }} type="arrow-left" />
+                <h3 style={{ fontSize: '1rem', fontWeight: '600' }}>Back to signing</h3>
+              </div>
               <p className={styles.messageFail}>{error}</p>
               <div>Please, show the signed QRCode from TronVault in landscape mode to the camera.</div>
             </Fragment>
@@ -185,7 +198,7 @@ class TransactionQRCode extends Component {
                   className={styles.button}
                   onClick={this.handleSubmitTransaction}
                 >
-              Submit
+                  Submit
                 </button>
               )}
             </Fragment>
