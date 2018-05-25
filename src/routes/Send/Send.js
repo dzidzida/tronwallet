@@ -98,7 +98,9 @@ class Send extends Component {
     const amountValid = this.isAmountValid();
     const toValid = this.isToValid();
     const canSend = toValid && amountValid && to !== null && amount > 0;
-    const trxBalance = balances.find(b => b.name === 'TRX').balance;
+    const trx = balances.find(b => b.name === 'TRX');
+
+    const trxBalance = trx ? trx.balance : 0;
 
     return (
       <div className={styles.card}>
