@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react';
-import { Modal, Spin } from 'antd';
+import { Modal, Spin, Icon, Button } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import QrReader from 'react-qr-reader';
-import { Button, Icon } from 'antd';
 import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 import TransactionDetails from './TransactionDetails';
@@ -43,7 +42,15 @@ class TransactionQRCode extends Component {
         type: 'user/fetchWalletData',
       });
     }
-    this.setState({ error: null }, onClose());
+    this.setState({
+      transactionQRCode: '',
+      stage: 0,
+      signedTransaction: {},
+      loadingScreen: false,
+      success: false,
+      submitted: false,
+      error: null,
+    }, onClose());
   };
 
 
@@ -62,6 +69,7 @@ class TransactionQRCode extends Component {
     this.setState({ transactionQRCode, stage: 0 });
   };
 
+  goBack = () => this.setState({ stage: this.state.stage - 1 });
 
   handleScanTransaction = (data) => {
     if (data) {
@@ -127,7 +135,7 @@ class TransactionQRCode extends Component {
           <p className={styles.messageFail}>{error}</p>
           <Button
             icon="scan"
-            type="primary" 
+            type="primary"
             size="large"
             onClick={() => this.setState({ stage: 1, error: null })}
           >
@@ -153,6 +161,9 @@ class TransactionQRCode extends Component {
               />
               <p className={styles.messageFail}>{error}</p>
               <div>Please, show the signed QRCode from TronVault in landscape mode to the camera.</div>
+              <Button type="danger" size="large" onClick={this.goBack} style={{ alignSelf: 'center' }} ghost>
+                <Icon type="arrow-left" />Back
+              </Button>
             </Fragment>
           )}
       </Fragment>
@@ -185,7 +196,7 @@ class TransactionQRCode extends Component {
                   className={styles.button}
                   onClick={this.handleSubmitTransaction}
                 >
-              Submit
+                  Submit
                 </button>
               )}
             </Fragment>
