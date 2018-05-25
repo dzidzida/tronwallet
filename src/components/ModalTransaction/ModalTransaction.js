@@ -3,6 +3,7 @@ import { Modal, Spin } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import QrReader from 'react-qr-reader';
+import { Button, Icon } from 'antd';
 import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 import TransactionDetails from './TransactionDetails';
@@ -114,17 +115,24 @@ class TransactionQRCode extends Component {
     const { transactionQRCode, error } = this.state;
     return (
       <Fragment>
-        <Header Text="Sign your transaction" />
         <img className={styles.qrcode} src={transactionQRCode} alt="Transaction QRCode" />
-        <h3 style={{ alignSelf: 'center' }}>Use this QRCode to sign it</h3>
-        <footer>
+        <h2 style={{ alignSelf: 'left' }}>Please, follow the steps below:</h2>
+        <h3 style={{ alignSelf: 'left' }}>1. Use the QRCode above to sign your transaction with TronVault.</h3>
+        <h3 style={{ alignSelf: 'left' }}>2. Add a contract in TronVault.</h3>
+        <h3 style={{ alignSelf: 'left' }}>3. Scan the QRCode and sign the transaction on TronVault.</h3>
+        <h3 style={{ alignSelf: 'left' }}>4. Click on the button "Scan and verify transaction" on TronWallet to scan the result QRCode from TronVault.</h3>
+        <h3 style={{ alignSelf: 'left' }}>5. TronWallet will ask to enable the camera on your desktop to verify the transaction data.</h3>
+        <h3 style={{ alignSelf: 'left' }}>6. The the button "Submit" will appear, click on it to send your transaction to the network.</h3>
+        <footer style={{ alignSelf: 'center' }}>
           <p className={styles.messageFail}>{error}</p>
-          <button
-            className={styles.button}
+          <Button
+            icon="scan"
+            type="primary" 
+            size="large"
             onClick={() => this.setState({ stage: 1, error: null })}
           >
-            Submit signed transaction
-          </button>
+            Scan and submit transaction
+          </Button>
         </footer>
       </Fragment>
     );
@@ -134,7 +142,6 @@ class TransactionQRCode extends Component {
     const { error, loadingScreen } = this.state;
     return (
       <Fragment>
-        <Header Text="Scan your Transaction" />
         {loadingScreen ? <Spin size="small" /> :
           (
             <Fragment>
@@ -142,9 +149,10 @@ class TransactionQRCode extends Component {
                 delay={300}
                 onError={() => this.setState({ error: 'Error while reading QRCode' })}
                 onScan={this.handleScanTransaction}
-                style={{ width: '80%', alignSelf: 'center' }}
+                style={{ width: '110%', alignSelf: 'center' }}
               />
               <p className={styles.messageFail}>{error}</p>
+              <div>Please, show the signed QRCode from TronVault in landscape mode to the camera.</div>
             </Fragment>
           )}
       </Fragment>
