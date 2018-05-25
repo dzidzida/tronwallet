@@ -3,9 +3,8 @@ import { Button } from 'antd';
 import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
-import Client, { ONE_TRX } from '../../utils/wallet-service/client';
+import Client from '../../utils/wallet-service/client';
 import { isAddressValid } from '../../utils/wallet-api-v2/utils/address';
-import { maskPrice } from '../../utils/mask';
 
 class Send extends Component {
   state = {
@@ -98,7 +97,7 @@ class Send extends Component {
     const amountValid = this.isAmountValid();
     const toValid = this.isToValid();
     const canSend = toValid && amountValid && to !== null && amount > 0;
-    const trxBalance = balances.find(b => b.name === 'TRX').balance;
+    const trxBalance = balances.length && balances.find(b => b.name === 'TRX').balance;
 
     return (
       <div className={styles.card}>
@@ -157,7 +156,7 @@ class Send extends Component {
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
-            txDetails={{ To: to, Amount: amount * 10, Type: 'SEND' }}
+            txDetails={{ To: to, Amount: amount, Type: 'SEND' }}
             data={transaction.data}
             visible={modalVisible}
             onClose={this.onCloseModal}

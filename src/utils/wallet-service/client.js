@@ -40,16 +40,15 @@ class ClientWallet {
     return userAttr['custom:publickey'];
   };
 
-  getTransactionDetails = async data => {
-    let transaction;
-    if (typeof data === 'string') {
-      const bytesDecode = base64DecodeFromString(data);
-      transaction = Transaction.deserializeBinary(bytesDecode);
-    } else if (data instanceof Transaction) {
-      transaction = data;
+  getTransactionDetails = async tx => {
+    try {
+      const { data: { transaction } } = await axios.post(`${this.api}/transaction?dry-run`, {
+        transaction: tx
+      })
+      return transaction
+    } catch (error) {
+      throw new Error(error.message || error)
     }
-    const transactionDetail = deserializeTransaction(transaction);
-    return transactionDetail;
   };
 
   // CREATE TOKEN
