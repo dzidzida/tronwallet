@@ -44,7 +44,6 @@
     "grpc": "^1.10.0",
     "grpc-caller": "^0.4.0",
     "grpc-tools": "^1.6.6",
-    "instascan": "^1.0.0",
     "js-sha3": "^0.7.0",
     "less": "2.7.2",
     "lodash": "^4.17.4",
