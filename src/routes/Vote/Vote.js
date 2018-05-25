@@ -5,7 +5,6 @@ import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
-import votes from '../../utils/wallet-service/votes.json';
 import Client from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
 import ListContent from './../../components/Vote/ListContent';
@@ -75,22 +74,12 @@ class Vote extends Component {
   };
 
   onLoadEndTime = async () => {
-    const endTimeInMilis = votes.end_time;
+    const endTimeInMilis = Date.now() + this.diffSeconds();
     if (!endTimeInMilis) {
       return;
     }
     const endTime = new Date(endTimeInMilis);
     this.setState({ endTime });
-  };
-
-  onLoadTotalVotes = async () => {
-    const totalVotesWithouFormat = +votes.total_votes;
-    if (!totalVotesWithouFormat) {
-      return;
-    }
-
-    const totalVotes = totalVotesWithouFormat;
-    this.setState({ totalVotes });
   };
 
   onCloseModal = () => {
@@ -137,7 +126,31 @@ class Vote extends Component {
       }, 0);
       this.setState({ totalRemaining: totalTrx - totalVotes });
     });
-  };
+  }
+
+  diffSeconds = () => {
+    const now = new Date();
+    const utcHour = now.getUTCHours();
+    const fromTime = new Date(2000, 1, 1, utcHour, now.getMinutes(), now.getSeconds());
+    let nextHour = 24;
+
+    if (utcHour >= 0 && utcHour < 6) {
+      nextHour = 6;
+    }
+    if (utcHour >= 6 && utcHour < 12) {
+      nextHour = 12;
+    }
+    if (utcHour >= 12 && utcHour < 18) {
+      nextHour = 18;
+    }
+    if (utcHour >= 18 && utcHour < 24) {
+      nextHour = 24;
+    }
+    const toTime = new Date(2000, 1, 1, nextHour, 0, 0);
+    const dif = fromTime.getTime() - toTime.getTime();
+    const secondsDiff = Math.abs(dif);
+    return secondsDiff;
+  }
 
   submit = async () => {
     const { voteList } = this.state;
