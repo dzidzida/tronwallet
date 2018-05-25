@@ -53,7 +53,7 @@ export default {
 
         const balance = account.balance 
         const balances = account.balances
-        const totalFreeze = account.frozen.total;
+        const totalFreeze = account.frozen;
         const entropy = account.entropy;
 
         const userWalletData = {

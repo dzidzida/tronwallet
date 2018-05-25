@@ -4,7 +4,7 @@ import styles from './FreezeModal.less';
 
 class FreezeModal extends Component {
   state = {
-    amount: undefined,
+    amount: '',
     terms: false,
   };
 
