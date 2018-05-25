@@ -30,7 +30,7 @@ class Vote extends Component {
     endTime: null,
     totalVotes: 0,
     transaction: '',
-    // isReset: true,
+    isReset: false,
     loading: true,
     userVotes: {},
     balance: 0,
@@ -101,12 +101,11 @@ class Vote extends Component {
         this.setState({ totalRemaining: totalTrx - totalVotes });
       });
     } else {
-      this.setState({ votesSend: [], totalRemaining: totalTrx });
+      this.setState({ votesSend: [], totalRemaining: totalTrx, isReset: true });
     }
   };
 
   onVoteChange = (address, value) => {
-    // const { voteList, totalTrx, votesSend } = this.state;
     const { totalTrx, votesSend } = this.state;
     const votes = votesSend;
     const index = votes.findIndex(v => v.address === address);
@@ -115,25 +114,7 @@ class Vote extends Component {
     } else {
       votes[index].value = value;
     }
-    this.setState({ votesSend: votes });
-    // const findAddressAmount = voteList.find(v => v.address === address).amount;
-
-    // if (!max) {
-    //   voteList.find(v => v.address === address).amount = value;
-    // } else if (findAddressAmount) {
-    //   voteList.find(v => v.address === address).amount += value;
-    // } else {
-    //   voteList.find(v => v.address === address).amount = value;
-    // }
-
-    // this.setState({ voteList, isReset: false }, () => {
-    // this.setState({ voteList }, () => {
-    //   const totalVotes = this.state.voteList.reduce((prev, vote) => {
-    //     return Number(prev) + Number(vote.amount || 0);
-    //   }, 0);
-    //   this.setState({ totalRemaining: totalTrx - totalVotes });
-    // });
-
+    this.setState({ votesSend: votes, isReset: false });
     const totalVotes = votesSend.reduce((prev, vote) => {
       return Number(prev) + Number(vote.value || 0);
     }, 0);
@@ -249,7 +230,7 @@ class Vote extends Component {
   // #endregion
 
   renderVoteList = () => {
-    const { voteList, totalVotes, totalRemaining, totalTrx } = this.state;
+    const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
 
     return (
       <div className={styles.wrapperVoteList}>
@@ -283,6 +264,7 @@ class Vote extends Component {
                       onChange={v => this.onVoteChange(item.address, v, false)}
                       totalRemaining={totalRemaining}
                       onResetVotes={() => this.onResetVotes(item.address)}
+                      isReset={isReset}
                     />
                     {/* <InputNumber
                       min={0}

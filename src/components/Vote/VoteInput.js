@@ -25,7 +25,7 @@ class VoteInput extends Component {
   }
 
   render() {
-    const { min, max, defaultValue, step, totalRemaining, item } = this.props;
+    const { min, max, defaultValue, step, totalRemaining, item, isReset } = this.props;
     const { value } = this.state;
 
     return (
@@ -34,7 +34,7 @@ class VoteInput extends Component {
           min={min}
           max={max}
           step={step}
-          value={value}
+          value={isReset ? 0 : value}
           defaultValue={defaultValue}
           onChange={this.onChange}
           formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
