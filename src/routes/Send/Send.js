@@ -114,7 +114,7 @@ class Send extends Component {
             <h3>Token</h3>
             <div className={styles.selectWrapper}>
               <select name="token" onChange={this.change} className={styles.selectBox}>
-                {this.renderOptions()}
+                {!loadingWallet && this.renderOptions()}
               </select>
             </div>
             <h3>Amount</h3>
