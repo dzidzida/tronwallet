@@ -32,24 +32,16 @@
 
 .transaction {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   flex-direction: column;
-  text-align: center;
-  margin-bottom: 1rem;
-  padding: 20px;
   border-radius: 0.25rem;
 }
 
-.messageContentWarning {
+.messageContent {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
-  padding: 10px;
-  border-radius: 0.25rem;
-  background-color: #fff3cd;
-  border-color: #fff3cd;
-  border: 1px solid transparent;
 }
 .messageContentSuccess {
   display: flex;
@@ -84,17 +76,16 @@
 }
 
 .messageFail {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 500;
-  text-align: left;
+  text-align: center;
   color: #821806;
-  margin-bottom: 0;
+  margin: 5px 0;
 }
-.messageWarning {
-  font-size: 1.1rem;
-  font-weight: 500;
+.message {
+  font-size: 1.6rem;
+  font-weight: 600;
   text-align: left;
-  color: #856404;
   margin-bottom: 0;
 }
 
@@ -124,4 +115,19 @@ img.qrcode {
   border-radius: 0.25rem;
   width: 100%;
   cursor: pointer;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.detailName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+.detailValue {
+  font-size: 1rem;
+  font-weight: 500;
 }
