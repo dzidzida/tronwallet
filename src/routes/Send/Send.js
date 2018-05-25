@@ -144,6 +144,7 @@ class Send extends Component {
             <Button
               disabled={transaction.loading || !canSend || trxBalance === 0}
               type="primary"
+              size="large"
               onClick={this.handleSend}
               className={[
                 styles.button,
