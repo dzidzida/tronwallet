@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input, Button, InputNumber } from 'antd';
+import { Card, Row, Col, List, Spin, Input } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
@@ -10,6 +10,7 @@ import CowntDownInfo from './CowntDownInfo';
 import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
+import VoteInput from './../../components/Vote/VoteInput';
 // import VoteSlider from './../../components/Vote/VoteSlider';
 
 const Info = ({ title, value, bordered }) => (
@@ -33,6 +34,7 @@ class Vote extends Component {
     loading: true,
     userVotes: {},
     balance: 0,
+    votesSend: [],
   };
 
   // #region logic
@@ -87,45 +89,55 @@ class Vote extends Component {
   };
 
   onResetVotes = (address) => {
-    const { voteList, totalTrx } = this.state;
+    const { totalTrx, votesSend } = this.state;
     if (address) {
-      delete voteList.find(v => v.address === address).amount;
-      // this.setState({ voteList, isReset: true }, () => {
-      this.setState({ voteList }, () => {
-        const totalVotes = this.state.voteList.reduce((prev, vote) => {
-          return Number(prev) + Number(vote.amount || 0);
+      const votes = votesSend;
+      const index = votes.findIndex(v => v.address === address);
+      votes.splice(index, 1);
+      this.setState({ votesSend: votes }, () => {
+        const totalVotes = this.state.votesSend.reduce((prev, vote) => {
+          return Number(prev) + Number(vote.value || 0);
         }, 0);
         this.setState({ totalRemaining: totalTrx - totalVotes });
       });
     } else {
-      voteList.filter(v => v.amount).forEach((v) => {
-        const vt = v;
-        delete vt.amount;
-      });
-      // this.setState({ voteList, totalRemaining: totalTrx, isReset: true });
-      this.setState({ voteList, totalRemaining: totalTrx });
+      this.setState({ votesSend: [], totalRemaining: totalTrx });
     }
   };
 
-  onVoteChange = (address, value, max) => {
-    const { voteList, totalTrx } = this.state;
-    const findAddressAmount = voteList.find(v => v.address === address).amount;
-
-    if (!max) {
-      voteList.find(v => v.address === address).amount = value;
-    } else if (findAddressAmount) {
-      voteList.find(v => v.address === address).amount += value;
+  onVoteChange = (address, value) => {
+    // const { voteList, totalTrx, votesSend } = this.state;
+    const { totalTrx, votesSend } = this.state;
+    const votes = votesSend;
+    const index = votes.findIndex(v => v.address === address);
+    if (index === -1) {
+      votes.push({ address, value });
     } else {
-      voteList.find(v => v.address === address).amount = value;
+      votes[index].value = value;
     }
+    this.setState({ votesSend: votes });
+    // const findAddressAmount = voteList.find(v => v.address === address).amount;
+
+    // if (!max) {
+    //   voteList.find(v => v.address === address).amount = value;
+    // } else if (findAddressAmount) {
+    //   voteList.find(v => v.address === address).amount += value;
+    // } else {
+    //   voteList.find(v => v.address === address).amount = value;
+    // }
 
     // this.setState({ voteList, isReset: false }, () => {
-    this.setState({ voteList }, () => {
-      const totalVotes = this.state.voteList.reduce((prev, vote) => {
-        return Number(prev) + Number(vote.amount || 0);
-      }, 0);
-      this.setState({ totalRemaining: totalTrx - totalVotes });
-    });
+    // this.setState({ voteList }, () => {
+    //   const totalVotes = this.state.voteList.reduce((prev, vote) => {
+    //     return Number(prev) + Number(vote.amount || 0);
+    //   }, 0);
+    //   this.setState({ totalRemaining: totalTrx - totalVotes });
+    // });
+
+    const totalVotes = votesSend.reduce((prev, vote) => {
+      return Number(prev) + Number(vote.value || 0);
+    }, 0);
+    this.setState({ totalRemaining: totalTrx - totalVotes });
   }
 
   diffSeconds = () => {
@@ -254,14 +266,25 @@ class Vote extends Component {
                   <div style={{ margin: 15 }}>
                     <ProgressItem votes={Number(item.votes)} total={totalVotes} />
                   </div>
-                  <div style={{ margin: 15 }}>
+                  <div className={styles.actionsContainer}>
                     {/* <VoteSlider
                       onVoteChange={v => this.onVoteChange(item.address, v, false)}
                       totalTrx={totalTrx}
                       isReset={isReset}
                       isMax={item.amount || 0}
                     /> */}
-                    <InputNumber
+                    <VoteInput
+                      min={0}
+                      max={totalTrx}
+                      step={10}
+                      item={item}
+                      defaultValue={0}
+                      placeholder="0"
+                      onChange={v => this.onVoteChange(item.address, v, false)}
+                      totalRemaining={totalRemaining}
+                      onResetVotes={() => this.onResetVotes(item.address)}
+                    />
+                    {/* <InputNumber
                       min={0}
                       max={totalTrx}
                       step={10}
@@ -270,9 +293,10 @@ class Vote extends Component {
                       value={item.amount}
                       formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                       onChange={v => this.onVoteChange(item.address, v, false)}
-                    />
+                      // onChange={() => {}}
+                    /> */}
                   </div>
-                  <div className={styles.smallButtonsContainer}>
+                  {/* <div className={styles.smallButtonsContainer}>
                     <Button
                       className={styles.smallButtons}
                       style={{ marginBottom: 5 }}
@@ -291,7 +315,7 @@ class Vote extends Component {
                     >
                       Reset
                     </Button>
-                  </div>
+                  </div> */}
                 </div>,
               ]}
             >

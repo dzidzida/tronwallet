@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { InputNumber } from 'antd';
-import styles from './index.less';
+import React, { Component, Fragment } from 'react';
+import { InputNumber, Button } from 'antd';
+import styles from './../../routes/Vote/Vote.less';
 
 class VoteInput extends Component {
   static defaultProps = {
@@ -10,18 +10,56 @@ class VoteInput extends Component {
     min: 0,
   };
 
+  state = {
+    value: 0,
+  };
+
   onChange = (value) => {
+    this.setState({ value });
     this.props.onChange(value);
   };
 
+  onReset = (address) => {
+    this.setState({ value: 0 });
+    this.props.onResetVotes(address);
+  }
+
   render() {
-    const { min, max, defaultValue } = this.props;
-    if (!this.props.show) return null;
+    const { min, max, defaultValue, step, totalRemaining, item } = this.props;
+    const { value } = this.state;
 
     return (
-      <div className={styles.actionContainer}>
-        <InputNumber min={min} max={max} defaultValue={defaultValue} onChange={this.onChange} />
-      </div>
+      <Fragment>
+        <InputNumber
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={this.onChange}
+          formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+        />
+        <div className={styles.smallButtonsContainer}>
+          <Button
+            className={styles.smallButtons}
+            style={{ marginBottom: 5 }}
+            type="primary"
+            size="small"
+            onClick={() => this.onChange(totalRemaining)}
+            icon="to-top"
+          >
+            Máx
+          </Button>
+          <Button
+            className={styles.smallButtons}
+            size="small"
+            onClick={() => this.onReset(item.address)}
+            icon="close-circle-o"
+          >
+            Reset
+          </Button>
+        </div>
+      </Fragment>
     );
   }
 }
