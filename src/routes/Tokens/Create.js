@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { Alert, Row, Col, Card } from 'antd';
 import styles from './Create.less';
 import Client from '../../utils/wallet-service/client';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
@@ -64,14 +65,30 @@ class Create extends PureComponent {
       createError } = this.state;
 
     return (
-      <div className={styles.container}>
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardHeaderTitle}>Issue a Token</h2>
-          </div>
+
+      <Row>
+      <Col span={6}/>
+      <Col span={12}>
+        <Card title="Issue a Token" style={{ marginBottom: 30 }}>
           <div className={styles.formContent}>
             <form className={styles.form}>
               <h1>Details</h1>
+              <Alert
+                message="About issue a token"
+                description="Issuing a token on the Tron Protocol can be done by anyone who has at least 1024 TRX
+                in their account. 
+                
+                When a token is issued it will be shown on the token overview page. Users can then
+                participate within the participation period and exchange their TRX for tokens. 
+                
+                After issuing the token your account will receive the amount of tokens equal to the
+              total supply. When other users exchange their TRX for tokens then the tokens will be
+              withdrawn from your account and you will receive TRX equal to the specified exchange
+              rate."
+                type="info"
+                showIcon
+              />
+              <br/><br/>
               <div className={styles.formRow}>
                 <div className={styles.formColumn}>
                   <h3>Token Name *</h3>
@@ -265,25 +282,6 @@ class Create extends PureComponent {
               <h3 className={styles.error}>{createError}</h3>
             </form>
           </div>
-        </div>
-        <div className={styles.cardDescription}>
-          <div className={styles.formContent}>
-            <p className={styles.description}>
-              Issuing a token on the Tron Protocol can be done by anyone who has at least 1024 TRX
-              in their account.
-            </p>
-            <p className={styles.description}>
-              When a token is issued it will be shown on the token overview page. Users can then
-              participate within the participation period and exchange their TRX for tokens.
-            </p>
-            <p className={styles.description}>
-              After issuing the token your account will receive the amount of tokens equal to the
-              total supply. When other users exchange their TRX for tokens then the tokens will be
-              withdrawn from your account and you will receive TRX equal to the specified exchange
-              rate.
-            </p>
-          </div>
-        </div>
         <ModalTransaction
           title="Create Token"
           message="Please, validate your transaction"
@@ -301,7 +299,11 @@ class Create extends PureComponent {
             URL: url,
           }}
         />
-      </div>
+        </Card>
+      </Col>
+      <Col span={6}/>
+    </Row>
+
     );
   }
 }
