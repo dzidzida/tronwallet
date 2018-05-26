@@ -72,7 +72,6 @@ class Create extends PureComponent {
         <Card title="Issue a Token" style={{ marginBottom: 30 }}>
           <div className={styles.formContent}>
             <form className={styles.form}>
-              <h1>Details</h1>
               <Alert
                 message="About issue a token"
                 description="Issuing a token on the Tron Protocol can be done by anyone who has at least 1024 TRX
