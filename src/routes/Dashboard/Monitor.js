@@ -27,14 +27,8 @@ class Monitor extends PureComponent {
     loadDataError: false,
   };
 
-  async componentDidMount() {
-    await this.loadData();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps.user.loadingWallet) {
-      this.loadData();
-    }
+   componentDidMount() {
+    this.loadData();
   }
 
   onOpenPkModal = () => {

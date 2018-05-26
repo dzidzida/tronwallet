@@ -173,6 +173,7 @@ class ClientWallet {
       transaction = await client.addRef(transaction);
       const transactionBytes = transaction.serializeBinary();
       const transactionString = byteArray2hexStr(transactionBytes);
+      //console.log('transactionString',transactionString)
       return transactionString;
     } catch (error) {
       console.log(error);
@@ -180,7 +181,7 @@ class ClientWallet {
   }
 
   async participateToken({ issuerAddress, token, amount }) {
-
+    
     try {
       const address = await this.getPublicKey();
       let transaction = buildAssetParticipate(address, issuerAddress, token, amount * ONE_TRX);

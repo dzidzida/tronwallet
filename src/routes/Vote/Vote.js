@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input } from 'antd';
+import { Card, Row, Col, List, Spin, Input, InputNumber } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
@@ -11,7 +11,7 @@ import ListContent from './../../components/Vote/ListContent';
 import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
 import VoteInput from './../../components/Vote/VoteInput';
-// import VoteSlider from './../../components/Vote/VoteSlider';
+import VoteItem from './VoteItem';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -35,6 +35,7 @@ class Vote extends Component {
     userVotes: {},
     balance: 0,
     votesSend: [],
+    currentVotes: {},
   };
 
   // #region logic
@@ -106,19 +107,14 @@ class Vote extends Component {
   };
 
   onVoteChange = (address, value) => {
-    const { totalTrx, votesSend } = this.state;
-    const votes = votesSend;
-    const index = votes.findIndex(v => v.address === address);
-    if (index === -1) {
-      votes.push({ address, value });
-    } else {
-      votes[index].value = value;
-    }
-    this.setState({ votesSend: votes, isReset: false });
-    const totalVotes = votesSend.reduce((prev, vote) => {
-      return Number(prev) + Number(vote.value || 0);
+
+    const { currentVotes, totalTrx } = this.state;
+    const newVotes = { ...currentVotes, [address]: value };
+    const totalUserVotes = _.reduce(newVotes, function(result, value, key) {
+      return result + value;
     }, 0);
-    this.setState({ totalRemaining: totalTrx - totalVotes });
+    const totalRemaining = totalTrx - totalUserVotes;
+    this.setState({ currentVotes: newVotes, totalRemaining });
   }
 
   diffSeconds = () => {
@@ -146,17 +142,10 @@ class Vote extends Component {
   }
 
   submit = async () => {
-    const { voteList } = this.state;
-    const votesPrepared = {};
-    voteList.forEach((vote) => {
-      if (vote.amount && Number(vote.amount) > 0) {
-        const key = vote.address;
-        votesPrepared[key] = vote.amount;
-      }
-    });
+    const { currentVotes } = this.state;
 
     try {
-      const TransactionData = await Client.voteForWitnesses(votesPrepared);
+      const TransactionData = await Client.voteForWitnesses(currentVotes);
       if (!TransactionData) {
         throw Error();
       } else {
@@ -184,50 +173,23 @@ class Vote extends Component {
     }
   };
 
-
-  renderTrxRemaining = () => {
-    const { totalRemaining } = this.state;
-    if (totalRemaining <= 0) {
-      return <p>No TRX remaining</p>;
-    }
-    return <p>{totalRemaining} TRX remaining</p>;
-  };
-
-  renderSubmitButton = () => {
-    const { totalRemaining, totalTrx } = this.state;
-    if (totalRemaining < 0) {
-      return (
-        <button className={styles.btDanger} disabled>
-          Submit Votes
-        </button>
-      );
-    }
+  renderItem = (item, index) => {
+    const { currentVotes, totalVotes, userVotes } = this.state;
     return (
-      <button
-        className={styles.btSubmit}
-        onClick={this.submit}
-        disabled={totalTrx === totalRemaining}
-      >
-        Submit Votes
-      </button>
+      <VoteItem 
+        item={item} 
+        index={index} 
+        votes={currentVotes[item.address]} 
+        userVote={userVotes[item.address]}
+        onVoteChange={this.onVoteChange} 
+        totalVotes={totalVotes}
+      />
     );
-  };
-
-  renderProgressBar = () => {
-    const { totalRemaining, totalTrx } = this.state;
-    const percent = ((totalTrx - totalRemaining) / totalTrx) * 100;
-    if (totalRemaining < 0) {
-      return <div className={styles.progressBarDanger} style={{ width: '100%' }} />;
-    } else if (totalRemaining === 0) {
-      return <div className={styles.progressBarSuccess} style={{ width: '100%' }} />;
-    }
-    return <div className={styles.progressBar} style={{ width: `${percent}%` }} />;
-  };
-  // #endregion
+  }
 
   renderVoteList = () => {
-    const { voteList, totalVotes, totalRemaining, totalTrx, isReset } = this.state;
-
+    const { voteList } = this.state;
+    
     return (
       <div className={styles.wrapperVoteList}>
         <List
@@ -235,71 +197,7 @@ class Vote extends Component {
           loading={false}
           size="large"
           dataSource={voteList}
-          renderItem={(item, index) => (
-            <List.Item
-              key={item.address}
-              actions={[
-                <div className={styles.listItemRow}>
-                  <div style={{ margin: 15 }}>
-                    <ProgressItem votes={Number(item.votes)} total={totalVotes} />
-                  </div>
-                  <div className={styles.actionsContainer}>
-                    {/* <VoteSlider
-                      onVoteChange={v => this.onVoteChange(item.address, v, false)}
-                      totalTrx={totalTrx}
-                      isReset={isReset}
-                      isMax={item.amount || 0}
-                    /> */}
-                    <VoteInput
-                      min={0}
-                      max={totalTrx}
-                      step={10}
-                      item={item}
-                      defaultValue={0}
-                      placeholder="0"
-                      onChange={v => this.onVoteChange(item.address, v, false)}
-                      totalRemaining={totalRemaining}
-                      onResetVotes={() => this.onResetVotes(item.address)}
-                      isReset={isReset}
-                    />
-                    {/* <InputNumber
-                      min={0}
-                      max={totalTrx}
-                      step={10}
-                      defaultValue={0}
-                      placeholder="0"
-                      value={item.amount}
-                      formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      onChange={v => this.onVoteChange(item.address, v, false)}
-                      // onChange={() => {}}
-                    /> */}
-                  </div>
-                  {/* <div className={styles.smallButtonsContainer}>
-                    <Button
-                      className={styles.smallButtons}
-                      style={{ marginBottom: 5 }}
-                      type="primary"
-                      size="small"
-                      onClick={() => this.onVoteChange(item.address, totalRemaining, true)}
-                      icon="to-top"
-                    >
-                      Máx
-                    </Button>
-                    <Button
-                      className={styles.smallButtons}
-                      size="small"
-                      onClick={() => this.onResetVotes(item.address)}
-                      icon="close-circle-o"
-                    >
-                      Reset
-                    </Button>
-                  </div> */}
-                </div>,
-              ]}
-            >
-              <ListContent index={index + 1} {...item} />
-            </List.Item>
-          )}
+          renderItem={this.renderItem}
         />
       </div>
     );
@@ -316,9 +214,8 @@ class Vote extends Component {
       totalTrx,
       loading,
       userVotes,
-      balance,
+      balance
     } = this.state;
-
     if (loading) {
       return (
         <div className={styles.loading}>
@@ -326,7 +223,6 @@ class Vote extends Component {
         </div>
       );
     }
-
     return (
       <div className={styles.container}>
         <Card bordered={false}>
@@ -341,7 +237,7 @@ class Vote extends Component {
             <Col sm={8} xs={24}>
               <VoteControl
                 totalRemaining={totalRemaining}
-                totalTrx={totalTrx}
+                totalFrozen={totalTrx}
                 onSubmit={this.submit}
                 onResetVotes={this.onResetVotes}
                 totalVotes={totalVotes}
@@ -372,6 +268,7 @@ class Vote extends Component {
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
+          loadData={this.onLoadData}
           data={transaction}
           visible={modalVisible}
           txDetails={{ Type: 'VOTE', Amount: totalTrx - totalRemaining }}
