@@ -6,19 +6,21 @@ import ModalTransaction from '../../components/ModalTransaction/ModalTransaction
 class Create extends PureComponent {
   state = {
     modalVisible: false,
-    tokenName: 'GettyTest',
-    totalSupply: 100000,
-    description: 'Test for getty',
-    url: 'https//getty.io',
-    trxAmount: 1,
-    tokenAmount: 1,
-    // startDate: '', //Eslint reclamando
-    // endDate: '',
-    acceptTerms: false,
-    createError: null,
-    transaction: {
-      data: null,
+    transactionData: null,
+    form: {
+      name: '',
+      totalSupply: 0,
+      description: '',
+      url: '',
+      trxNum: 1,
+      num: 1,
+      startTime: '',
+      endTime: '',
+      freezeAmount: 0,
+      freezeDays: 1,
+      acceptTerms: false,
     },
+    createError: null,
   };
 
   onCloseModal = () => {
@@ -27,26 +29,19 @@ class Create extends PureComponent {
   change = (e) => {
     const { name, value, checked } = e.target;
     this.setState({
-      [name]: name === 'acceptTerms' ? checked : value,
+      form: {
+        ...this.state.form,
+        [name]: name === 'acceptTerms' ? checked : value,
+      },
     });
   };
 
   submit = async (e) => {
     e.preventDefault();
-    const form = this.state;
-    const { transaction } = this.state;
+    const { form } = this.state;
     try {
-      const TransactionData = await Client.createToken(form);
-      if (!TransactionData) {
-        throw Error();
-      } else {
-        this.setState({
-          modalVisible: true,
-          transaction: { ...transaction, data: TransactionData },
-        });
-      }
-      // TODO
-      // Now do something
+      const transactionData = await Client.createToken(form);
+      this.setState({ modalVisible: true, transactionData });
     } catch (error) {
       this.setState({ createError: 'Something wrong while creating Token' });
     }
@@ -54,15 +49,20 @@ class Create extends PureComponent {
 
   render() {
     const {
-      tokenName,
+      name,
       totalSupply,
       description,
       url,
-      trxAmount,
-      tokenAmount,
+      trxNum,
+      num,
+      startTime,
+      endTime,
       acceptTerms,
-      createError,
-    } = this.state;
+    } = this.state.form;
+    const {
+      modalVisible,
+      transactionData,
+      createError } = this.state;
 
     return (
       <div className={styles.container}>
@@ -75,19 +75,19 @@ class Create extends PureComponent {
               <h1>Details</h1>
               <div className={styles.formRow}>
                 <div className={styles.formColumn}>
-                  <h3>Token Name</h3>
+                  <h3>Token Name *</h3>
                   <input
                     onChange={this.change}
                     className={styles.formControl}
                     type="text"
-                    name="tokenName"
-                    id="tokenName"
-                    value={tokenName}
+                    name="name"
+                    id="name"
+                    value={name}
                     required
                   />
                 </div>
                 <div className={styles.formColumn}>
-                  <h3>Total Supply</h3>
+                  <h3>Total Supply *</h3>
                   <input
                     onChange={this.change}
                     className={styles.formControl}
@@ -105,7 +105,7 @@ class Create extends PureComponent {
                 </div>
               </div>
               <div className={styles.formColumn}>
-                <h3>Description</h3>
+                <h3>Description *</h3>
                 <input
                   onChange={this.change}
                   className={styles.formControl}
@@ -120,7 +120,7 @@ class Create extends PureComponent {
                 </small>
               </div>
               <div className={styles.formColumn}>
-                <h3>Url</h3>
+                <h3>Url*</h3>
                 <input
                   onChange={this.change}
                   className={styles.formControl}
@@ -144,45 +144,79 @@ class Create extends PureComponent {
               <p className={styles.descriptionForm}>
                 Participants will receive{' '}
                 <b>
-                  {tokenAmount} {tokenName || 'Token'}
+                  {num} {name || 'Token'}
                 </b>{' '}
-                for every <b>{trxAmount} TRX</b>.
+                for every <b>{trxNum} TRX</b>.
               </p>
               <div className={styles.formRow}>
                 <div className={styles.formColumn}>
-                  <h3>TRX Amount</h3>
+                  <h3>TRX Amount *</h3>
                   <input
                     onChange={this.change}
                     className={styles.formControl}
                     type="number"
-                    name="trxAmount"
-                    id="trxAmount"
+                    name="trxNum"
+                    id="trxNum"
                     placeholder="1"
-                    value={trxAmount}
-                    min="0"
+                    value={trxNum}
+                    min={1}
                     required
                   />
                 </div>
                 <div className={styles.formColumn}>
-                  <h3>Token Amount</h3>
+                  <h3>Token Amount *</h3>
                   <input
                     onChange={this.change}
                     className={styles.formControl}
                     type="number"
-                    name="tokenAmount"
-                    id="tokenAmount"
+                    name="num"
+                    id="num"
                     placeholder="1"
-                    value={tokenAmount}
-                    min="0"
+                    value={num}
+                    min={1}
                     required
                   />
                 </div>
               </div>
               <p className={styles.descriptionForm}>
-                <b>Token Price:</b> 1 {tokenName || 'Token'} = {trxAmount / tokenAmount} TRX
+                <b>Token Price:</b> 1 {name || 'Token'} = {trxNum / num} TRX
               </p>
-
-              <h1>Participation</h1>
+              <h1>Frozen Supply</h1>
+              <p className={styles.descriptionForm}>
+                A part of the supply can be frozen. The amount of supply can be specified 
+                and must be frozen for a minimum of 1 day. The frozen supply can manually 
+                be unfrozen after start date + frozen days has been reached. 
+                Freezing supply is not required.
+              </p>
+              <div className={styles.formRow}>
+                <div className={styles.formColumn} style={{ flex: 0.7 }}>
+                  <h3>Amount</h3>
+                  <input
+                    onChange={this.change}
+                    className={styles.formControl}
+                    type="number"
+                    name="freezeAmount"
+                    id="freezeAmount"
+                    defaultValue={0}
+                    min={0}
+                    required
+                  />
+                </div>
+                <div className={styles.formColumn} style={{ flex: 0.3 }}>
+                  <h3>Days to Freeze</h3>
+                  <input
+                    onChange={this.change}
+                    className={styles.formControl}
+                    type="number"
+                    name="freezeDays"
+                    id="freezeDays"
+                    min={1}
+                    defaultValue={1}
+                    required
+                  />
+                </div>
+              </div>
+              <h1>Participation *</h1>
               <p className={styles.descriptionForm}>
                 Specify the participation period in which tokens will be issued. During the
                 participation period users can exchange TRX for tokens.
@@ -196,6 +230,7 @@ class Create extends PureComponent {
                     type="date"
                     name="startTime"
                     id="startTime"
+                    max="9999-12-31T23:59"
                     required
                   />
                 </div>
@@ -211,7 +246,6 @@ class Create extends PureComponent {
                   />
                 </div>
               </div>
-
               <div className={styles.checkboxRow}>
                 <input
                   onChange={this.change}
@@ -229,6 +263,7 @@ class Create extends PureComponent {
                   onClick={this.submit}
                   className={acceptTerms ? styles.button : styles.buttonDisabled}
                   type="submit"
+                  max="9999-12-31T23:59"
                   disabled={!acceptTerms}
                 >
                   Issue Token
@@ -259,9 +294,18 @@ class Create extends PureComponent {
         <ModalTransaction
           title="Create Token"
           message="Please, validate your transaction"
-          data={this.state.transaction.data}
-          visible={this.state.modalVisible}
+          data={transactionData}
+          visible={modalVisible}
           onClose={this.onCloseModal}
+          txDetails={{
+            TokenName: name,
+            TotalSupply: totalSupply,
+            Type: 'CREATE',
+            TokenValue: `${trxNum / num}TRX`,
+            Start: startTime,
+            End: endTime,
+            URL: url,
+          }}
         />
       </div>
     );

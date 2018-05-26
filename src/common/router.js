@@ -86,10 +86,10 @@ export const getRouterData = (app) => {
     '/receive': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Receive/Receive')),
     },
-    '/tokens': {
+    '/token/view': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Tokens/View')),
     },
-    '/create': {
+    '/token/create': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Tokens/Create')),
     },
     '/vote': {

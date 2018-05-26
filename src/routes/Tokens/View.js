@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
+import { Spin, Progress } from 'antd';
 import moment from 'moment';
 import styles from './View.less';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
@@ -11,13 +11,14 @@ class View extends PureComponent {
     modalVisible: false,
     currentToken: null,
     amount: 0,
+    tokenName: 'TRX',
+    issuerAddress: null,
     tokenList: [],
     acceptTerms: false,
     participateError: null,
-    transaction: {
-      data: null,
-      loading: false,
-    },
+    transactionData: {},
+    loading: true,
+    error: false,
   };
 
   componentDidMount() {
@@ -34,42 +35,43 @@ class View extends PureComponent {
   onClick = (token) => {
     this.setState({
       currentToken: token,
+      tokenName: token.name,
       amount: 0,
       acceptTerms: false,
+      issuerAddress: token.ownerAddress,
     });
   };
 
   onCloseModal = () => {
-    this.setState({ modalVisible: false });
+    this.setState({ modalVisible: false, loading: true, currentToken: null });
+    this.loadTokens();
   };
 
   submit = async (e) => {
     e.preventDefault();
-    const { currentToken, amount, transaction } = this.state;
-    this.setState({ transaction: { ...transaction, loading: true } });
+    const { tokenName, amount, issuerAddress } = this.state;
 
     try {
-      const TransactionData = await Client.participateToken({ ...currentToken, amount });
-      if (!TransactionData) {
-        throw Error();
-      } else {
-        this.setState({
-          modalVisible: true,
-          transaction: { ...transaction, data: TransactionData },
-        });
-      }
-      // TODO
-      // Now do something
+      const transactionData = await Client.participateToken({
+        token: tokenName,
+        amount,
+        issuerAddress,
+      });
+      this.setState({ transactionData, modalVisible: true });
     } catch (error) {
-      this.setState({ participateError: 'Something wrong participating for Token' });
+      this.setState({ error: 'Something wrong participating for Token' });
     } finally {
-      this.setState({ transaction: { ...transaction, loading: false } });
+      this.setState({ loading: false });
     }
   };
 
   loadTokens = async () => {
-    const tokenList = await Client.getTokensList();
-    this.setState({ tokenList });
+    try {
+      const { tokenList } = await Client.getTokensList();
+      this.setState({ tokenList, loading: false });
+    } catch (error) {
+      this.setState({ error: error.message, loading: false });
+    }
   };
 
   selectToken = (tokenId) => {
@@ -77,7 +79,9 @@ class View extends PureComponent {
   };
 
   renderParticipateButton = (token) => {
-    if (moment(token.startTime).isAfter() || moment(token.endTime).isBefore()) {
+    if (moment(token.startTime).isAfter()
+    || moment(token.endTime).isBefore()
+    || token.percentage === 100) {
       return (
         <button disabled className={styles.close}>
           {moment(token.startTime).isAfter() ? 'Not started' : 'Finished'}
@@ -93,8 +97,8 @@ class View extends PureComponent {
   };
 
   renderCollapse = (ownerAddress) => {
-    const { currentToken, amount, acceptTerms } = this.state;
-    const { loading } = this.state.transaction;
+    const { currentToken, amount, acceptTerms, loading, error } = this.state;
+
     if (currentToken && currentToken.ownerAddress === ownerAddress) {
       return (
         <tr>
@@ -109,7 +113,7 @@ class View extends PureComponent {
               <h3 className={styles.item}>
                 <b>Price</b>
               </h3>
-              <h3 className={styles.item}>{Number(currentToken.price / ONE_TRX).toFixed(5)} TRX</h3>
+              <h3 className={styles.item}>{Number(currentToken.price / ONE_TRX).toFixed(2)} TRX</h3>
             </div>
             <div className={styles.collapseRow}>
               <h3 className={styles.item}>
@@ -133,7 +137,7 @@ class View extends PureComponent {
               />
               <span className={styles.checkboxText}>
                 I&#39;ve confirmed to spend{' '}
-                <b>{((amount * currentToken.price) / ONE_TRX).toFixed(5)} TRX</b> on token
+                <b>{((amount * currentToken.price) / ONE_TRX).toFixed(2)} TRX</b> on token
                 distribution, and get a total of{' '}
                 <b>
                   {amount} {currentToken.name}
@@ -150,6 +154,7 @@ class View extends PureComponent {
                 Confirm transaction
               </button>
             </div>
+            <p className={styles.error}>{error}</p>
           </td>
         </tr>
       );
@@ -164,7 +169,15 @@ class View extends PureComponent {
           <tr>
             <td>{token.name}</td>
             <td>{token.ownerAddress}</td>
-            <td className={styles.right}>{token.totalSupply}</td>
+            <td className={styles.right}>
+              <p>{token.issued} / {token.totalSupply}</p>
+              <span style={{ display: 'block' }}>
+                <Progress
+                  percent={token.percentage}
+                  showInfo={false}
+                />
+              </span>
+            </td>
             <td>
               <span style={{ display: 'block' }}>
                 {moment(token.startTime).format('DD-MM-YYYY HH:MM')}
@@ -182,17 +195,24 @@ class View extends PureComponent {
   };
 
   render() {
-    const { transaction, modalVisible, participateError } = this.state;
+    const {
+      transactionData,
+      loading,
+      modalVisible,
+      participateError,
+      amount,
+      issuerAddress,
+      tokenName } = this.state;
+
+    if (loading) {
+      return (
+        <div className={styles.container} >
+          <Spin size="large" />
+        </div>
+      );
+    }
     return (
       <div className={styles.container}>
-        <div className={styles.buttonContainer}>
-          <a
-            onClick={() => this.props.dispatch(routerRedux.push('/create'))}
-            className={styles.create}
-          >
-            Create
-          </a>
-        </div>
         <table>
           <thead>
             <tr>
@@ -209,9 +229,15 @@ class View extends PureComponent {
         <ModalTransaction
           title="Participate to asset"
           message="Please, validate your transaction"
-          data={transaction.data}
+          data={transactionData}
           visible={modalVisible}
           onClose={this.onCloseModal}
+          txDetails={{
+            Type: 'PARTICIPATE',
+            Amount: amount,
+            Issuer: issuerAddress,
+            Token: tokenName,
+          }}
         />
       </div>
     );

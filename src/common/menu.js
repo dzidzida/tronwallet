@@ -175,17 +175,27 @@ const menuData = [
     path: 'receive',
     children: [],
   },
-  // {
-  //   name: 'tokens',
-  //   icon: 'form',
-  //   path: 'tokens',
-  //   children: [],
-  // },
+  {
+    name: 'Tokens',
+    icon: 'pay-circle-o',
+    path: 'token',
+    children: [
+      {
+        name: 'Create',
+        icon: 'plus-square-o',
+        path: 'create',
+      },
+      {
+        name: 'Participate',
+        icon: 'team',
+        path: 'view',
+      },
+    ],
+  },
   {
     name: 'Vote',
     icon: 'like-o',
     path: 'vote',
-    children: [],
   },
 ];
 
