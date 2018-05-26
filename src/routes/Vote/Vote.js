@@ -168,8 +168,8 @@ class Vote extends Component {
       });
       this.setState({ voteList: votesFilter });
     } else {
-      const allVotes = await Client.getWitnesses();
-      this.setState({ voteList: allVotes });
+      const data = await Client.getTotalVotes();
+      this.setState({ voteList: _.orderBy(data.candidates, ['votes', 'url'], ['desc', 'asc']) || 0 })
     }
   };
 

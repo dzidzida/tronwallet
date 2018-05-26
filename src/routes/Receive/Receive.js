@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Row, Col, Card, Button, Icon, Spin } from 'antd';
+import { Divider, Alert, Row, Col, Card, Button, Icon, Spin } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import styles from './Receive.less';
@@ -64,6 +64,12 @@ class Receive extends Component {
                   </Button>)}
                 {!loading && !errorQRCode && <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />}
               </div>
+              <Alert
+                message="Warning"
+                description="This qrcode should only be scanned by TronWallet Mobile for iOS and Android. It wont will be recognized by TronVault. You can share your public key with your friends and clients, to receive and send TRX and TRON Tokens."
+                type="warning"
+                showIcon
+              />
           </Card>
         </Col>
         <Col span={9}/>

@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Modal, Spin, Icon, Button, message } from 'antd';
+import { Modal, Spin, Icon, Button, message, Alert } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import QrReader from 'react-qr-reader';
@@ -132,7 +132,7 @@ class TransactionQRCode extends Component {
         <h5 style={{ alignSelf: 'left' }}>1. Use the QRCode above to sign your transaction with TronVault.</h5>
         <h5 style={{ alignSelf: 'left' }}>2. Add a contract in TronVault.</h5>
         <h5 style={{ alignSelf: 'left' }}>3. Scan the QRCode and sign the transaction on TronVault.</h5>
-        <h5 style={{ alignSelf: 'left' }}>4. Click on the button "Scan and verify transaction" on TronWallet to scan the result QRCode from TronVault.</h5>
+        <h5 style={{ alignSelf: 'left' }}>4. Click on the button "Scan and submit transaction" on TronWallet to scan the result QRCode from TronVault.</h5>
         <h5 style={{ alignSelf: 'left' }}>5. TronWallet will ask to enable the camera on your desktop to verify the transaction data.</h5>
         <h5 style={{ alignSelf: 'left' }}>6. The the button "Submit" will appear, click on it to send your transaction to the network.</h5>
         <footer style={{ alignSelf: 'center' }}>
@@ -164,7 +164,13 @@ class TransactionQRCode extends Component {
                 style={{ width: '110%', alignSelf: 'center' }}
               />
               <p className={styles.messageFail}>{error}</p>
-              <div>Please, show the signed QRCode from TronVault in portrait mode to the camera.</div>
+              <Alert
+                message="Notice"
+                description="Some users have reported problems to show the qrcode to the pc or notebook camera. Please, show the signed qrcode in TronVault with your phone in landscape mode."
+                type="info"
+                showIcon
+              />
+              <br/>
               <Button type="danger" size="large" onClick={this.goBack} style={{ alignSelf: 'center' }} ghost>
                 <Icon type="arrow-left" />Back
               </Button>
