@@ -124,7 +124,6 @@ class View extends PureComponent {
                 name="amount"
                 type="number"
                 min="0"
-                value={amount}
                 onChange={this.onChange}
               />
             </div>
