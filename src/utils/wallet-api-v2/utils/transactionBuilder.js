@@ -147,6 +147,7 @@ export function buildAssetParticipate(address, issuerAddress, token, amount) {
     "ParticipateAssetIssueContract");
 }
 
+
 export function buildAssetIssue(options) {
 
   let contract = new AssetIssueContract();

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'antd';
+import { Button, Row, Col, Card } from 'antd';
 import { connect } from 'dva';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import styles from './Send.less';
@@ -96,71 +96,75 @@ class Send extends Component {
     const trxBalance = trx ? trx.balance : 0;
 
     return (
-      <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <h2 className={styles.cardHeaderTitle}>Send TRX</h2>
-        </div>
-        <div className={styles.formContent}>
-          <div className={styles.form}>
-            <h3>To</h3>
-            <input
-              ref={(el) => { this.inputTo = el; }}
-              className={[styles.formControl, toValid ? null : styles.invalidInput].join(' ')}
-              onChange={this.change}
-              type="text"
-              name="to"
-              id="to"
-            />
-            <div className={styles.invalid}>{!toValid && 'Put a valid address'}</div>
-            <h3>Token</h3>
-            <div className={styles.selectWrapper}>
-              <select name="token" onChange={this.change} className={styles.selectBox}>
-                {!loadingWallet && this.renderOptions()}
-              </select>
+      <Row>
+        <Col span={9}/>
+        <Col span={6}>
+          <Card title="Send TRX" style={{ marginBottom: 30 }}>
+            <div className={styles.formContent}>
+              <div className={styles.form}>
+                <div className={styles.messageContent}>
+                  <h2 className={styles.message}>
+                    Only enter valid TRON wallet address. Incorrect addresses can lead to TRX loss.
+                  </h2>
+                </div>              
+                <h3>To</h3>
+                <input
+                  ref={(el) => { this.inputTo = el; }}
+                  className={[styles.formControl, toValid ? null : styles.invalidInput].join(' ')}
+                  onChange={this.change}
+                  type="text"
+                  name="to"
+                  id="to"
+                />
+                <div className={styles.invalid}>{!toValid && 'Put a valid address'}</div>
+                <h3>Token</h3>
+                <div className={styles.selectWrapper}>
+                  <select name="token" onChange={this.change} className={styles.selectBox}>
+                    {!loadingWallet && this.renderOptions()}
+                  </select>
+                </div>
+                <h3>Amount</h3>
+                <input
+                  ref={(el) => { this.inputAmount = el; }}
+                  className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
+                  onChange={this.changeAmount}
+                  type="text"
+                  name="amount"
+                  id="amount"
+                />
+                <div className={styles.invalid}>
+                  {!amountValid && 'Insufficient tokens or invalid amount'}
+                </div>
+
+                <h3 className={styles.messageError}>{error}</h3>
+                <Button
+                  disabled={loadingWallet || !canSend || trxBalance === 0}
+                  type="primary"
+                  onClick={this.handleSend}
+                  className={[
+                    styles.button,
+                    !canSend || loadingWallet ? styles.disabled : null,
+                  ].join(' ')}
+                  icon="check-circle-o"
+                  loading={loadingWallet || loading}
+                >
+                  {loadingWallet ? 'Loading data' : 'Send'}
+                </Button>
+              </div>
+              <ModalTransaction
+                title="Send TRX"
+                message="Please, validate your transaction"
+                txDetails={{ To: to, Token: token, Amount: amount, Type: 'SEND' }}
+                data={transactionData}
+                visible={modalVisible}
+                onClose={this.onCloseModal}
+              />
             </div>
-            <h3>Amount</h3>
-            <input
-              ref={(el) => { this.inputAmount = el; }}
-              className={[styles.formControl, amountValid ? null : styles.invalidInput].join(' ')}
-              onChange={this.changeAmount}
-              type="text"
-              name="amount"
-              id="amount"
-            />
-            <div className={styles.invalid}>
-              {!amountValid && 'Insufficient tokens or invalid amount'}
-            </div>
-            <div className={styles.messageContent}>
-              <h2 className={styles.message}>
-                Only enter valid TRON wallet address. Incorrect addresses can lead to TRX loss.
-              </h2>
-            </div>
-            <h3 className={styles.messageError}>{error}</h3>
-            <Button
-              disabled={loadingWallet || !canSend || trxBalance === 0}
-              type="primary"
-              onClick={this.handleSend}
-              className={[
-                styles.button,
-                !canSend || loadingWallet ? styles.disabled : null,
-              ].join(' ')}
-              icon="check-circle-o"
-              loading={loadingWallet || loading}
-            >
-              {loadingWallet ? 'Loading data' : 'Send'}
-            </Button>
-          </div>
-          <ModalTransaction
-            title="Send TRX"
-            message="Please, validate your transaction"
-            txDetails={{ To: to, Token: token, Amount: amount, Type: 'SEND' }}
-            data={transactionData}
-            visible={modalVisible}
-            onClose={this.onCloseModal}
-          />
-        </div>
-      </div>
-    );
+          </Card>
+        </Col>
+        <Col span={9}/>
+      </Row>
+    )
   }
 }
 

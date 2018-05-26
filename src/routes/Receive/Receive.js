@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Button, Icon, Spin } from 'antd';
+import { Divider, Row, Col, Card, Button, Icon, Spin } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import styles from './Receive.less';
@@ -42,27 +42,32 @@ class Receive extends Component {
   render() {
     const { errorQRCode, loading } = this.state;
     return (
-      <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <div className={styles.cardHeaderTitle}>Receive TRX</div>
-        </div>
-        <div className={styles.cardContent}>
-          <p>Send TRX to the following address</p>
-          <CopyToClipboard text={this.state.userPublicKey} />
-          <Divider />
-          <span>Or scan this QR code on a mobile device</span>
-          {loading && <Spin size="small" />}
-          {errorQRCode && (
-            <Button
-              type="primary"
-              size="large"
-              icon="reload"
-              onClick={() => this.loadUrl()}
-            >Refresh QRCode
-            </Button>)}
-          {!loading && !errorQRCode && <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />}
-        </div>
-      </div>
+      <Row>
+        <Col span={9}/>
+        <Col span={6}>
+          <Card title="Receive TRX"
+                    style={{ marginBottom: 30 }}>
+
+              <div className={styles.cardContent}>
+                <p>Send TRX to the following address</p>
+                <CopyToClipboard text={this.state.userPublicKey} />
+                <Divider />
+                <span>Or scan this QR code on a mobile device</span>
+                {loading && <Spin size="small" />}
+                {errorQRCode && (
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon="reload"
+                    onClick={() => this.loadUrl()}
+                  >Refresh QRCode
+                  </Button>)}
+                {!loading && !errorQRCode && <img className={styles.qrcode} src={this.state.qrcode} alt="QRCode" />}
+              </div>
+          </Card>
+        </Col>
+        <Col span={9}/>
+      </Row>
     );
   }
 }

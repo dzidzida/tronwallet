@@ -7,7 +7,7 @@ import voteStyles from '../../routes/Vote/Vote.less';
 class VoteControl extends Component {
   static defautlProps = {
     totalRemaining: 0,
-    totalTrx: 0,
+    totalFrozen: 0,
     onStartVote: () => {},
   };
 
@@ -23,20 +23,21 @@ class VoteControl extends Component {
   onChangeAffix = affix => this.setState({ affix });
 
   renderSubmitButton = () => {
-    const { totalRemaining, totalTrx, onSubmit, balance } = this.props;
+    const { totalRemaining, totalFrozen, onSubmit } = this.props;
 
-    if (totalRemaining < 0 || !balance) {
+    if (totalRemaining < 0 || !totalFrozen) {
       return (
         <Button type="primary" disabled>
           SUBMIT
         </Button>
       );
     }
+
     return (
       <Button
         type="primary"
         onClick={onSubmit}
-        disabled={Number(totalTrx) === Number(totalRemaining)}
+        disabled={Number(totalFrozen) === Number(totalRemaining)}
         icon="check-circle-o"
       >
         SUBMIT

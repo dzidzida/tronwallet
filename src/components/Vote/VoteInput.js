@@ -48,7 +48,7 @@ class VoteInput extends Component {
             onClick={() => this.onChange(totalRemaining)}
             icon="to-top"
           >
-            Máx
+            Max
           </Button>
           <Button
             className={styles.smallButtons}
