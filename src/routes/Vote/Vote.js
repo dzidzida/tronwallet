@@ -113,7 +113,6 @@ class Vote extends Component {
     const totalUserVotes = _.reduce(newVotes, function(result, value, key) {
       return result + value;
     }, 0);
-    console.log('totalUserVotes', totalUserVotes);
     const totalRemaining = totalTrx - totalUserVotes;
     this.setState({ currentVotes: newVotes, totalRemaining });
   }
