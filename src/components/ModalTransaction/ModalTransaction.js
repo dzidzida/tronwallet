@@ -42,15 +42,17 @@ class TransactionQRCode extends Component {
       });
     }
     onClose();
-    this.setState({
-      transactionQRCode: '',
-      stage: 0,
-      signedTransaction: {},
-      loadingScreen: false,
-      success: false,
-      submitted: false,
-      error: null,
-    });
+    setTimeout(() => {
+      this.setState({
+        transactionQRCode: '',
+        stage: 0,
+        signedTransaction: {},
+        loadingScreen: false,
+        success: false,
+        submitted: false,
+        error: null,
+      });
+    }, 1000);
   };
 
 

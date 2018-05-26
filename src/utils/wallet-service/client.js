@@ -27,7 +27,6 @@ class ClientWallet {
 
   // SEND TRANSACTION
   async send({ token, to, amount }) {
-    console.log(">>>", token, to, amount);
     const owner = await this.getPublicKey();
     let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
     transaction = await client.addRef(transaction);
