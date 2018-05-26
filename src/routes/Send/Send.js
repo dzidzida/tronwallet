@@ -77,11 +77,12 @@ class Send extends Component {
 
   renderOptions = () => {
     const { balances } = this.props.userWallet;
-    return balances.map(bl => (
-      <option key={bl.name + bl.balance} value={bl.name}>
-        {bl.name} ({this.format(bl.balance)} available)
+    const trxBalance = balances.find(bl => bl.name === 'TRX');
+    return (
+      <option key={trxBalance.name + trxBalance.balance} value={trxBalance.name}>
+        {trxBalance.name} ({this.format(trxBalance.balance)} available)
       </option>
-    ));
+    );
   };
 
   render() {
