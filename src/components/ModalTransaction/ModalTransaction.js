@@ -101,14 +101,14 @@ class TransactionQRCode extends Component {
 
   handleSubmitTransaction = async () => {
     const { signedTransaction } = this.state;
-    let txError = null;
+    let error = null;
     this.setState({ loadingScreen: true });
     try {
-      const { success, error } = await Client.submitTransaction(signedTransaction);
-      if (!success) txError = error.message;
-      this.setState({ success, error: txError, loadingScreen: false, submitted: true });
+      const { success, message } = await Client.submitTransaction(signedTransaction);
+      if (!success) error = message;
+      this.setState({ success, error, loadingScreen: false, submitted: true });
     } catch (err) {
-      this.setState({ error: err.message, loadingScreen: false, submitted: true });
+      this.setState({ error: message, loadingScreen: false, submitted: true });
     }
   }
 
@@ -200,7 +200,6 @@ class TransactionQRCode extends Component {
         <footer>
           {(!loadingScreen && !error) && (
             <Fragment>
-              <p className={styles.messageFail}>{error}</p>
               {submitted ? this.renderSuccess() : (
                 <button
                   className={styles.button}
@@ -211,6 +210,7 @@ class TransactionQRCode extends Component {
               )}
             </Fragment>
           )}
+          <p className={styles.messageFail}>{error}</p>
         </footer>
       </Fragment>
     );

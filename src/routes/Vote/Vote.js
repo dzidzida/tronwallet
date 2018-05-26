@@ -81,8 +81,10 @@ class Vote extends Component {
     this.setState({ endTime });
   };
 
-  onCloseModal = () => {
-    this.setState({ modalVisible: false });
+  onCloseModal = (submitted) => {
+    this.setState({ modalVisible: false, loading: !!submitted });
+    // if user finished all transaction then reload data
+    if (submitted) this.onLoadData();
   };
 
   onResetVotes = (address) => {
@@ -169,7 +171,7 @@ class Vote extends Component {
       this.setState({ voteList: votesFilter });
     } else {
       const data = await Client.getTotalVotes();
-      this.setState({ voteList: _.orderBy(data.candidates, ['votes', 'url'], ['desc', 'asc']) || 0 })
+      this.setState({ voteList: _.orderBy(data.candidates, ['votes', 'url'], ['desc', 'asc']) || 0 });
     }
   };
 
