@@ -181,7 +181,6 @@ class Vote extends Component {
     }
   };
 
-
   renderItem = (item, index) => {
     const { currentVotes, totalVotes, userVotes } = this.state;
     return (

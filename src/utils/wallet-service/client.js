@@ -12,6 +12,8 @@ import {
   buildTransferTransaction,
   buildFreezeBalance,
   buildUnfreezeBalance,
+  buildAssetIssue,
+  buildAssetParticipate,
 } from './../wallet-api-v2/utils/transactionBuilder';
 
 const client = new Client();
@@ -25,9 +27,9 @@ class ClientWallet {
 
   // SEND TRANSACTION
   async send({ token, to, amount }) {
+    console.log(">>>", token, to, amount);
     const owner = await this.getPublicKey();
     let transaction = buildTransferTransaction(token, owner, to, amount * ONE_TRX);
-
     transaction = await client.addRef(transaction);
     const transactionBytes = transaction.serializeBinary();
     const transactionString = byteArray2hexStr(transactionBytes);
@@ -52,20 +54,26 @@ class ClientWallet {
 
   // CREATE TOKEN
   async createToken(form) {
-    const from = await this.getPublicKey();
-    const body = qs.stringify({
-      name: form.tokenName,
-      totalSupply: form.totalSupply,
-      num: form.tokenAmount * ONE_TRX,
-      trxNum: form.trxAmount,
-      startTime: Date.parse(form.startTime),
-      endTime: Date.parse(form.endTime),
-      description: form.description,
-      url: form.url,
-      ownerAddress: from,
-    });
-    const { data } = await axios.post(`${this.url}/createAssetIssueToView`, body);
-    return data;
+    const address = await this.getPublicKey();
+    const frozenSupply = form.freezeAmount > 0 ? [{
+      amount: form.freezeAmount,
+      days: form.freezeDays,
+    }] : null;
+
+    const formToPost = {
+      ...form,
+      address,
+      frozenSupply,
+    };
+    try {
+      let transaction = buildAssetIssue(formToPost);
+      transaction = await client.addRef(transaction);
+      const transactionBytes = transaction.serializeBinary();
+      const transactionString = byteArray2hexStr(transactionBytes);
+      return transactionString;
+    } catch (error) {
+      console.warn(error.message);
+    }
   }
 
   // Get Witnessess
@@ -88,22 +96,18 @@ class ClientWallet {
     });
   }
 
-  async getTokensList() {
-    const { data } = await axios.get(`${this.url}/getAssetIssueList`);
-    const assetIssueListObj = AssetIssueList.deserializeBinary(base64DecodeFromString(data));
-    return assetIssueListObj.getAssetissueList().map(asset => {
-      return {
-        name: bytesToString(asset.getName()),
-        ownerAddress: getBase58CheckAddress(Array.from(asset.getOwnerAddress())),
-        totalSupply: asset.getTotalSupply(),
-        startTime: asset.getStartTime(),
-        endTime: asset.getEndTime(),
-        description: bytesToString(asset.getDescription()),
-        num: asset.getNum(),
-        trxNum: asset.getTrxNum(),
-        price: asset.getTrxNum() / asset.getNum(),
-      };
+  async getTokensList(options = {}) {
+    let { data } = await axios.get(`${this.api}/token`, {
+      params: Object.assign({
+        sort: '-name',
+        limit: 50,
+      }, { start: 0, status: 'ico' })
     });
+
+    return {
+      tokenList: data.data,
+      total: data.total,
+    }
   }
 
   async getBalances() {
@@ -176,6 +180,20 @@ class ClientWallet {
     }
   }
 
+  async participateToken({ issuerAddress, token, amount }) {
+
+    try {
+      const address = await this.getPublicKey();
+      let transaction = buildAssetParticipate(address, issuerAddress, token, amount * ONE_TRX);
+      transaction = await client.addRef(transaction);
+      const transactionBytes = transaction.serializeBinary();
+      const transactionString = byteArray2hexStr(transactionBytes);
+      return transactionString;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async freezeBalance(amount) {
     try {
       const owner = await this.getPublicKey();
@@ -201,6 +219,7 @@ class ClientWallet {
       console.warn(error);
     }
   }
+
 }
 
 export default new ClientWallet();
