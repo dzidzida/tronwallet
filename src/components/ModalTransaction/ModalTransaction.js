@@ -100,7 +100,6 @@ class TransactionQRCode extends Component {
 
   handleSubmitTransaction = async () => {
     const { signedTransaction } = this.state;
-    const { loadData } = this.props;
     let error = null;
     this.setState({ loadingScreen: true });
     try {
@@ -124,17 +123,17 @@ class TransactionQRCode extends Component {
 
   renderSignTransaction = () => {
     const { transactionQRCode, error } = this.state;
-    
+
     return (
       <Fragment>
         <img className={styles.qrcode} src={transactionQRCode} alt="Transaction QRCode" />
-        <h2 style={{ alignSelf: 'left' }}>Please, follow the steps below:</h2>
-        <h3 style={{ alignSelf: 'left' }}>1. Use the QRCode above to sign your transaction with TronVault.</h3>
-        <h3 style={{ alignSelf: 'left' }}>2. Add a contract in TronVault.</h3>
-        <h3 style={{ alignSelf: 'left' }}>3. Scan the QRCode and sign the transaction on TronVault.</h3>
-        <h3 style={{ alignSelf: 'left' }}>4. Click on the button "Scan and verify transaction" on TronWallet to scan the result QRCode from TronVault.</h3>
-        <h3 style={{ alignSelf: 'left' }}>5. TronWallet will ask to enable the camera on your desktop to verify the transaction data.</h3>
-        <h3 style={{ alignSelf: 'left' }}>6. The the button "Submit" will appear, click on it to send your transaction to the network.</h3>
+        <h3 style={{ alignSelf: 'left' }}>Please, follow the steps below:</h3>
+        <h5 style={{ alignSelf: 'left' }}>1. Use the QRCode above to sign your transaction with TronVault.</h5>
+        <h5 style={{ alignSelf: 'left' }}>2. Add a contract in TronVault.</h5>
+        <h5 style={{ alignSelf: 'left' }}>3. Scan the QRCode and sign the transaction on TronVault.</h5>
+        <h5 style={{ alignSelf: 'left' }}>4. Click on the button "Scan and verify transaction" on TronWallet to scan the result QRCode from TronVault.</h5>
+        <h5 style={{ alignSelf: 'left' }}>5. TronWallet will ask to enable the camera on your desktop to verify the transaction data.</h5>
+        <h5 style={{ alignSelf: 'left' }}>6. The the button "Submit" will appear, click on it to send your transaction to the network.</h5>
         <footer style={{ alignSelf: 'center' }}>
           <p className={styles.messageFail}>{error}</p>
           <Button
@@ -192,7 +191,7 @@ class TransactionQRCode extends Component {
         <TransactionDetails Details={transactionDetails} />
         {loadingScreen && <Spin size="small" />}
         <footer>
-          {!loadingScreen && (
+          {(!loadingScreen && !error) && (
             <Fragment>
               <p className={styles.messageFail}>{error}</p>
               {submitted ? this.renderSuccess() : (
