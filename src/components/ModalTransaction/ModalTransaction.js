@@ -100,7 +100,6 @@ class TransactionQRCode extends Component {
 
   handleSubmitTransaction = async () => {
     const { signedTransaction } = this.state;
-    const { loadData } = this.props;
     let error = null;
     this.setState({ loadingScreen: true });
     try {
@@ -124,7 +123,7 @@ class TransactionQRCode extends Component {
 
   renderSignTransaction = () => {
     const { transactionQRCode, error } = this.state;
-    
+
     return (
       <Fragment>
         <img className={styles.qrcode} src={transactionQRCode} alt="Transaction QRCode" />
@@ -192,7 +191,7 @@ class TransactionQRCode extends Component {
         <TransactionDetails Details={transactionDetails} />
         {loadingScreen && <Spin size="small" />}
         <footer>
-          {!loadingScreen && (
+          {(!loadingScreen && !error) && (
             <Fragment>
               <p className={styles.messageFail}>{error}</p>
               {submitted ? this.renderSuccess() : (
