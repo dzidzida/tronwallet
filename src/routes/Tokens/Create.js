@@ -287,6 +287,7 @@ class Create extends PureComponent {
         <ModalTransaction
           title="Create Token"
           message="Please, validate your transaction"
+          onSuccess="Token created successfully"
           data={transactionData}
           visible={modalVisible}
           onClose={this.onCloseModal}

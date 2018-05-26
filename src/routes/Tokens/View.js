@@ -228,6 +228,7 @@ class View extends PureComponent {
         <ModalTransaction
           title="Participate to asset"
           message="Please, validate your transaction"
+          onSuccess="Participated to token sucessfully"
           data={transactionData}
           visible={modalVisible}
           onClose={this.onCloseModal}

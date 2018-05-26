@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input, InputNumber } from 'antd';
+import { Card, Row, Col, List, Spin, Input } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
@@ -7,10 +7,7 @@ import ModalTransaction from '../../components/ModalTransaction/ModalTransaction
 import styles from './Vote.less';
 import Client from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
-import ListContent from './../../components/Vote/ListContent';
-import ProgressItem from './../../components/Vote/ProgessItem';
 import VoteControl from './../../components/Vote/VoteControl';
-import VoteInput from './../../components/Vote/VoteInput';
 import VoteItem from './VoteItem';
 
 const Info = ({ title, value, bordered }) => (
@@ -30,7 +27,6 @@ class Vote extends Component {
     endTime: null,
     totalVotes: 0,
     transaction: '',
-    isReset: false,
     loading: true,
     userVotes: {},
     balance: 0,
@@ -102,7 +98,7 @@ class Vote extends Component {
         this.setState({ totalRemaining: totalTrx - totalVotes });
       });
     } else {
-      this.setState({ votesSend: [], totalRemaining: totalTrx, isReset: true });
+      this.setState({ votesSend: [], totalRemaining: totalTrx });
     }
   };
 
@@ -268,6 +264,7 @@ class Vote extends Component {
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
+          onSuccess="Voted successfully"
           loadData={this.onLoadData}
           data={transaction}
           visible={modalVisible}

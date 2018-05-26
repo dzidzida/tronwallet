@@ -78,7 +78,8 @@ class Send extends Component {
   renderOptions = () => {
     const { balances } = this.props.userWallet;
     const trxBalance = balances.find(bl => bl.name === 'TRX');
-    return (
+
+    return trxBalance && (
       <option key={trxBalance.name + trxBalance.balance} value={trxBalance.name}>
         {trxBalance.name} ({this.format(trxBalance.balance)} available)
       </option>
@@ -97,7 +98,7 @@ class Send extends Component {
 
     return (
       <Row>
-        <Col span={9}/>
+        <Col span={9} />
         <Col span={6}>
           <Card title="Send TRX" style={{ marginBottom: 30 }}>
             <div className={styles.formContent}>
@@ -106,7 +107,7 @@ class Send extends Component {
                   <h2 className={styles.message}>
                     Only enter valid TRON wallet address. Incorrect addresses can lead to TRX loss.
                   </h2>
-                </div>              
+                </div>
                 <h3>To</h3>
                 <input
                   ref={(el) => { this.inputTo = el; }}
@@ -154,6 +155,7 @@ class Send extends Component {
               <ModalTransaction
                 title="Send TRX"
                 message="Please, validate your transaction"
+                onSuccess="Successfully sent"
                 txDetails={{ To: to, Token: token, Amount: amount, Type: 'SEND' }}
                 data={transactionData}
                 visible={modalVisible}
@@ -162,9 +164,9 @@ class Send extends Component {
             </div>
           </Card>
         </Col>
-        <Col span={9}/>
+        <Col span={9} />
       </Row>
-    )
+    );
   }
 }
 
