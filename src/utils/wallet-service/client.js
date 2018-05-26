@@ -180,7 +180,7 @@ class ClientWallet {
   }
 
   async participateToken({ issuerAddress, token, amount }) {
-    
+
     try {
       const address = await this.getPublicKey();
       let transaction = buildAssetParticipate(address, issuerAddress, token, amount * ONE_TRX);

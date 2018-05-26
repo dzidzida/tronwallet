@@ -34,15 +34,15 @@ class TransactionQRCode extends Component {
 
 
   onCloseModal = () => {
-    const { success } = this.state;
+    const { success, submitted } = this.state;
     const { onClose, onSuccess } = this.props;
-    if (success) {
+    if (success || submitted) {
       this.props.dispatch({
         type: 'user/fetchWalletData',
       });
       message.success(onSuccess, 5);
     }
-    onClose();
+    onClose(submitted);
     setTimeout(() => {
       this.setState({
         transactionQRCode: '',
@@ -79,7 +79,7 @@ class TransactionQRCode extends Component {
       if (data.match(/^[0-9A-F]+$/g)) {
         this.handleGetTransactionDetails(data);
       } else {
-        this.setState({ error: 'Invalid Transaction' });
+        this.setState({ error: 'Invalid Transaction, try again' });
       }
     }
   }
@@ -105,10 +105,11 @@ class TransactionQRCode extends Component {
     this.setState({ loadingScreen: true });
     try {
       const { success, code } = await Client.submitTransaction(signedTransaction);
+      console.log(success, code);
       if (!success) error = code;
       this.setState({ success, error, loadingScreen: false, submitted: true });
     } catch (err) {
-      this.setState({ error: err.message, loadingScreen: false, submitted: true });
+      this.setState({ error: err.message || err, loadingScreen: false, submitted: true });
     }
   }
 
@@ -170,7 +171,7 @@ class TransactionQRCode extends Component {
                 type="info"
                 showIcon
               />
-              <br/>
+              <br />
               <Button type="danger" size="large" onClick={this.goBack} style={{ alignSelf: 'center' }} ghost>
                 <Icon type="arrow-left" />Back
               </Button>
@@ -200,7 +201,6 @@ class TransactionQRCode extends Component {
         <footer>
           {(!loadingScreen && !error) && (
             <Fragment>
-              <p className={styles.messageFail}>{error}</p>
               {submitted ? this.renderSuccess() : (
                 <button
                   className={styles.button}
@@ -211,6 +211,7 @@ class TransactionQRCode extends Component {
               )}
             </Fragment>
           )}
+          <p className={styles.messageFail}>{error}</p>
         </footer>
       </Fragment>
     );
