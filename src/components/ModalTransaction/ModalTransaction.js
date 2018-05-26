@@ -7,7 +7,6 @@ import styles from './ModalTransaction.less';
 import Client from '../../utils/wallet-service/client';
 import TransactionDetails from './TransactionDetails';
 
-const URL = 'https://notifier.tronwallet.me/validate';
 
 const Header = ({ Text }) => (
   <div className={styles.messageContent}>
@@ -42,6 +41,7 @@ class TransactionQRCode extends Component {
         type: 'user/fetchWalletData',
       });
     }
+    onClose();
     this.setState({
       transactionQRCode: '',
       stage: 0,
@@ -50,7 +50,7 @@ class TransactionQRCode extends Component {
       success: false,
       submitted: false,
       error: null,
-    }, onClose());
+    });
   };
 
 
@@ -60,11 +60,11 @@ class TransactionQRCode extends Component {
     const validateData = JSON.stringify({
       txDetails,
       data,
-      URL,
+      URL: '',
       pk,
       token: 'tron-wallet-getty',
     });
-    // console.log('Sending this data', validateData);
+
     const transactionQRCode = await QRCode.toDataURL(validateData);
     this.setState({ transactionQRCode, stage: 0 });
   };

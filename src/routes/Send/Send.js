@@ -77,15 +77,16 @@ class Send extends Component {
 
   renderOptions = () => {
     const { balances } = this.props.userWallet;
-    return balances.map(bl => (
-      <option key={bl.name + bl.balance} value={bl.name}>
-        {bl.name} ({this.format(bl.balance)} available)
+    const trxBalance = balances.find(bl => bl.name === 'TRX');
+    return (
+      <option key={trxBalance.name + trxBalance.balance} value={trxBalance.name}>
+        {trxBalance.name} ({this.format(trxBalance.balance)} available)
       </option>
-    ));
+    );
   };
 
   render() {
-    const { to, amount, modalVisible, error, transactionData, loading } = this.state;
+    const { to, amount, modalVisible, error, transactionData, loading, token } = this.state;
     const { loadingWallet } = this.props;
     const { balances } = this.props.userWallet;
     const amountValid = this.isAmountValid();
@@ -152,7 +153,7 @@ class Send extends Component {
           <ModalTransaction
             title="Send TRX"
             message="Please, validate your transaction"
-            txDetails={{ To: to, Amount: amount, Type: 'SEND' }}
+            txDetails={{ To: to, Token: token, Amount: amount, Type: 'SEND' }}
             data={transactionData}
             visible={modalVisible}
             onClose={this.onCloseModal}

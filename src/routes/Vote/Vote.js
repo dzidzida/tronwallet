@@ -184,10 +184,6 @@ class Vote extends Component {
     }
   };
 
-  handleBack = () => {
-    const { transaction } = this.state;
-    this.setState({ transaction: { ...transaction, status: false, qrcode: '' } });
-  };
 
   renderTrxRemaining = () => {
     const { totalRemaining } = this.state;
