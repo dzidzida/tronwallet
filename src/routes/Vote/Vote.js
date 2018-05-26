@@ -5,7 +5,7 @@ import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 
 import styles from './Vote.less';
-import Client from '../../utils/wallet-service/client';
+import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
 import VoteControl from './../../components/Vote/VoteControl';
 import VoteItem from './VoteItem';
@@ -43,8 +43,8 @@ class Vote extends Component {
   componentWillReceiveProps(nextProps) {
     const { totalFreeze } = nextProps.userWallet;
     if (totalFreeze && totalFreeze.total > 0) {
-      const totalTrx = totalFreeze.total;
-      this.setState({ totalTrx, totalRemaining: totalTrx });
+      const totalTrx = totalFreeze.total / ONE_TRX;
+      this.setState({ totalTrx });
     }
   }
 
@@ -86,7 +86,12 @@ class Vote extends Component {
   };
 
   onResetVotes = (address) => {
-    const { totalTrx, votesSend } = this.state;
+    const { totalTrx, votesSend, currentVotes } = this.state;
+    const newVotes = { ...currentVotes };
+    for (const v in newVotes) {
+      if (v) newVotes[v] = 0;
+    }
+
     if (address) {
       const votes = votesSend;
       const index = votes.findIndex(v => v.address === address);
@@ -95,18 +100,17 @@ class Vote extends Component {
         const totalVotes = this.state.votesSend.reduce((prev, vote) => {
           return Number(prev) + Number(vote.value || 0);
         }, 0);
-        this.setState({ totalRemaining: totalTrx - totalVotes });
+        this.setState({ totalRemaining: totalTrx - totalVotes, currentVotes: newVotes });
       });
     } else {
-      this.setState({ votesSend: [], totalRemaining: totalTrx });
+      this.setState({ votesSend: [], totalRemaining: totalTrx, isReset: true, currentVotes: newVotes });
     }
   };
 
   onVoteChange = (address, value) => {
-
     const { currentVotes, totalTrx } = this.state;
     const newVotes = { ...currentVotes, [address]: value };
-    const totalUserVotes = _.reduce(newVotes, function(result, value, key) {
+    const totalUserVotes = _.reduce(newVotes, (result, value, key) => {
       return result + value;
     }, 0);
     const totalRemaining = totalTrx - totalUserVotes;
@@ -172,12 +176,12 @@ class Vote extends Component {
   renderItem = (item, index) => {
     const { currentVotes, totalVotes, userVotes } = this.state;
     return (
-      <VoteItem 
-        item={item} 
-        index={index} 
-        votes={currentVotes[item.address]} 
+      <VoteItem
+        item={item}
+        index={index}
+        votes={currentVotes[item.address]}
         userVote={userVotes[item.address]}
-        onVoteChange={this.onVoteChange} 
+        onVoteChange={this.onVoteChange}
         totalVotes={totalVotes}
       />
     );
@@ -185,7 +189,7 @@ class Vote extends Component {
 
   renderVoteList = () => {
     const { voteList } = this.state;
-    
+
     return (
       <div className={styles.wrapperVoteList}>
         <List
@@ -210,7 +214,7 @@ class Vote extends Component {
       totalTrx,
       loading,
       userVotes,
-      balance
+      balance,
     } = this.state;
     if (loading) {
       return (
