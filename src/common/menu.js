@@ -177,7 +177,7 @@ const menuData = [
   },
   {
     name: 'Tokens',
-    icon: 'pay-circle-o',
+    icon: 'appstore',
     path: 'token',
     children: [
       {
