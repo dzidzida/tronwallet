@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Modal, Spin, Icon, Button } from 'antd';
+import { Modal, Spin, Icon, Button, message } from 'antd';
 import * as QRCode from 'qrcode';
 import { connect } from 'dva';
 import QrReader from 'react-qr-reader';
@@ -35,11 +35,12 @@ class TransactionQRCode extends Component {
 
   onCloseModal = () => {
     const { success } = this.state;
-    const { onClose } = this.props;
+    const { onClose, onSuccess } = this.props;
     if (success) {
       this.props.dispatch({
         type: 'user/fetchWalletData',
       });
+      message.success(onSuccess, 5);
     }
     onClose();
     setTimeout(() => {

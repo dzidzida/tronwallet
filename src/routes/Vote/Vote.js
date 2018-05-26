@@ -27,7 +27,6 @@ class Vote extends Component {
     endTime: null,
     totalVotes: 0,
     transaction: '',
-    isReset: false,
     loading: true,
     userVotes: {},
     balance: 0,
@@ -269,6 +268,7 @@ class Vote extends Component {
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
+          onSuccess="Voted successfully"
           loadData={this.onLoadData}
           data={transaction}
           visible={modalVisible}

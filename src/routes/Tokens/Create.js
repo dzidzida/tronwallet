@@ -51,7 +51,6 @@ class Create extends PureComponent {
     const {
       name,
       totalSupply,
-      description,
       url,
       trxNum,
       num,
@@ -95,8 +94,7 @@ class Create extends PureComponent {
                     name="totalSupply"
                     id="totalSupply"
                     placeholder="100000"
-                    value={totalSupply}
-                    min="0"
+                    min={0}
                     required
                   />
                   <small className={styles.smallText}>
@@ -112,7 +110,6 @@ class Create extends PureComponent {
                   type="text"
                   name="description"
                   id="description"
-                  value={description}
                   required
                 />
                 <small className={styles.smallText}>
@@ -128,7 +125,6 @@ class Create extends PureComponent {
                   name="url"
                   id="url"
                   placeholder="http://"
-                  value={url}
                   required
                 />
                 <small className={styles.smallText}>
@@ -158,7 +154,6 @@ class Create extends PureComponent {
                     name="trxNum"
                     id="trxNum"
                     placeholder="1"
-                    value={trxNum}
                     min={1}
                     required
                   />
@@ -172,7 +167,6 @@ class Create extends PureComponent {
                     name="num"
                     id="num"
                     placeholder="1"
-                    value={num}
                     min={1}
                     required
                   />
@@ -197,7 +191,7 @@ class Create extends PureComponent {
                     type="number"
                     name="freezeAmount"
                     id="freezeAmount"
-                    defaultValue={0}
+                    placeholder="0"
                     min={0}
                     required
                   />
@@ -210,8 +204,8 @@ class Create extends PureComponent {
                     type="number"
                     name="freezeDays"
                     id="freezeDays"
+                    placeholder="1"
                     min={1}
-                    defaultValue={1}
                     required
                   />
                 </div>
@@ -263,7 +257,6 @@ class Create extends PureComponent {
                   onClick={this.submit}
                   className={acceptTerms ? styles.button : styles.buttonDisabled}
                   type="submit"
-                  max="9999-12-31T23:59"
                   disabled={!acceptTerms}
                 >
                   Issue Token
@@ -294,6 +287,7 @@ class Create extends PureComponent {
         <ModalTransaction
           title="Create Token"
           message="Please, validate your transaction"
+          onSuccess="Token created successfully"
           data={transactionData}
           visible={modalVisible}
           onClose={this.onCloseModal}
