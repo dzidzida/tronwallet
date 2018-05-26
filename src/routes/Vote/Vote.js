@@ -142,17 +142,10 @@ class Vote extends Component {
   }
 
   submit = async () => {
-    const { voteList } = this.state;
-    const votesPrepared = {};
-    voteList.forEach((vote) => {
-      if (vote.amount && Number(vote.amount) > 0) {
-        const key = vote.address;
-        votesPrepared[key] = vote.amount;
-      }
-    });
+    const { currentVotes } = this.state;
 
     try {
-      const TransactionData = await Client.voteForWitnesses(votesPrepared);
+      const TransactionData = await Client.voteForWitnesses(currentVotes);
       if (!TransactionData) {
         throw Error();
       } else {
@@ -275,6 +268,7 @@ class Vote extends Component {
         <ModalTransaction
           title="Vote"
           message="Please, validate your transaction"
+          loadData={this.onLoadData}
           data={transaction}
           visible={modalVisible}
           txDetails={{ Type: 'VOTE', Amount: totalTrx - totalRemaining }}

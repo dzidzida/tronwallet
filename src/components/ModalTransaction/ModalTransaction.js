@@ -98,6 +98,7 @@ class TransactionQRCode extends Component {
 
   handleSubmitTransaction = async () => {
     const { signedTransaction } = this.state;
+    const { loadData } = this.props;
     let error = null;
     this.setState({ loadingScreen: true });
     try {
@@ -160,7 +161,7 @@ class TransactionQRCode extends Component {
                 style={{ width: '110%', alignSelf: 'center' }}
               />
               <p className={styles.messageFail}>{error}</p>
-              <div>Please, show the signed QRCode from TronVault in landscape mode to the camera.</div>
+              <div>Please, show the signed QRCode from TronVault in portrait mode to the camera.</div>
               <Button type="danger" size="large" onClick={this.goBack} style={{ alignSelf: 'center' }} ghost>
                 <Icon type="arrow-left" />Back
               </Button>
