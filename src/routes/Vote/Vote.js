@@ -48,7 +48,7 @@ class Vote extends Component {
     const { totalFreeze } = nextProps.userWallet;
     if (totalFreeze && totalFreeze.total > 0) {
       const totalTrx = totalFreeze.total;
-      this.setState({ totalTrx, totalRemaining: totalTrx });
+      this.setState({ totalTrx });
     }
   }
 
