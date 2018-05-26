@@ -122,6 +122,7 @@ class TransactionQRCode extends Component {
 
   renderSignTransaction = () => {
     const { transactionQRCode, error } = this.state;
+    
     return (
       <Fragment>
         <img className={styles.qrcode} src={transactionQRCode} alt="Transaction QRCode" />

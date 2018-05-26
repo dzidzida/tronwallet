@@ -44,13 +44,13 @@ class Vote extends Component {
     this.onLoadEndTime();
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   const { totalFreeze } = nextProps.userWallet;
-  //   if (totalFreeze && totalFreeze.total > 0) {
-  //     const totalTrx = totalFreeze.total;
-  //     this.setState({ totalTrx, totalRemaining: totalTrx });
-  //   }
-  // }
+  componentWillReceiveProps(nextProps) {
+    const { totalFreeze } = nextProps.userWallet;
+    if (totalFreeze && totalFreeze.total > 0) {
+      const totalTrx = totalFreeze.total;
+      this.setState({ totalTrx, totalRemaining: totalTrx });
+    }
+  }
 
   onLoadData = async () => {
     const data = await Promise.all([
