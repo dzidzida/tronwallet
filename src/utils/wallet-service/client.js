@@ -120,6 +120,7 @@ class ClientWallet {
       `${this.api}/transaction`,
       { transaction: tx },
     );
+    console.log(">>AASUIHSAU", data);
     return data;
   }
 

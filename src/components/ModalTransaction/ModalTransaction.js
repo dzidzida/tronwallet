@@ -36,12 +36,13 @@ class TransactionQRCode extends Component {
   onCloseModal = () => {
     const { success, submitted } = this.state;
     const { onClose, onSuccess } = this.props;
-    if (success || submitted) {
+    if (submitted) {
       this.props.dispatch({
         type: 'user/fetchWalletData',
       });
-      message.success(onSuccess, 5);
     }
+    if (success) message.success(onSuccess, 5);
+
     onClose(submitted);
     setTimeout(() => {
       this.setState({
@@ -79,7 +80,7 @@ class TransactionQRCode extends Component {
       if (data.match(/^[0-9A-F]+$/g)) {
         this.handleGetTransactionDetails(data);
       } else {
-        this.setState({ error: 'Invalid Transaction, try again' });
+        this.setState({ error: 'Invalid Transaction' });
       }
     }
   }
@@ -104,12 +105,11 @@ class TransactionQRCode extends Component {
     let error = null;
     this.setState({ loadingScreen: true });
     try {
-      const { success, code } = await Client.submitTransaction(signedTransaction);
-      console.log(success, code);
-      if (!success) error = code;
+      const { success, message } = await Client.submitTransaction(signedTransaction);
+      if (!success) error = message;
       this.setState({ success, error, loadingScreen: false, submitted: true });
     } catch (err) {
-      this.setState({ error: err.message || err, loadingScreen: false, submitted: true });
+      this.setState({ error: message, loadingScreen: false, submitted: true });
     }
   }
 

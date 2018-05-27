@@ -155,7 +155,7 @@ class Send extends Component {
               <ModalTransaction
                 title="Send TRX"
                 message="Please, validate your transaction"
-                onSuccess="Successfully sent"
+                onSuccess="Transfer successfull"
                 txDetails={{ To: to, Token: token, Amount: amount, Type: 'SEND' }}
                 data={transactionData}
                 visible={modalVisible}
