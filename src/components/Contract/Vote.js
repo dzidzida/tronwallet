@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Icon } from 'antd';
+import { List, Icon, Tag } from 'antd';
 import moment from 'moment';
 import styles from './Contract.less';
 
@@ -13,9 +13,9 @@ export default ({ transaction }) => {
       <List.Item.Meta
         title={
           <div className={styles.address}>
-            <div>Type: Vote</div>
+            <Tag color="#bf00c8">Vote</Tag>
           </div>
-                }
+        }
         description={
           <div className={styles.address}>
             <div className={styles.itemFont}>
@@ -26,8 +26,8 @@ export default ({ transaction }) => {
       />
       <div>
         <div className={styles.itemFont}>
-          {totalVotes}
-          <Icon type="like-o" style={{ marginLeft: 5, fontSize: 24, color: 'blue' }} />
+          {totalVotes} TRX
+          <Icon type="like-o" style={{ marginLeft: 5, fontSize: 20, color: '#011529' }} />
         </div>
       </div>
     </React.Fragment >

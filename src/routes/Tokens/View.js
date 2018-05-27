@@ -222,7 +222,6 @@ class View extends PureComponent {
                 />
               </Row>
             </Row>
-
             <Row>
               <br />
               <div style={{ width: '100%', textAlign: 'center' }}>{this.renderParticipateButton(token)}</div>

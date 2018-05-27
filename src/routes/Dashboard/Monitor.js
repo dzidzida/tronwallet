@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Spin, Modal } from 'antd';
+import { Card, Col, List, Row, Button, Spin, Modal, Tag } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -141,7 +141,7 @@ class Monitor extends PureComponent {
     if (balances && transactionsData.transactions.length) {
       return balances.map(bl => (
         <List.Item key={`${bl.name}-${bl.balance}`}>
-          <List.Item.Meta title={<span>{bl.name}</span>} />
+          <List.Item.Meta title={<Tag color={'#333333'}>{bl.name}</Tag>} />
           <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
       ));
@@ -157,10 +157,10 @@ class Monitor extends PureComponent {
   renderTransactions = () => {
     const { transactionsData } = this.props.userWallet;
     if (transactionsData.transactions.length) {
-      return transactionsData.transactions.map(tr => (
-        <List.Item key={`${tr.timestamp}-${uuid()}`}>
+      return transactionsData.transactions.map(tx => (
+        <List.Item key={`${tx.timestamp}-${uuid()}`}>
           <div className={styles.itemRow}>
-            <Contract transaction={tr} />
+            <Contract transaction={tx} />
           </div>
         </List.Item>
       ));

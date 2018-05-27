@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Icon } from 'antd';
+import { List, Icon, Tag } from 'antd';
 import moment from 'moment';
 import styles from './Contract.less';
 import { formatAmount } from './util';
@@ -12,7 +12,8 @@ export default ({ transaction }) => {
       <List.Item.Meta
         title={
           <div className={styles.address}>
-            <div>Type: Transfer</div>
+            <Tag color="#108ee9">Transfer</Tag>
+
             <div>From: {contractData.from}</div>
             <div>To: {contractData.to}</div>
           </div>
@@ -32,11 +33,13 @@ export default ({ transaction }) => {
                         (`+${formatAmount(contractData.amount)}`)}
           {' '}
           TRX
-          {contractData.from === transaction.ownerAddress ? (
-            <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
-                    ) : (
-                      <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
-                        )}
+          {
+            contractData.from === transaction.ownerAddress ? (
+              <Icon type="arrow-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
+            ) : (
+              <Icon type="arrow-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
+            )
+          }
         </div>
       </div>
     </React.Fragment >

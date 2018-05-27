@@ -24,7 +24,7 @@ export default ({ transaction }) => {
       />
       <div>
         <div className={styles.itemFont}>
-          <Icon type="swap" style={{ marginLeft: 5, fontSize: 24, color: 'blue' }} />
+          <Icon type="swap" style={{ marginLeft: 5, fontSize: 20, color: '#011529' }} />
         </div>
       </div>
     </React.Fragment >
