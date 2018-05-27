@@ -34,15 +34,16 @@ class TransactionQRCode extends Component {
 
 
   onCloseModal = () => {
-    const { success } = this.state;
+    const { success, submitted } = this.state;
     const { onClose, onSuccess } = this.props;
-    if (success) {
+    if (submitted) {
       this.props.dispatch({
         type: 'user/fetchWalletData',
       });
-      message.success(onSuccess, 5);
     }
-    onClose();
+    if (success) message.success(onSuccess, 5);
+
+    onClose(submitted);
     setTimeout(() => {
       this.setState({
         transactionQRCode: '',
