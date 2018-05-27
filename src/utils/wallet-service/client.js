@@ -147,18 +147,6 @@ class ClientWallet {
     return { totalVotes, candidates };
   }
 
-  async getEntropy() {
-    try {
-      const owner = await this.getPublicKey();
-      const { data: { entropy } } = await axios.get(`${this.api}/account/${owner}`);
-      return entropy;
-    } catch (error) {
-      throw new Error(error.message);
-      console.warn(error);
-    }
-
-  }
-
   async getUserVotes() {
     const owner = await this.getPublicKey();
     const { data: { votes } } = await axios.get(`${this.api}/account/${owner}/votes`);

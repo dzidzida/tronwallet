@@ -14,7 +14,7 @@ export default {
       tronAccount: null,
       transactionsData: null,
       totalFreeze: {},
-      entropy: 0,
+      bandwidth: 0,
     },
   },
 
@@ -46,15 +46,14 @@ export default {
             Client.getTransactionList(),
           ])
         );
-        
         const account = data[0];
         const tronAccount = data[1];
         const transactionsData = data[2];
 
-        const balance = account.balance 
+        const balance = account.balance
         const balances = account.balances
         const totalFreeze = account.frozen;
-        const entropy = account.entropy;
+        const bandwidth = account.bandwidth.netRemaining;
 
         const userWalletData = {
           balance,
@@ -62,7 +61,7 @@ export default {
           tronAccount,
           transactionsData,
           totalFreeze,
-          entropy,
+          bandwidth,
         };
         yield put({
           type: 'updateDataUser',

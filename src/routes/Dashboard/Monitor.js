@@ -217,7 +217,7 @@ class Monitor extends PureComponent {
       loadDataError,
     } = this.state;
 
-    const { balance, tronAccount, totalFreeze, entropy } = this.props.userWallet;
+    const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet } = this.props.user;
 
 
@@ -385,7 +385,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={this.formatAmount(entropy)}
+                total={this.formatAmount(bandwidth)}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
