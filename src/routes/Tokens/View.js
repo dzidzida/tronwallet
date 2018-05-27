@@ -19,7 +19,7 @@ class View extends PureComponent {
     transactionData: {},
     loading: true,
     error: false,
-    isParticipateModalVisible: false
+    isParticipateModalVisible: false,
   };
 
   componentDidMount() {
@@ -27,14 +27,13 @@ class View extends PureComponent {
   }
 
   onChange = (e) => {
-    console.log('e', typeof e)
     if ((typeof e === 'number')) {
       this.setState({
-        amount: e
+        amount: e,
       });
     } else if ((typeof e === 'string') || (typeof e === undefined)) {
       this.setState({
-        amount: 0
+        amount: 0,
       });
     } else {
       const { name, value, type, checked } = e.target;
@@ -51,7 +50,7 @@ class View extends PureComponent {
       amount: 0,
       acceptTerms: false,
       issuerAddress: token.ownerAddress,
-    }, ()=> {
+    }, () => {
       this.setState({ isParticipateModalVisible: true });
     });
   };
@@ -94,12 +93,10 @@ class View extends PureComponent {
 
   renderParticipateButton = (token) => {
     if (moment(token.startTime).isAfter()
-    || moment(token.endTime).isBefore()
-    || token.percentage === 100) {
+      || moment(token.endTime).isBefore()
+      || token.percentage === 100) {
       return (
-        <button disabled className={styles.close}>
-          {moment(token.startTime).isAfter() ? 'Not started' : 'Finished'}
-        </button>
+        <Button type="primary" icon="close-circle-o" disabled>Finished</Button>
       );
     } else {
       return (
@@ -111,7 +108,7 @@ class View extends PureComponent {
   };
 
   renderCollapse = () => {
-    const { currentToken, amount, acceptTerms, loading, error } = this.state;
+    const { currentToken, amount, acceptTerms, error } = this.state;
 
     if (currentToken) {
       return (
@@ -123,7 +120,7 @@ class View extends PureComponent {
               </h3>
             </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
-                {currentToken.name}
+              {currentToken.name}
             </Col>
           </Row>
           <Row>
@@ -133,7 +130,7 @@ class View extends PureComponent {
               </h3>
             </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
-                {currentToken.description}
+              {currentToken.description}
             </Col>
           </Row>
           <Row>
@@ -143,7 +140,7 @@ class View extends PureComponent {
               </h3>
             </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
-                {Number(currentToken.price / ONE_TRX).toFixed(2)} TRX
+              {Number(currentToken.price / ONE_TRX).toFixed(2)} TRX
             </Col>
           </Row>
           <Row>
@@ -153,15 +150,15 @@ class View extends PureComponent {
               </h3>
             </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
-                <InputNumber
-                  min={0}
-                  step={10}
-                  value={amount}
-                  onChange={this.onChange}
-                />
+              <InputNumber
+                min={0}
+                step={10}
+                value={amount}
+                onChange={this.onChange}
+              />
             </Col>
           </Row>
-          <br/>
+          <br />
           <Row>
             <Col span={20} >
               I&#39;ve confirmed to spend{' '}
@@ -200,7 +197,7 @@ class View extends PureComponent {
             title={token.name}
             extra={
               <div>
-                {`Ends in ${moment(token.endTime).diff(new Date(), 'day')+1} days`}
+                {`Ends in ${moment(token.endTime).diff(new Date(), 'day') + 1} days`}
               </div>
             }
           >
@@ -210,10 +207,10 @@ class View extends PureComponent {
 
             <Row>
               <Row>
-                <Col span={12}>
+                <Col span={20}>
                   {`${token.issued} / ${token.totalSupply}`}
                 </Col>
-                <Col span={12} style={{ textAlign: 'right'}}>
+                <Col span={4} style={{ textAlign: 'right' }}>
                   {`${totalPercentage}%`}
                 </Col>
               </Row>
@@ -227,8 +224,8 @@ class View extends PureComponent {
             </Row>
 
             <Row>
-              <br/>
-              <div style={{ width: '100%', textAlign: 'center'}}>{this.renderParticipateButton(token)}</div>
+              <br />
+              <div style={{ width: '100%', textAlign: 'center' }}>{this.renderParticipateButton(token)}</div>
             </Row>
             {/* {this.renderCollapse(token.ownerAddress)} */}
           </Card>
@@ -246,7 +243,7 @@ class View extends PureComponent {
       amount,
       issuerAddress,
       tokenName,
-      isParticipateModalVisible
+      isParticipateModalVisible,
     } = this.state;
 
     if (loading) {
@@ -264,7 +261,7 @@ class View extends PureComponent {
         <Modal
           title="Participate"
           visible={isParticipateModalVisible}
-          onCancel={()=> this.setState({ isParticipateModalVisible: false }, ()=> this.setState({ currentToken: null }))}
+          onCancel={() => this.setState({ isParticipateModalVisible: false }, () => this.setState({ currentToken: null }))}
           onOk={this.submit}
           okText="Confirm Participation"
         >
