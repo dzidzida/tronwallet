@@ -193,7 +193,7 @@ class View extends PureComponent {
 
   renderToken = () => {
     return this.state.tokenList.map((token) => {
-      const totalPercentage = parseFloat((token.percentage * 100).toFixed(2));
+      const totalPercentage = parseFloat((token.percentage).toFixed(2));
       return (
         <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
           <Card 
