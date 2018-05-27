@@ -375,7 +375,7 @@ class Monitor extends PureComponent {
 
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
-              title="ENTROPY"
+              title="BANDWIDTH"
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={

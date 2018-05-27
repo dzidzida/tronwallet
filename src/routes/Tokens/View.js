@@ -1,10 +1,11 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Spin, Progress } from 'antd';
+import { Button, Modal, Spin, Progress, Row, Col, Card, InputNumber } from 'antd';
 import moment from 'moment';
 import styles from './View.less';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+import { divide } from 'gl-matrix/src/gl-matrix/vec4';
 
 class View extends PureComponent {
   state = {
@@ -19,6 +20,7 @@ class View extends PureComponent {
     transactionData: {},
     loading: true,
     error: false,
+    isParticipateModalVisible: false
   };
 
   componentDidMount() {
@@ -26,24 +28,37 @@ class View extends PureComponent {
   }
 
   onChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    this.setState({
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    console.log('e', typeof e)
+    if ((typeof e === 'number')) {
+      this.setState({
+        amount: e
+      });
+    } else if ((typeof e === 'string') || (typeof e === undefined)) {
+      this.setState({
+        amount: 0
+      });
+    } else {
+      const { name, value, type, checked } = e.target;
+      this.setState({
+        [name]: type === 'checkbox' ? checked : value,
+      });
+    }
   };
 
-  onClick = (token) => {
+  onParticipate = (token) => {
     this.setState({
       currentToken: token,
       tokenName: token.name,
       amount: 0,
       acceptTerms: false,
       issuerAddress: token.ownerAddress,
+    }, ()=> {
+      this.setState({ isParticipateModalVisible: true });
     });
   };
 
   onCloseModal = () => {
-    this.setState({ modalVisible: false, loading: true, currentToken: null });
+    this.setState({ modalVisible: false, loading: true, currentToken: null, isParticipateModalVisible: false });
     this.loadTokens();
   };
 
@@ -89,73 +104,88 @@ class View extends PureComponent {
       );
     } else {
       return (
-        <button className={styles.participate} onClick={() => this.onClick(token)}>
+        <Button type="primary" icon="like" onClick={() => this.onParticipate(token)}>
           Participate
-        </button>
+        </Button>
       );
     }
   };
 
-  renderCollapse = (ownerAddress) => {
+  renderCollapse = () => {
     const { currentToken, amount, acceptTerms, loading, error } = this.state;
 
-    if (currentToken && currentToken.ownerAddress === ownerAddress) {
+    if (currentToken) {
       return (
-        <tr>
-          <td colSpan="5" className={styles.collapse}>
-            <div className={styles.collapseRow}>
+        <div>
+          <Row>
+            <Col span={8}>
+              <h3 className={styles.item}>
+                <b>Name</b>
+              </h3>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {currentToken.name}
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Description</b>
               </h3>
-              <h3 className={styles.item}>{currentToken.description}</h3>
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {currentToken.description}
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Price</b>
               </h3>
-              <h3 className={styles.item}>{Number(currentToken.price / ONE_TRX).toFixed(2)} TRX</h3>
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {Number(currentToken.price / ONE_TRX).toFixed(2)} TRX
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Amount</b>
               </h3>
-              <input
-                className={styles.amount}
-                name="amount"
-                type="number"
-                min="0"
-                onChange={this.onChange}
-              />
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                <InputNumber
+                  min={0}
+                  step={10}
+                  value={amount}
+                  onChange={this.onChange}
+                />
+            </Col>                            
+          </Row>
+          <br/>
+          <Row>
+            <Col span={20} >
+              I&#39;ve confirmed to spend{' '}
+              <b>{((amount * currentToken.price) / ONE_TRX).toFixed(2)} TRX</b> on token
+              distribution, and get a total of{' '}
+              <b>
+                {amount} {currentToken.name}
+              </b>{' '}
+              tokens.
+            </Col>     
+            <Col span={4} style={{ textAlign: 'right' }}>
               <input
                 onChange={this.onChange}
                 type="checkbox"
                 name="acceptTerms"
                 value={acceptTerms}
               />
-              <span className={styles.checkboxText}>
-                I&#39;ve confirmed to spend{' '}
-                <b>{((amount * currentToken.price) / ONE_TRX).toFixed(2)} TRX</b> on token
-                distribution, and get a total of{' '}
-                <b>
-                  {amount} {currentToken.name}
-                </b>{' '}
-                tokens.
-              </span>
-            </div>
-            <div className={styles.collapseRow}>
-              <button
-                className={styles.transaction}
-                onClick={this.submit}
-                disabled={!acceptTerms || loading}
-              >
-                Confirm transaction
-              </button>
-            </div>
+            </Col>                              
+          </Row>                             
+          <Row>
             <p className={styles.error}>{error}</p>
-          </td>
-        </tr>
+          </Row>
+        </div>
       );
     }
     return null;
@@ -163,32 +193,47 @@ class View extends PureComponent {
 
   renderToken = () => {
     return this.state.tokenList.map((token) => {
+      const totalPercentage = parseFloat((token.percentage).toFixed(2));
       return (
-        <Fragment key={token.name}>
-          <tr>
-            <td>{token.name}</td>
-            <td>{token.ownerAddress}</td>
-            <td className={styles.right}>
-              <p>{token.issued} / {token.totalSupply}</p>
-              <span style={{ display: 'block' }}>
+        <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
+          <Card 
+            key={`${token.name}-${Date.now()}`}
+            title={token.name}
+            extra={
+              <div>
+                {`Ends in ${moment(token.endTime).diff(new Date(), 'day')+1} days`}
+              </div>
+            }
+          >
+            <Row>
+              <div>{token.description}</div>
+            </Row>
+
+            <Row>
+              <Row>
+                <Col span={12}>
+                  {`${token.issued} / ${token.totalSupply}`}
+                </Col>
+                <Col span={12} style={{ textAlign: 'right'}}>
+                  {`${totalPercentage}%`}
+                </Col>  
+              </Row>
+              <Row>
                 <Progress
-                  percent={token.percentage}
+                  status="success"
+                  percent={totalPercentage}
                   showInfo={false}
                 />
-              </span>
-            </td>
-            <td>
-              <span style={{ display: 'block' }}>
-                {moment(token.startTime).format('DD-MM-YYYY HH:MM')}
-              </span>
-              <span style={{ display: 'block' }}>
-                {moment(token.endTime).format('DD-MM-YYYY HH:MM')}
-              </span>
-            </td>
-            <td className={styles.center}>{this.renderParticipateButton(token)}</td>
-          </tr>
-          {this.renderCollapse(token.ownerAddress)}
-        </Fragment>
+              </Row>
+            </Row>
+
+            <Row>
+              <br/>
+              <div style={{ width: '100%', textAlign: 'center'}}>{this.renderParticipateButton(token)}</div>
+            </Row>
+            {/* {this.renderCollapse(token.ownerAddress)} */}
+          </Card>
+        </Col>
       );
     });
   };
@@ -201,7 +246,9 @@ class View extends PureComponent {
       participateError,
       amount,
       issuerAddress,
-      tokenName } = this.state;
+      tokenName,
+      isParticipateModalVisible
+    } = this.state;
 
     if (loading) {
       return (
@@ -210,21 +257,20 @@ class View extends PureComponent {
         </div>
       );
     }
+
     return (
-      <div className={styles.container}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Issuer</th>
-              <th className={styles.right}>Total Supply</th>
-              <th>Start / End Time</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>{this.renderToken()}</tbody>
-        </table>
+      <Fragment>
+        {this.renderToken()}
         <h3 className={styles.error}>{participateError}</h3>
+        <Modal 
+          title="Participate"
+          visible={isParticipateModalVisible}
+          onCancel={()=> this.setState({ isParticipateModalVisible: false }, ()=> this.setState({ currentToken: null }))}
+          onOk={this.submit}
+          okText="Confirm Participation"
+        >
+          {this.renderCollapse()}
+        </Modal>
         <ModalTransaction
           title="Participate to asset"
           message="Please, validate your transaction"
@@ -239,7 +285,7 @@ class View extends PureComponent {
             Token: tokenName,
           }}
         />
-      </div>
+      </Fragment>
     );
   }
 }
