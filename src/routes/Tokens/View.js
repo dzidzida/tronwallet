@@ -28,9 +28,14 @@ class View extends PureComponent {
   }
 
   onChange = (e) => {
-    if (typeof e === 'number') {
+    console.log('e', typeof e)
+    if ((typeof e === 'number')) {
       this.setState({
         amount: e
+      });
+    } else if ((typeof e === 'string') || (typeof e === undefined)) {
+      this.setState({
+        amount: 0
       });
     } else {
       const { name, value, type, checked } = e.target;
@@ -152,6 +157,7 @@ class View extends PureComponent {
                 <InputNumber
                   min={0}
                   step={10}
+                  value={amount}
                   onChange={this.onChange}
                 />
             </Col>                            
