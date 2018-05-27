@@ -20,6 +20,16 @@ export default ({ Details }) => {
           </div>
 
         );
+      } else if (ctr === 'votes') {
+        const totalVotes = contracts[0][ctr].reduce((prev, curr) => {
+          return (prev + curr.voteCount);
+        }, 0);
+        contractsElements.push(
+          <div className={styles.detailRow} key="votes">
+            <h3 className={styles.detailName}>TotalVotes</h3>
+            <h3 className={styles.detailValue}>{totalVotes}</h3>
+          </div>
+        );
       } else {
         contractsElements.push(
           <div className={styles.detailRow} key={ctr}>
