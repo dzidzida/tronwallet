@@ -106,49 +106,74 @@ class View extends PureComponent {
     if (currentToken) {
       return (
         <div>
-          <div colSpan="5" className={styles.collapse}>
-            <div className={styles.collapseRow}>
+          <Row>
+            <Col span={8}>
+              <h3 className={styles.item}>
+                <b>Name</b>
+              </h3>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {currentToken.name}
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Description</b>
               </h3>
-              <h3 className={styles.item}>{currentToken.description}</h3>
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {currentToken.description}
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Price</b>
               </h3>
-              <h3 className={styles.item}>{Number(currentToken.price / ONE_TRX).toFixed(2)} TRX</h3>
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                {Number(currentToken.price / ONE_TRX).toFixed(2)} TRX
+            </Col>                
+          </Row>
+          <Row>
+            <Col span={8}>
               <h3 className={styles.item}>
                 <b>Amount</b>
               </h3>
-              <InputNumber
-                name="amount"
-                type="number"
-                min="0"
-                onChange={this.onChange}
-              />
-            </div>
-            <div className={styles.collapseRow}>
+            </Col>      
+            <Col span={16} style={{ textAlign: 'right' }}>
+                <InputNumber
+                  name="amount"
+                  type="number"
+                  min="0"
+                  onChange={this.onChange}
+                />
+            </Col>                            
+          </Row>
+          <br/>
+          <Row>
+            <Col span={20} >
+              I&#39;ve confirmed to spend{' '}
+              <b>{((amount * currentToken.price) / ONE_TRX).toFixed(2)} TRX</b> on token
+              distribution, and get a total of{' '}
+              <b>
+                {amount} {currentToken.name}
+              </b>{' '}
+              tokens.
+            </Col>     
+            <Col span={4} style={{ textAlign: 'right' }}>
               <input
                 onChange={this.onChange}
                 type="checkbox"
                 name="acceptTerms"
                 value={acceptTerms}
               />
-              <span className={styles.checkboxText}>
-                I&#39;ve confirmed to spend{' '}
-                <b>{((amount * currentToken.price) / ONE_TRX).toFixed(2)} TRX</b> on token
-                distribution, and get a total of{' '}
-                <b>
-                  {amount} {currentToken.name}
-                </b>{' '}
-                tokens.
-              </span>
-            </div>
+            </Col>                              
+          </Row>                             
+          <Row>
             <p className={styles.error}>{error}</p>
-          </div>
+          </Row>
         </div>
       );
     }
@@ -160,7 +185,6 @@ class View extends PureComponent {
       const totalPercentage = `${(token.percentage * 100).toFixed(2)}`;
       const daysToGo = moment(token.endTime).diff(new Date(), 'day') + 1;
       const totalDaysFromBegining = moment(token.endTime).diff(token.startTime, 'day') + 1;
-      console.log('totalDaysFromBegining',totalDaysFromBegining)
       return (
         <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
           <Card 
@@ -187,6 +211,7 @@ class View extends PureComponent {
               </Row>
               <Row>
                 <Progress
+                  status="success"
                   percent={totalPercentage}
                   showInfo={false}
                 />
