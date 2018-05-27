@@ -250,6 +250,7 @@ class BasicLayout extends React.PureComponent {
     const layout = (
       <Layout>
         <SiderMenu
+          
           logo={logo}
           // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
           // If you do not have the Authorized parameter
@@ -261,7 +262,7 @@ class BasicLayout extends React.PureComponent {
           isMobile={this.state.isMobile}
           onCollapse={this.handleMenuCollapse}
         />
-        <Layout>
+        <Layout style={{ marginLeft: 80 }}>
           <Header style={{ padding: 0 }}>
             <GlobalHeader
               logo={logo}
