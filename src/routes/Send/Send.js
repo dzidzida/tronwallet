@@ -98,8 +98,8 @@ class Send extends Component {
 
     return (
       <Row>
-        <Col span={9} />
-        <Col span={6}>
+        <Col span={8} />
+        <Col span={8}>
           <Card title="Send TRX" style={{ marginBottom: 30 }}>
             <div className={styles.formContent}>
               <div className={styles.form}>
@@ -164,7 +164,7 @@ class Send extends Component {
             </div>
           </Card>
         </Col>
-        <Col span={9} />
+        <Col span={8} />
       </Row>
     );
   }

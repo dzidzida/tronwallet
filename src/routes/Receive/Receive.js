@@ -43,8 +43,8 @@ class Receive extends Component {
     const { errorQRCode, loading } = this.state;
     return (
       <Row>
-        <Col span={9}/>
-        <Col span={6}>
+        <Col span={8}/>
+        <Col span={8}>
           <Card title="Receive TRX"
                     style={{ marginBottom: 30 }}>
 
@@ -72,7 +72,7 @@ class Receive extends Component {
               />
           </Card>
         </Col>
-        <Col span={9}/>
+        <Col span={8}/>
       </Row>
     );
   }
