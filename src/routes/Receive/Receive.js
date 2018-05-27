@@ -66,7 +66,7 @@ class Receive extends Component {
               </div>
               <Alert
                 message="Warning"
-                description="This qrcode should only be scanned by TronWallet Mobile for iOS and Android. It wont will be recognized by TronVault. You can share your public key with your friends and clients, to receive and send TRX and TRON Tokens."
+                description="You can share your public key with your friends and clients, to receive and send TRX and TRON Tokens."
                 type="warning"
                 showIcon
               />
