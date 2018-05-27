@@ -105,11 +105,11 @@ class TransactionQRCode extends Component {
     let error = null;
     this.setState({ loadingScreen: true });
     try {
-      const { success, message } = await Client.submitTransaction(signedTransaction);
-      if (!success) error = message;
+      const { success, code } = await Client.submitTransaction(signedTransaction);
+      if (!success) error = code;
       this.setState({ success, error, loadingScreen: false, submitted: true });
     } catch (err) {
-      this.setState({ error: message, loadingScreen: false, submitted: true });
+      this.setState({ error: err.message || err, loadingScreen: false, submitted: true });
     }
   }
 
