@@ -5,7 +5,6 @@ import moment from 'moment';
 import styles from './View.less';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
-import { divide } from 'gl-matrix/src/gl-matrix/vec4';
 
 class View extends PureComponent {
   state = {
@@ -122,37 +121,37 @@ class View extends PureComponent {
               <h3 className={styles.item}>
                 <b>Name</b>
               </h3>
-            </Col>      
+            </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
                 {currentToken.name}
-            </Col>                
+            </Col>
           </Row>
           <Row>
             <Col span={8}>
               <h3 className={styles.item}>
                 <b>Description</b>
               </h3>
-            </Col>      
+            </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
                 {currentToken.description}
-            </Col>                
+            </Col>
           </Row>
           <Row>
             <Col span={8}>
               <h3 className={styles.item}>
                 <b>Price</b>
               </h3>
-            </Col>      
+            </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
                 {Number(currentToken.price / ONE_TRX).toFixed(2)} TRX
-            </Col>                
+            </Col>
           </Row>
           <Row>
             <Col span={8}>
               <h3 className={styles.item}>
                 <b>Amount</b>
               </h3>
-            </Col>      
+            </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
                 <InputNumber
                   min={0}
@@ -160,7 +159,7 @@ class View extends PureComponent {
                   value={amount}
                   onChange={this.onChange}
                 />
-            </Col>                            
+            </Col>
           </Row>
           <br/>
           <Row>
@@ -172,7 +171,7 @@ class View extends PureComponent {
                 {amount} {currentToken.name}
               </b>{' '}
               tokens.
-            </Col>     
+            </Col>
             <Col span={4} style={{ textAlign: 'right' }}>
               <input
                 onChange={this.onChange}
@@ -180,8 +179,8 @@ class View extends PureComponent {
                 name="acceptTerms"
                 value={acceptTerms}
               />
-            </Col>                              
-          </Row>                             
+            </Col>
+          </Row>
           <Row>
             <p className={styles.error}>{error}</p>
           </Row>
@@ -196,7 +195,7 @@ class View extends PureComponent {
       const totalPercentage = parseFloat((token.percentage).toFixed(2));
       return (
         <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
-          <Card 
+          <Card
             key={`${token.name}-${Date.now()}`}
             title={token.name}
             extra={
@@ -216,7 +215,7 @@ class View extends PureComponent {
                 </Col>
                 <Col span={12} style={{ textAlign: 'right'}}>
                   {`${totalPercentage}%`}
-                </Col>  
+                </Col>
               </Row>
               <Row>
                 <Progress
@@ -262,7 +261,7 @@ class View extends PureComponent {
       <Fragment>
         {this.renderToken()}
         <h3 className={styles.error}>{participateError}</h3>
-        <Modal 
+        <Modal
           title="Participate"
           visible={isParticipateModalVisible}
           onCancel={()=> this.setState({ isParticipateModalVisible: false }, ()=> this.setState({ currentToken: null }))}
