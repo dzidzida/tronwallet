@@ -53,7 +53,7 @@ class View extends PureComponent {
   };
 
   onCloseModal = () => {
-    this.setState({ modalVisible: false, loading: true, currentToken: null });
+    this.setState({ modalVisible: false, loading: true, currentToken: null, isParticipateModalVisible: false });
     this.loadTokens();
   };
 
@@ -188,7 +188,6 @@ class View extends PureComponent {
   renderToken = () => {
     return this.state.tokenList.map((token) => {
       const totalPercentage = parseFloat((token.percentage * 100).toFixed(2));
-      console.log('totalPercentage', typeof totalPercentage)
       return (
         <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
           <Card 
