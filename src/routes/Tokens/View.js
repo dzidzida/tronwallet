@@ -28,10 +28,16 @@ class View extends PureComponent {
   }
 
   onChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    this.setState({
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    if (typeof e === 'number') {
+      this.setState({
+        amount: e
+      });
+    } else {
+      const { name, value, type, checked } = e.target;
+      this.setState({
+        [name]: type === 'checkbox' ? checked : value,
+      });
+    }
   };
 
   onParticipate = (token) => {
@@ -144,9 +150,8 @@ class View extends PureComponent {
             </Col>      
             <Col span={16} style={{ textAlign: 'right' }}>
                 <InputNumber
-                  name="amount"
-                  type="number"
-                  min="0"
+                  min={0}
+                  step={10}
                   onChange={this.onChange}
                 />
             </Col>                            
@@ -182,9 +187,8 @@ class View extends PureComponent {
 
   renderToken = () => {
     return this.state.tokenList.map((token) => {
-      const totalPercentage = `${(token.percentage * 100).toFixed(2)}`;
-      const daysToGo = moment(token.endTime).diff(new Date(), 'day') + 1;
-      const totalDaysFromBegining = moment(token.endTime).diff(token.startTime, 'day') + 1;
+      const totalPercentage = parseFloat((token.percentage * 100).toFixed(2));
+      console.log('totalPercentage', typeof totalPercentage)
       return (
         <Col span={6} style={{ padding: 8 }} key={`${token.name}-${Date.now()}`}>
           <Card 
