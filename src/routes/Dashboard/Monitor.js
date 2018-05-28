@@ -356,7 +356,7 @@ class Monitor extends PureComponent {
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={this.formatAmount(bandwidth)}
+                total={this.formatAmountTokens(bandwidth)}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
