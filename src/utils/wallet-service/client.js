@@ -126,12 +126,16 @@ class ClientWallet {
   async getTransactionList() {
     const owner = await this.getPublicKey();
     const obj = { owner };
-    const { data } = await axios.get(
-      `${this.api}/transaction?sort=-timestamp&limit=50&address=${owner}`
-    );
-    obj.transactions = data.data;
+    const tx = () => axios.get(`${this.api}/transaction?sort=-timestamp&limit=50&address=${owner}`);
+    const tf = () => axios.get(`${this.api}/transfer?sort=-timestamp&limit=50&address=${owner}`);
+    const transactions = await Promise.all([tx(), tf()]);
+    const txs = transactions[0].data.data.filter(d => d.contractType != 1);
+    const trfs = transactions[1].data.data.map(d => ({ ...d, contractType: 1, ownerAddress: owner }));
+    const sortedTxs = [...txs, ...trfs].sort((a, b) => (b.timestamp - a.timestamp));
+    obj.transactions = sortedTxs;
     return obj;
   }
+
 
   async getFreeze() {
     const owner = await this.getPublicKey();

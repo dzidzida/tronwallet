@@ -50,8 +50,8 @@ export default {
         const tronAccount = data[1];
         const transactionsData = data[2];
 
-        const balance = account.balance
-        const balances = account.balances
+        const balance = account.balance;
+        const balances = account.balances;
         const totalFreeze = account.frozen;
         const bandwidth = account.bandwidth.netRemaining;
 
