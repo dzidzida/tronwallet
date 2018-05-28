@@ -5,8 +5,6 @@ import styles from './Contract.less';
 import { formatAmount } from './util';
 
 export default ({ transaction }) => {
-  const { contractData } = transaction;
-
   return (
     <React.Fragment>
       <List.Item.Meta
@@ -14,8 +12,8 @@ export default ({ transaction }) => {
           <div className={styles.address}>
             <Tag color="#108ee9">Transfer</Tag>
 
-            <div>From: {contractData.from}</div>
-            <div>To: {contractData.to}</div>
+            <div>From: {transaction.transferFromAddress}</div>
+            <div>To: {transaction.transferToAddress}</div>
           </div>
                 }
         description={
@@ -28,13 +26,13 @@ export default ({ transaction }) => {
       />
       <div>
         <div className={styles.itemFont}>
-          {contractData.from === transaction.ownerAddress ?
-                        (`-${formatAmount(contractData.amount)}`) :
-                        (`+${formatAmount(contractData.amount)}`)}
+          {transaction.transferFromAddress === transaction.ownerAddress ?
+                        (`-${formatAmount(transaction.amount)}`) :
+                        (`+${formatAmount(transaction.amount)}`)}
           {' '}
           TRX
           {
-            contractData.from === transaction.ownerAddress ? (
+            transaction.transferFromAddress === transaction.ownerAddress ? (
               <Icon type="arrow-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
             ) : (
               <Icon type="arrow-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
