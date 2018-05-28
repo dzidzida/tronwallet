@@ -120,7 +120,6 @@ class ClientWallet {
       `${this.api}/transaction`,
       { transaction: tx },
     );
-    console.log(">>AASUIHSAU", data);
     return data;
   }
 
@@ -145,18 +144,6 @@ class ClientWallet {
     const totalVotes = data.total_votes;
     const candidates = data.candidates;
     return { totalVotes, candidates };
-  }
-
-  async getEntropy() {
-    try {
-      const owner = await this.getPublicKey();
-      const { data: { entropy } } = await axios.get(`${this.api}/account/${owner}`);
-      return entropy;
-    } catch (error) {
-      throw new Error(error.message);
-      console.warn(error);
-    }
-
   }
 
   async getUserVotes() {

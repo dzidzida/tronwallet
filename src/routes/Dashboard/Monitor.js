@@ -1,4 +1,4 @@
-import { Card, Col, List, Row, Button, Icon, Spin, Modal } from 'antd';
+import { Card, Col, List, Row, Button, Spin, Modal, Tag } from 'antd';
 import ActiveChart from 'components/ActiveChart';
 import { ChartCard, Field } from 'components/Charts';
 import moment from 'moment';
@@ -13,6 +13,7 @@ import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+import Contract from '../../components/Contract/Contract';
 
 class Monitor extends PureComponent {
   state = {
@@ -140,7 +141,7 @@ class Monitor extends PureComponent {
     if (balances && transactionsData.transactions.length) {
       return balances.map(bl => (
         <List.Item key={`${bl.name}-${bl.balance}`}>
-          <List.Item.Meta title={<span>{bl.name}</span>} />
+          <List.Item.Meta title={<Tag color={'#333333'}>{bl.name}</Tag>} />
           <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
       ));
@@ -156,40 +157,10 @@ class Monitor extends PureComponent {
   renderTransactions = () => {
     const { transactionsData } = this.props.userWallet;
     if (transactionsData.transactions.length) {
-      return transactionsData.transactions.map(tr => (
-        <List.Item key={`${tr.timestamp}-${uuid()}`}>
+      return transactionsData.transactions.map(tx => (
+        <List.Item key={`${tx.timestamp}-${uuid()}`}>
           <div className={styles.itemRow}>
-            <List.Item.Meta
-              title={
-                <div className={styles.address}>
-                  <div>From: {tr.transferFromAddress}</div>
-                  <div>To: {tr.transferToAddress}</div>
-                </div>
-              }
-              description={
-                <div className={styles.address}>
-                  <div className={styles.itemFont}>
-                    {moment(tr.timestamp).fromNow()}
-                  </div>
-                </div>
-              }
-            />
-            <div>
-              <div className={styles.itemFont}>
-                {tr.transferFromAddress === transactionsData.owner ? (
-                  `-${this.formatAmount(tr.amount)}`
-                ) : (
-                  `+${this.formatAmount(tr.amount)}`
-                )}
-                {' '}
-                {tr.tokenName}
-                {tr.transferFromAddress === transactionsData.owner ? (
-                  <Icon type="caret-down" style={{ marginLeft: 5, fontSize: 24, color: 'red' }} />
-                ) : (
-                  <Icon type="caret-up" style={{ marginLeft: 5, fontSize: 24, color: '#53d769' }} />
-                )}
-              </div>
-            </div>
+            <Contract transaction={tx} />
           </div>
         </List.Item>
       ));
@@ -217,7 +188,7 @@ class Monitor extends PureComponent {
       loadDataError,
     } = this.state;
 
-    const { balance, tronAccount, totalFreeze, entropy } = this.props.userWallet;
+    const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet } = this.props.user;
 
 
@@ -262,7 +233,7 @@ class Monitor extends PureComponent {
                 >
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
-              }
+                  }
             >
               <ActiveChart data={tronPriceData} lastDay={lastDay} />
             </Card>
@@ -274,7 +245,7 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-              }
+                  }
             >
               <ChartCard
                 bordered={false}
@@ -312,7 +283,7 @@ class Monitor extends PureComponent {
                     disabled={balance === 0}
                   />
                 </Fragment>
-              }
+                  }
             >
               <ChartCard
                 bordered={false}
@@ -320,22 +291,22 @@ class Monitor extends PureComponent {
                 total={this.formatAmount(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
-                  totalFreeze.balances && totalFreeze.balances.length ? (
-                    <Field
-                      label="Expires"
-                      value={moment(new Date(totalFreeze.balances[0].expires)).format(
-                        'dddd, MMMM Do YYYY'
-                      )}
-                    />
-                  ) : (
-                    <Field
-                      label=""
-                      value={moment(new Date()).format(
-                          'dddd, MMMM Do YYYY'
-                        )}
-                    />
-                    )
-                }
+                      totalFreeze.balances && totalFreeze.balances.length ? (
+                        <Field
+                          label="Expires"
+                          value={moment(new Date(totalFreeze.balances[0].expires)).format(
+                            'dddd, MMMM Do YYYY'
+                          )}
+                        />
+                      ) : (
+                        <Field
+                          label=""
+                          value={moment(new Date()).format(
+                              'dddd, MMMM Do YYYY'
+                            )}
+                        />
+                        )
+                    }
               />
             </Card>
           </Col>
@@ -359,7 +330,7 @@ class Monitor extends PureComponent {
                     <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                   </CopyToClipboard>
                 </Fragment>
-              }
+                  }
             >
               <ChartCard
                 bordered={false}
@@ -380,12 +351,12 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-              }
+                  }
             >
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={this.formatAmount(entropy)}
+                total={this.formatAmount(bandwidth)}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
@@ -396,7 +367,7 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-              }
+                  }
             >
               {this.renderTokens()}
             </Card>
@@ -408,7 +379,7 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-              }
+                  }
             >
               {this.renderTransactions()}
             </Card>
