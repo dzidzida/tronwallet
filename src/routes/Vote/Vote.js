@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Card, Row, Col, List, Spin, Input } from 'antd';
+import React, { Component, Fragment } from 'react';
+import { Card, Row, Col, List, Spin, Input, Icon } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
@@ -9,6 +9,7 @@ import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import CowntDownInfo from './CowntDownInfo';
 import VoteControl from './../../components/Vote/VoteControl';
 import VoteItem from './VoteItem';
+import VoteInfo from '../../components/InfoModal/VoteInfo';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -32,6 +33,7 @@ class Vote extends Component {
     balance: 0,
     votesSend: [],
     currentVotes: {},
+    voteInfo: false,
   };
 
   // #region logic
@@ -72,7 +74,7 @@ class Vote extends Component {
     });
   };
 
-  onLoadEndTime = async () => {
+  onLoadEndTime = () => {
     const endTimeInMilis = Date.now() + this.diffSeconds();
     if (!endTimeInMilis) {
       return;
@@ -105,15 +107,15 @@ class Vote extends Component {
         this.setState({ totalRemaining: totalTrx - totalVotes, currentVotes: newVotes });
       });
     } else {
-      this.setState({ votesSend: [], totalRemaining: totalTrx, isReset: true, currentVotes: newVotes });
+      this.setState({ votesSend: [], totalRemaining: totalTrx, currentVotes: newVotes });
     }
   };
 
   onVoteChange = (address, value) => {
     const { currentVotes, totalTrx } = this.state;
     const newVotes = { ...currentVotes, [address]: value };
-    const totalUserVotes = _.reduce(newVotes, (result, value, key) => {
-      return result + value;
+    const totalUserVotes = _.reduce(newVotes, (result, nextValue) => {
+      return result + nextValue;
     }, 0);
     const totalRemaining = totalTrx - totalUserVotes;
     this.setState({ currentVotes: newVotes, totalRemaining });
@@ -217,6 +219,7 @@ class Vote extends Component {
       loading,
       userVotes,
       balance,
+      voteInfo,
     } = this.state;
     if (loading) {
       return (
@@ -252,7 +255,18 @@ class Vote extends Component {
 
         <Card
           className={styles.listCard}
-          title="VOTES"
+          title={
+            <Fragment>
+              <span>
+                VOTES
+              </span>
+              <Icon
+                type="question-circle-o"
+                style={{ color: '#46ABFC', marginLeft: 5, fontSize: 15, cursor: 'pointer' }}
+                onClick={() => this.setState({ voteInfo: true })}
+              />
+            </Fragment>
+          }
           style={{ marginTop: 24 }}
           bodyStyle={{ padding: '0 0px 40px 0px' }}
           loading={transaction.status}
@@ -276,6 +290,10 @@ class Vote extends Component {
           visible={modalVisible}
           txDetails={{ Type: 'VOTE', Amount: totalTrx - totalRemaining }}
           onClose={this.onCloseModal}
+        />
+        <VoteInfo
+          visible={voteInfo}
+          onClose={() => this.setState({ voteInfo: false })}
         />
       </div>
     );
