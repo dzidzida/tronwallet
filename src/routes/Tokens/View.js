@@ -202,10 +202,6 @@ class View extends PureComponent {
             }
           >
             <Row>
-              <div>{token.description}</div>
-            </Row>
-
-            <Row>
               <Row>
                 <Col span={20}>
                   {`${token.issued} / ${token.totalSupply}`}
