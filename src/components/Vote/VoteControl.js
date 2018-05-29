@@ -54,7 +54,7 @@ class VoteControl extends Component {
     return (
       <Affix offsetTop={0} style={affixStyle} onChange={this.onChangeAffix}>
         <div className={affix ? voteStyles.out : voteStyles.headerInfo}>
-          <span>Votes Remaining</span>
+          <span>Votes Available</span>
           <p className={totalRemaining < 0 ? styles.totalRemainingDanger : ''}>
             {Number(totalRemaining).toLocaleString()}
           </p>
