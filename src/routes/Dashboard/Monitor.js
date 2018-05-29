@@ -14,6 +14,8 @@ import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
 import Contract from '../../components/Contract/Contract';
+import FreezeInfo from '../../components/InfoModal/FreezeInfo';
+import BandwidthInfo from '../../components/InfoModal/BandwidthInfo';
 
 class Monitor extends PureComponent {
   state = {
@@ -26,6 +28,8 @@ class Monitor extends PureComponent {
     qrcodeVisible: false,
     loading: true,
     loadDataError: false,
+    freezeInfo: false,
+    bandwidthInfo: false,
   };
 
   componentDidMount() {
@@ -141,7 +145,7 @@ class Monitor extends PureComponent {
     if (balances && transactionsData.transactions.length) {
       return balances.map(bl => (
         <List.Item key={`${bl.name}-${bl.balance}`}>
-          <List.Item.Meta title={<Tag color={'#333333'}>{bl.name}</Tag>} />
+          <List.Item.Meta title={<Tag color="#333333">{bl.name}</Tag>} />
           <div>{this.formatAmountTokens(bl.balance)}</div>
         </List.Item>
       ));
@@ -186,6 +190,8 @@ class Monitor extends PureComponent {
       loading,
       transactionDetail,
       loadDataError,
+      freezeInfo,
+      bandwidthInfo,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
@@ -262,28 +268,15 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <Fragment>
-                  <Button
-                    type="danger"
-                    size="default"
-                    ghost
-                    icon="close"
-                    shape="circle"
-                    onClick={() => this.setState({ unFreezeModalVisible: true })}
-                    disabled={balance === 0}
-                  />
-                  {'  '}
-                  <Button
-                    type="primary"
-                    size="default"
-                    icon="check"
-                    shape="circle"
-                    ghost
-                    onClick={() => this.setState({ freezeModalVisible: true })}
-                    disabled={balance === 0}
-                  />
-                </Fragment>
-                  }
+                <Button
+                  type="primary"
+                  size="default"
+                  icon="question"
+                  shape="circle"
+                  ghost
+                  onClick={() => this.setState({ freezeInfo: true })}
+                />
+              }
             >
               <ChartCard
                 bordered={false}
@@ -299,13 +292,36 @@ class Monitor extends PureComponent {
                           )}
                         />
                       ) : (
-                        <Field
-                          label=""
-                          value={moment(new Date()).format(
-                              'dddd, MMMM Do YYYY'
-                            )}
-                        />
-                        )
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                          <Field
+                            label=""
+                            value={moment(new Date()).format(
+                                'dddd, MMMM Do YYYY'
+                              )}
+                          />
+                          <div>
+                            <Button
+                              type="danger"
+                              size="small"
+                              ghost
+                              icon="close"
+                              shape="circle"
+                              onClick={() => this.setState({ unFreezeModalVisible: true })}
+                              disabled={balance === 0}
+                            />
+                            {'  '}
+                            <Button
+                              type="primary"
+                              size="small"
+                              icon="check"
+                              shape="circle"
+                              ghost
+                              onClick={() => this.setState({ freezeModalVisible: true })}
+                              disabled={balance === 0}
+                            />
+                          </div>
+                        </div>
+                      )
                     }
               />
             </Card>
@@ -350,8 +366,8 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-                  }
+                <Button type="primary" size="default" icon="question" shape="circle" ghost onClick={() => this.setState({ bandwidthInfo: true })} />
+              }
             >
               <ChartCard
                 bordered={false}
@@ -413,6 +429,14 @@ class Monitor extends PureComponent {
           txDetails={transactionDetail}
           visible={qrcodeVisible}
           onClose={this.onCloseQRmodal}
+        />
+        <FreezeInfo
+          visible={freezeInfo}
+          onClose={() => this.setState({ freezeInfo: false })}
+        />
+        <BandwidthInfo
+          visible={bandwidthInfo}
+          onClose={() => this.setState({ bandwidthInfo: false })}
         />
       </Fragment>
     );
