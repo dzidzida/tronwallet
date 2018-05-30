@@ -16,6 +16,7 @@ import ModalTransaction from '../../components/ModalTransaction/ModalTransaction
 import Contract from '../../components/Contract/Contract';
 import FreezeInfo from '../../components/InfoModal/FreezeInfo';
 import BandwidthInfo from '../../components/InfoModal/BandwidthInfo';
+import CreateTokenInfo from '../../components/InfoModal/CreateTokenInfo';
 
 class Monitor extends PureComponent {
   state = {
@@ -30,6 +31,7 @@ class Monitor extends PureComponent {
     loadDataError: false,
     freezeInfo: false,
     bandwidthInfo: false,
+    createTokenInfo: false,
   };
 
   componentDidMount() {
@@ -192,6 +194,7 @@ class Monitor extends PureComponent {
       loadDataError,
       freezeInfo,
       bandwidthInfo,
+      createTokenInfo,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
@@ -382,8 +385,8 @@ class Monitor extends PureComponent {
               style={{ marginBottom: 16 }}
               bordered={false}
               extra={
-                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-                  }
+                <Button type="primary" size="default" icon="question" shape="circle" ghost onClick={() => this.setState({ createTokenInfo: true })} />
+              }
             >
               {this.renderTokens()}
             </Card>
@@ -437,6 +440,10 @@ class Monitor extends PureComponent {
         <BandwidthInfo
           visible={bandwidthInfo}
           onClose={() => this.setState({ bandwidthInfo: false })}
+        />
+        <CreateTokenInfo
+          visible={createTokenInfo}
+          onClose={() => this.setState({ createTokenInfo: false })}
         />
       </Fragment>
     );
