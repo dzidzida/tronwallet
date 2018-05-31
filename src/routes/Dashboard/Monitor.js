@@ -17,6 +17,7 @@ import Contract from '../../components/Contract/Contract';
 import FreezeInfo from '../../components/InfoModal/FreezeInfo';
 import BandwidthInfo from '../../components/InfoModal/BandwidthInfo';
 import CreateTokenInfo from '../../components/InfoModal/CreateTokenInfo';
+import RefreshButton from '../../components/RefreshButton/RefreshButton';
 
 class Monitor extends PureComponent {
   state = {
@@ -198,12 +199,8 @@ class Monitor extends PureComponent {
     } = this.state;
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
-    const { loadingWallet } = this.props.user;
+    const { loadingWallet, walletError } = this.props.user;
 
-
-    if (!tronAccount && !loading && !loadingWallet) {
-      return <div />;
-    }
 
     if (loading || loadingWallet) {
       return (
@@ -213,18 +210,8 @@ class Monitor extends PureComponent {
       );
     }
     // Something wrong while getting the api
-    if (!this.props.userWallet || loadDataError) {
-      return (
-        <div className={styles.loading}>
-          <Button
-            type="primary"
-            size="large"
-            icon="reload"
-            onClick={() => window.location.reload()}
-          >Refresh Page
-          </Button>
-        </div>
-      );
+    if (!this.props.userWallet || loadDataError || walletError || !tronAccount) {
+      return <RefreshButton />;
     }
 
 
@@ -242,7 +229,7 @@ class Monitor extends PureComponent {
                 >
                   <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                 </CopyToClipboard>
-                  }
+              }
             >
               <ActiveChart data={tronPriceData} lastDay={lastDay} />
             </Card>
@@ -254,7 +241,7 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-                  }
+              }
             >
               <ChartCard
                 bordered={false}
@@ -287,45 +274,45 @@ class Monitor extends PureComponent {
                 total={this.formatAmount(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
-                      totalFreeze.balances && totalFreeze.balances.length ? (
-                        <Field
-                          label="Expires"
-                          value={moment(new Date(totalFreeze.balances[0].expires)).format(
+                  totalFreeze.balances && totalFreeze.balances.length ? (
+                    <Field
+                      label="Expires"
+                      value={moment(new Date(totalFreeze.balances[0].expires)).format(
+                        'dddd, MMMM Do YYYY'
+                      )}
+                    />
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Field
+                        label=""
+                        value={moment(new Date()).format(
                             'dddd, MMMM Do YYYY'
                           )}
-                        />
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <Field
-                            label=""
-                            value={moment(new Date()).format(
-                                'dddd, MMMM Do YYYY'
-                              )}
+                      />
+                      <div>
+                        <Button
+                            type="danger"
+                            size="small"
+                            ghost
+                            icon="close"
+                            shape="circle"
+                            onClick={() => this.setState({ unFreezeModalVisible: true })}
+                            disabled={balance === 0}
                           />
-                          <div>
-                            <Button
-                              type="danger"
-                              size="small"
-                              ghost
-                              icon="close"
-                              shape="circle"
-                              onClick={() => this.setState({ unFreezeModalVisible: true })}
-                              disabled={balance === 0}
-                            />
-                            {'  '}
-                            <Button
-                              type="primary"
-                              size="small"
-                              icon="check"
-                              shape="circle"
-                              ghost
-                              onClick={() => this.setState({ freezeModalVisible: true })}
-                              disabled={balance === 0}
-                            />
-                          </div>
-                        </div>
-                      )
-                    }
+                        {'  '}
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon="check"
+                            shape="circle"
+                            ghost
+                            onClick={() => this.setState({ freezeModalVisible: true })}
+                            disabled={balance === 0}
+                          />
+                      </div>
+                    </div>
+                    )
+                }
               />
             </Card>
           </Col>
@@ -349,7 +336,7 @@ class Monitor extends PureComponent {
                     <Button type="primary" size="default" icon="copy" shape="circle" ghost />
                   </CopyToClipboard>
                 </Fragment>
-                  }
+              }
             >
               <ChartCard
                 bordered={false}
@@ -398,7 +385,7 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
-                  }
+              }
             >
               {this.renderTransactions()}
             </Card>

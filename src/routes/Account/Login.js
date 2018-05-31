@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import * as QRCode from 'qrcode';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
-import { Modal, Button } from 'antd';
+import { Modal, Button, message } from 'antd';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
 import {
@@ -50,7 +50,7 @@ class Login extends PureComponent {
       forgotPasswordEmail: '',
       forgotPasswordCode: '',
       newPassword: '',
-      newPasswordVisible: '',
+      newPasswordVisible: false,
       loading: false,
     });
   };
@@ -75,6 +75,8 @@ class Login extends PureComponent {
     const { name, value } = e.target;
     this.setState({
       [name]: value,
+      loginError: '',
+      confirmLoginError: '',
     });
   };
 
@@ -91,6 +93,13 @@ class Login extends PureComponent {
       reloadAuthorized();
       dispatch(routerRedux.push('/'));
     } catch (error) {
+      if (error.code === 'NotAuthorizedException') {
+        this.setState({ confirmLoginError: error.message }, () => {
+          message.warn('Session expired, try again');
+          this.onCancel();
+        });
+        return;
+      }
       this.setState({ confirmLoginError: error.message });
     }
   };
@@ -141,13 +150,13 @@ class Login extends PureComponent {
             Google Authenticator). You wont be able to log into your account without a six digit
             code from some authenticator.
           </p>
-          <div style={{textAlign: 'center'}}>
+          <div style={{ textAlign: 'center' }}>
             <img src={qrcode} alt="QRCode Authenticator" width={200} />
           </div>
-          <br/>
+          <br />
           <h3>Save this code for future references.</h3>
           <CopyToClipboard text={totpCode} />
-          <br/>
+          <br />
           <h3>Authenticator Code</h3>
           <input
             className={styles.formControl}
