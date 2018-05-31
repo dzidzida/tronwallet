@@ -145,7 +145,7 @@ class Monitor extends PureComponent {
 
   renderTokens = () => {
     const { balances, transactionsData } = this.props.userWallet;
-    if (balances && transactionsData.transactions.length) {
+    if (balances && transactionsData) {
       return balances.map(bl => (
         <List.Item key={`${bl.name}-${bl.balance}`}>
           <List.Item.Meta title={<Tag color="#333333">{bl.name}</Tag>} />
@@ -201,6 +201,8 @@ class Monitor extends PureComponent {
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
 
+    // If user doesnt have a PK yet
+    if (!tronAccount) return <div />;
 
     if (loading || loadingWallet) {
       return (
@@ -210,7 +212,7 @@ class Monitor extends PureComponent {
       );
     }
     // Something wrong while getting the api
-    if (!this.props.userWallet || loadDataError || walletError || !tronAccount) {
+    if (!this.props.userWallet || loadDataError || walletError) {
       return <RefreshButton />;
     }
 
@@ -291,24 +293,24 @@ class Monitor extends PureComponent {
                       />
                       <div>
                         <Button
-                            type="danger"
-                            size="small"
-                            ghost
-                            icon="close"
-                            shape="circle"
-                            onClick={() => this.setState({ unFreezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="danger"
+                          size="small"
+                          ghost
+                          icon="close"
+                          shape="circle"
+                          onClick={() => this.setState({ unFreezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                         {'  '}
                         <Button
-                            type="primary"
-                            size="small"
-                            icon="check"
-                            shape="circle"
-                            ghost
-                            onClick={() => this.setState({ freezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="primary"
+                          size="small"
+                          icon="check"
+                          shape="circle"
+                          ghost
+                          onClick={() => this.setState({ freezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                       </div>
                     </div>
                     )

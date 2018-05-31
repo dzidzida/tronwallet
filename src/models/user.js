@@ -68,10 +68,9 @@ export default {
           type: 'updateDataUser',
           payload: userWalletData,
           loadingWallet: false,
-          error: null,
+          walletError: null,
         });
       } catch (error) {
-        console.log("CAI AQUI ?!?!?");
         yield put({
           type: 'updateDataUser',
           payload: false,
@@ -115,7 +114,7 @@ export default {
         ...state,
         userWalletData: action.payload,
         loadingWallet: action.loadingWallet,
-        walletError: 'Data fetching failed',
+        walletError: action.walletError,
       };
     },
   },
