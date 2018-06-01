@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Modal, Button, Tooltip, Icon, message } from 'antd';
 import { routerRedux } from 'dva/router';
+import { Auth } from 'aws-amplify';
 import { connect } from 'dva';
 import styles from './Signup.less';
 import { signUp, confirmSignup } from '../../services/api';
@@ -11,7 +12,7 @@ class Signup extends PureComponent {
   state = {
     password: '',
     email: '',
-    phoneNumber: '',
+    username: '',
     modalVisible: false,
     signupError: '',
     confirmSignupError: '',
@@ -20,7 +21,7 @@ class Signup extends PureComponent {
   };
 
   submit = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, signupError: null });
     try {
       const response = await signUp(this.state);
       this.setState({
@@ -36,19 +37,21 @@ class Signup extends PureComponent {
   };
 
   confirmSignup = async () => {
+    const { username, password } = this.state;
     try {
       await confirmSignup(this.state);
+      await Auth.signIn(username, password);
       this.setState({
         modalVisible: false,
         signupSuccess: true,
         password: '',
         email: '',
-        phoneNumber: '',
+        username: '',
       });
       setAuthority('user');
       reloadAuthorized();
-      this.props.dispatch(routerRedux.push('/user/login'));
-      message.success('Account confirmed with success! Log in to enter.');
+      this.props.dispatch(routerRedux.push('/'));
+      message.success('Account confirmed with success !');
     } catch (error) {
       this.setState({ confirmSignupError: error.message, signupSuccess: false });
     }
@@ -75,7 +78,7 @@ class Signup extends PureComponent {
   };
 
   renderConfirmModal = () => {
-    const { modalVisible, email, confirmSignupError } = this.state;
+    const { modalVisible, confirmSignupError } = this.state;
     return (
       <Modal
         title="Confirm Signup"
@@ -84,7 +87,7 @@ class Signup extends PureComponent {
         onCancel={() => this.setState({ modalVisible: false })}
       >
         <h3>We have sent you an email with the account verification code. Please type it to confirm your registration.</h3>
-        <br/>
+        <br />
         <h3>Verification Code:</h3>
         <input
           className={styles.formControl}
@@ -99,7 +102,7 @@ class Signup extends PureComponent {
   };
 
   render() {
-    const { password, email, phoneNumber, signupError, loading } = this.state;
+    const { password, email, username, signupError, loading } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -108,6 +111,15 @@ class Signup extends PureComponent {
         <div className={styles.formContent}>
           <div className={styles.form}>
             {this.renderSuccessMessage()}
+            <h3>Username</h3>
+            <input
+              className={styles.formControl}
+              value={username}
+              onChange={this.change}
+              type="text"
+              name="username"
+              id="username"
+            />
             <h3>Email</h3>
             <input
               className={styles.formControl}
@@ -116,15 +128,6 @@ class Signup extends PureComponent {
               type="email"
               name="email"
               id="email"
-            />
-            <h3>Phone number</h3>
-            <input
-              className={styles.formControl}
-              value={phoneNumber}
-              onChange={this.change}
-              type="text"
-              name="phoneNumber"
-              id="phoneNumber"
             />
             <div style={{ display: 'flex', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
               <h3 style={{ paddingRight: 5 }}>Password</h3>
