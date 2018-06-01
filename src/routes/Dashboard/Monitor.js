@@ -200,7 +200,7 @@ class Monitor extends PureComponent {
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
-    console.log('totalFreeze',totalFreeze)
+    //console.log('totalFreeze',totalFreeze)
     // If user doesnt have a PK yet
     if (!tronAccount) return <div />;
 
