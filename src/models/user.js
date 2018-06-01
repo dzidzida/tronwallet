@@ -8,6 +8,7 @@ export default {
     list: [],
     currentUser: {},
     loadingWallet: false,
+    walletError: null,
     userWalletData: {
       balance: null,
       balances: [],
@@ -67,12 +68,14 @@ export default {
           type: 'updateDataUser',
           payload: userWalletData,
           loadingWallet: false,
+          walletError: null,
         });
       } catch (error) {
         yield put({
           type: 'updateDataUser',
           payload: false,
           loadingWallet: false,
+          walletError: 'Data fetching failed',
         });
       }
     },
@@ -111,6 +114,7 @@ export default {
         ...state,
         userWalletData: action.payload,
         loadingWallet: action.loadingWallet,
+        walletError: action.walletError,
       };
     },
   },

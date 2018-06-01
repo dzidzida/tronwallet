@@ -5,6 +5,7 @@ import moment from 'moment';
 import styles from './View.less';
 import Client, { ONE_TRX } from '../../utils/wallet-service/client';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+import RefreshButton from '../../components/RefreshButton/RefreshButton';
 
 class View extends PureComponent {
   state = {
@@ -19,6 +20,7 @@ class View extends PureComponent {
     transactionData: {},
     loading: true,
     error: false,
+    loadingError: false,
     isParticipateModalVisible: false,
   };
 
@@ -239,12 +241,24 @@ class View extends PureComponent {
       issuerAddress,
       tokenName,
       isParticipateModalVisible,
+      tokenList,
+      loadingError,
     } = this.state;
 
     if (loading) {
       return (
         <div className={styles.container} >
           <Spin size="large" />
+        </div>
+      );
+    }
+
+    if (loadingError) return <RefreshButton />;
+
+    if (!tokenList.length) {
+      return (
+        <div className={styles.emptyList}>
+          <Button disabled>No tokens available</Button>
         </div>
       );
     }

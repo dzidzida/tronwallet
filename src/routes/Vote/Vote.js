@@ -10,6 +10,7 @@ import CowntDownInfo from './CowntDownInfo';
 import VoteControl from './../../components/Vote/VoteControl';
 import VoteItem from './VoteItem';
 import VoteInfo from '../../components/InfoModal/VoteInfo';
+import RefreshButton from '../../components/RefreshButton/RefreshButton';
 
 const Info = ({ title, value, bordered }) => (
   <div className={styles.headerInfo}>
@@ -22,6 +23,7 @@ const Info = ({ title, value, bordered }) => (
 class Vote extends Component {
   state = {
     voteError: undefined,
+    loadingError: false,
     voteList: [],
     totalTrx: 0,
     totalRemaining: 0,
@@ -51,27 +53,31 @@ class Vote extends Component {
   }
 
   onLoadData = async () => {
-    const data = await Promise.all([
-      Client.getTotalVotes(),
-      Client.getFreeze(),
-      Client.getUserVotes(),
-    ]);
-    const { balance } = this.props.userWallet;
-    const voteList = _.orderBy(data[0].candidates, ['votes', 'url'], ['desc', 'asc']) || 0;
-    const totalVotes = data[0].totalVotes || 0;
-    const frozen = data[1];
-    const userVotes = data[2];
-    const totalTrx = frozen.total || 0;
+    try {
+      const data = await Promise.all([
+        Client.getTotalVotes(),
+        Client.getFreeze(),
+        Client.getUserVotes(),
+      ]);
+      const { balance } = this.props.userWallet;
+      const voteList = _.orderBy(data[0].candidates, ['votes', 'url'], ['desc', 'asc']) || 0;
+      const totalVotes = data[0].totalVotes || 0;
+      const frozen = data[1];
+      const userVotes = data[2];
+      const totalTrx = frozen.total || 0;
 
-    this.setState({
-      balance,
-      voteList,
-      totalTrx,
-      totalRemaining: totalTrx,
-      totalVotes,
-      userVotes,
-      loading: false,
-    });
+      this.setState({
+        balance,
+        voteList,
+        totalTrx,
+        totalRemaining: totalTrx,
+        totalVotes,
+        userVotes,
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({ loadingError: 'Could not communicate with server' });
+    }
   };
 
   onLoadEndTime = () => {
@@ -220,6 +226,7 @@ class Vote extends Component {
       userVotes,
       balance,
       voteInfo,
+      loadingError,
     } = this.state;
     if (loading) {
       return (
@@ -228,6 +235,8 @@ class Vote extends Component {
         </div>
       );
     }
+    if (loadingError) return <RefreshButton />;
+
     return (
       <div className={styles.container}>
         <Card bordered={false}>
