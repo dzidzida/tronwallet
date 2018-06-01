@@ -30,10 +30,10 @@
 const awsmobile = {
   aws_project_name: 'TronWallet',
   aws_project_region: 'us-east-1',
-  aws_cognito_identity_pool_id: 'us-east-1:46f514a1-df93-4adf-9fad-bd5ce0ff6eda',
+  aws_cognito_identity_pool_id: 'us-east-1:c5a0a18d-8fe2-421b-858d-e6a2c7f97f0a',
   aws_cognito_region: 'us-east-1',
-  aws_user_pools_id: 'us-east-1_R6P9H9F1H',
-  aws_user_pools_web_client_id: '15gcgjt62mvd05tffqitbvk9v2',
+  aws_user_pools_id: 'us-east-1_i3fDuXSwH',
+  aws_user_pools_web_client_id: '3rj2t1v5d9cj2jlrk9u6sq4i2s',
 };
 
 export default awsmobile;
