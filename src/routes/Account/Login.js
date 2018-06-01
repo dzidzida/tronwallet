@@ -3,12 +3,13 @@ import * as QRCode from 'qrcode';
 import { routerRedux } from 'dva/router';
 import { connect } from 'dva';
 import { Modal, Button, message } from 'antd';
+import { Auth } from 'aws-amplify';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import styles from './Login.less';
 import {
-  signIn,
   confirmSignIn,
   setUserPk,
+  confirmSignup,
   forgotPassword,
   confirmForgotPassword,
 } from '../../services/api';
@@ -17,7 +18,7 @@ import { setAuthority } from '../../utils/authority';
 
 class Login extends PureComponent {
   state = {
-    email: '',
+    username: '',
     password: '',
     user: {},
     code: '',
@@ -33,12 +34,16 @@ class Login extends PureComponent {
     forgotPasswordCode: '',
     newPassword: '',
     newPasswordVisible: false,
+    confirmEmailVisible: false,
+    confirmEmailError: '',
     loading: false,
   };
+
 
   onCancel = () => {
     this.setState({
       user: {},
+      username: '',
       code: '',
       totpCode: null,
       qrcode: null,
@@ -56,13 +61,23 @@ class Login extends PureComponent {
   };
 
   submit = async () => {
-    const { email, password } = this.state;
+    const { dispatch } = this.props;
+    const { username, password } = this.state;
     this.setState({ loading: true });
     try {
-      const { user, totpCode } = await signIn(email, password);
-      if (totpCode) this.renderQRCode(totpCode, email);
-      this.setState({ totpCode, user, modalVisible: true, loading: false });
+      await Auth.signIn(username, password);
+      this.setState({ signInsuccess: true });
+      setAuthority('user');
+      reloadAuthorized();
+      dispatch(routerRedux.push('/'));
+      // const { user, totpCode } = await signIn(username, password);
+      // if (totpCode) this.renderQRCode(totpCode, username);
+      // this.setState({ totpCode, user, modalVisible: true, loading: false });
     } catch (error) {
+      if (error.code === 'UserNotConfirmedException') {
+        this.setState({ loading: false, confirmEmailVisible: true });
+        return;
+      }
       this.setState({ loginError: error.message, loading: false });
     }
   };
@@ -77,6 +92,7 @@ class Login extends PureComponent {
       [name]: value,
       loginError: '',
       confirmLoginError: '',
+      confirmEmailError: '',
     });
   };
 
@@ -111,6 +127,7 @@ class Login extends PureComponent {
       this.setState({ forgotPasswordVisible: false, newPasswordVisible: true });
     } catch (error) {
       // TODO: FAZER CASO DE FALHA
+      this.setState({ forgotPasswordError: error.message });
     }
   };
 
@@ -119,6 +136,18 @@ class Login extends PureComponent {
     await confirmForgotPassword(forgotPasswordEmail, forgotPasswordCode, newPassword);
     this.onCancel();
   };
+
+  confirmEmail = async () => {
+    const { username, code } = this.state;
+    try {
+      await confirmSignup({ username, code });
+      this.setState({ confirmEmailVisible: false });
+      message.success('Account confirmed with success !');
+      this.submit();
+    } catch (error) {
+      this.setState({ confirmEmailError: error.message });
+    }
+  }
 
   renderQRCode = async (code, username) => {
     const totpUrl = `otpauth://totp/${username}?secret=${code}&issuer=TronWallet`;
@@ -137,6 +166,31 @@ class Login extends PureComponent {
     }
 
     return null;
+  };
+
+
+  renderConfirmEmailModal = () => {
+    const { confirmEmailVisible, confirmEmailError } = this.state;
+    return (
+      <Modal
+        title="Confirm Signup"
+        visible={confirmEmailVisible}
+        onOk={this.confirmEmail}
+        onCancel={() => this.setState({ modalVisible: false })}
+      >
+        <h3>We have sent you an email with the account verification code.Please type it to confirm your registration.</h3>
+        <br />
+        <h3>Verification Code:</h3>
+        <input
+          className={styles.formControl}
+          onChange={this.change}
+          type="text"
+          name="code"
+          id="code"
+        />
+        <h3 className={styles.error}>{confirmEmailError}</h3>
+      </Modal>
+    );
   };
 
   renderConfirmModal = () => {
@@ -197,7 +251,7 @@ class Login extends PureComponent {
   };
 
   renderForgotPasswordModal = () => {
-    const { forgotPasswordVisible, forgotPasswordEmail } = this.state;
+    const { forgotPasswordVisible, forgotPasswordEmail, forgotPasswordError } = this.state;
     return (
       <Modal
         title="Forgot password"
@@ -214,6 +268,7 @@ class Login extends PureComponent {
           name="forgotPasswordEmail"
           id="forgotPasswordEmail"
         />
+        <h3 className={styles.error}>{forgotPasswordError}</h3>
       </Modal>
     );
   };
@@ -259,7 +314,7 @@ class Login extends PureComponent {
   };
 
   render() {
-    const { email, password, loginError, loading } = this.state;
+    const { username, password, loginError, loading } = this.state;
     return (
       <div className={styles.card}>
         <div className={styles.cardHeader}>
@@ -268,14 +323,14 @@ class Login extends PureComponent {
         <div className={styles.formContent}>
           <div className={styles.form}>
             {this.renderSuccessMessage()}
-            <h3>Email</h3>
+            <h3>Username</h3>
             <input
               className={styles.formControl}
-              value={email}
+              value={username}
               onChange={this.change}
-              type="email"
-              name="email"
-              id="email"
+              type="username"
+              name="username"
+              id="username"
             />
             <h3>Password</h3>
             <input
@@ -311,6 +366,7 @@ class Login extends PureComponent {
             </div>
           </div>
           {this.renderConfirmModal()}
+          {this.renderConfirmEmailModal()}
           {this.renderForgotPasswordModal()}
           {this.renderConfirmForgotPasswordModal()}
         </div>

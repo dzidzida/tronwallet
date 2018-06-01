@@ -3,9 +3,9 @@ import { Auth } from 'aws-amplify';
 import request from '../utils/request';
 
 // framework default apis
-export const signIn = async (email, password) => {
+export const signIn = async (username, password) => {
   try {
-    const user = await Auth.signIn(email, password);
+    const user = await Auth.signIn(username, password);
     let totpCode = null;
     if (user.challengeParam.MFAS_CAN_SETUP) {
       totpCode = await Auth.setupTOTP(user);
@@ -25,9 +25,9 @@ export const confirmSignIn = async (user, totpCode, code) => {
 
 export const signOut = async () => Auth.signOut();
 
-export const signUp = async ({ password, email }) => {
+export const signUp = async ({ password, username, email }) => {
   return Auth.signUp({
-    username: email,
+    username,
     password,
     attributes: {
       email,
@@ -36,8 +36,8 @@ export const signUp = async ({ password, email }) => {
   });
 };
 
-export const confirmSignup = async ({ email, code }) => {
-  return Auth.confirmSignUp(email, code);
+export const confirmSignup = async ({ username, code }) => {
+  return Auth.confirmSignUp(username, code);
 };
 
 export const changePassword = async () => {
