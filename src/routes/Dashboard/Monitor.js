@@ -200,7 +200,7 @@ class Monitor extends PureComponent {
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
-
+    console.log('totalFreeze',totalFreeze)
     // If user doesnt have a PK yet
     if (!tronAccount) return <div />;
 
@@ -276,7 +276,7 @@ class Monitor extends PureComponent {
                 total={this.formatAmount(totalFreeze.total || 0)}
                 contentHeight={46}
                 footer={
-                  totalFreeze.balances && totalFreeze.balances.length ? (
+                  totalFreeze.balances && totalFreeze.balances.total ? (
                     <Field
                       label="Expires"
                       value={moment(new Date(totalFreeze.balances[0].expires)).format(
