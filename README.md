@@ -16,28 +16,26 @@ For the desktop and web versions, TronWallet sign with sign offline transactions
 
 TronWallet Features:
 
-[x] Login / Signup
-[x] MFA - 2 Factor Authentication
-[x] Send (Offline sign with TronVault)
-[x] Vote  (Offline sign with TronVault)
-[x] Freeze  (Offline sign with TronVault)
-[x] Unfreeze  (Offline sign with TronVault)
-[x] Official news from Justin Sun Twitter
-[x] User Dashboard
-[x] Balances widget
-[x] Frozen Tokens widget
-[x] Entropy widget
-[x] Receive widget
-[x] Transactions list widget
-[x] User Tokens widget
-[x] TRX price chart widget
-[x] TronWallet Notifier Micro App
-[x] TronWallet Notifier API
-[x] List Tokens
-[x] Create Tokens (Only Desktop)
-[x] Participate Tokens
-
-
+- Login / Signup
+- MFA - 2 Factor Authentication
+- Send (Offline sign with TronVault)
+- Vote  (Offline sign with TronVault)
+- Freeze  (Offline sign with TronVault)
+- Unfreeze  (Offline sign with TronVault)
+- Official news from Justin Sun Twitter
+- User Dashboard
+- Balances widget
+- Frozen Tokens widget
+- Entropy widget
+- Receive widget
+- Transactions list widget
+- User Tokens widget
+- TRX price chart widget
+- TronWallet Notifier Micro App
+- TronWallet Notifier API
+- List Tokens
+- Create Tokens (Only Desktop)
+- Participate Tokens
 
 ## Compatibility
 
