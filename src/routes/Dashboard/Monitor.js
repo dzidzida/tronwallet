@@ -237,18 +237,18 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card
-              title="BALANCE"
+          <Card
+              title="BANDWIDTH"
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
+                <Button type="primary" size="default" icon="question" shape="circle" ghost onClick={() => this.setState({ bandwidthInfo: true })} />
               }
             >
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={Number(balance) ? this.formatAmount(balance) : '0'}
+                total={this.formatAmountTokens(bandwidth)}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
@@ -353,22 +353,23 @@ class Monitor extends PureComponent {
         <Row gutter={24}>
 
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card
-              title="BANDWIDTH"
+          <Card
+              title="BALANCE"
               style={{ marginBottom: 30 }}
               bordered={false}
               extra={
-                <Button type="primary" size="default" icon="question" shape="circle" ghost onClick={() => this.setState({ bandwidthInfo: true })} />
+                <Button type="primary" size="default" icon="reload" shape="circle" ghost onClick={() => this.fetchWalletData()} />
               }
             >
               <ChartCard
                 bordered={false}
                 title="TRX"
-                total={this.formatAmountTokens(bandwidth)}
+                total={Number(balance) ? this.formatAmount(balance) : '0'}
                 footer={<small style={{ color: '#fff' }}>.</small>}
                 contentHeight={46}
               />
             </Card>
+            
             <Card
               title="TOKENS"
               style={{ marginBottom: 16 }}
