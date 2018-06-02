@@ -4,7 +4,7 @@ import dva from 'dva';
 import Amplify from 'aws-amplify';
 import createHistory from 'history/createBrowserHistory';
 import createLoading from 'dva-loading';
-import awsmobile from './aws-export';
+import awsmobile from './aws-exports';
 
 // user BrowserHistory
 // import createHistory from 'history/createBrowserHistory';
