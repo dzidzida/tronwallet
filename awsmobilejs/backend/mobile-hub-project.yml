@@ -18,16 +18,6 @@ features:
     components:
       sign-in-user-pools: !com.amazonaws.mobilehub.v0.UserPoolsIdentityProvider 
         attributes:
-          alias-attributes:
-            - email
-            - phone_number
-          mfa-configuration: ON
-          name: userpool
-          password-policy: !com.amazonaws.mobilehub.ConvertibleMap 
-            min-length: '8'
-            require-lower-case: true
-            require-numbers: true
-            require-symbols: true
-            require-upper-case: true
+          user-pool-id: us-east-1_i3fDuXSwH
 name: TronWallet
 region: us-east-1
