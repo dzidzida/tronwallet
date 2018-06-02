@@ -8,7 +8,7 @@
     "start": "cross-env ESLINT=none roadhog dev",
     "start:no-proxy": "cross-env NO_PROXY=true ESLINT=none roadhog dev",
     "prebuild": "npm version patch",
-    "build": "cross-env ESLINT=none roadhog build",
+    "build": "cross-env ESLINT=none roadhog build --analyze",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "cross-env ANALYZE=true roadhog build",
     "lint:style": "stylelint \"src/**/*.less\" --syntax less",
