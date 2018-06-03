@@ -7,7 +7,6 @@ import { Route, Redirect, Switch, routerRedux } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
-import openSocket from 'socket.io-client';
 import { enquireScreen, unenquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
@@ -21,11 +20,9 @@ import { getUserAttributes } from '../services/api';
 import SetPkModal from '../components/SetPkModal/SetPkModal';
 import TransactionResultModal from '../components/TransactionResultModal/TransactionResultModal';
 import { version } from './../../package.json';
-import Client from '../utils/wallet-service/client';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
-const URL_SOCKET = 'https://tronnotifier.now.sh';
 
 /**
  * 根据菜单取得重定向地址.
@@ -107,10 +104,6 @@ class BasicLayout extends React.PureComponent {
     };
   }
 
-  componentWillMount() {
-    this.openSocket();
-  }
-
   componentDidMount() {
     this.checkUserAttr();
 
@@ -188,20 +181,6 @@ class BasicLayout extends React.PureComponent {
     }
   };
 
-  openSocket = async () => {
-    const { dispatch } = this.props;
-    const pk = await Client.getPublicKey();
-    this.socket = openSocket(URL_SOCKET);
-    this.socket.on('payback', (data) => {
-      if (data.uuid === pk) {
-        dispatch({
-          type: 'monitor/changeModalResult',
-          payload: { visible: true, transaction: { ...data.transaction, result: data.succeeded } },
-        });
-      }
-    });
-  };
-
   handleMenuCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
@@ -223,6 +202,9 @@ class BasicLayout extends React.PureComponent {
     if (key === 'logout') {
       this.props.dispatch({
         type: 'login/logout',
+      });
+      this.props.dispatch({
+        type: 'user/clearCurrent',
       });
     }
   };
@@ -249,7 +231,6 @@ class BasicLayout extends React.PureComponent {
     const layout = (
       <Layout>
         <SiderMenu
-          
           logo={logo}
           // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
           // If you do not have the Authorized parameter
