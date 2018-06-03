@@ -200,9 +200,8 @@ class Monitor extends PureComponent {
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
-    //console.log('totalFreeze',totalFreeze)
+    // console.log('totalFreeze',totalFreeze)
     // If user doesnt have a PK yet
-    if (!tronAccount) return <div />;
 
     if (loading || loadingWallet) {
       return (
@@ -211,6 +210,9 @@ class Monitor extends PureComponent {
         </div>
       );
     }
+
+    if (!tronAccount) return <div />;
+
     // Something wrong while getting the api
     if (!this.props.userWallet || loadDataError || walletError) {
       return <RefreshButton />;
@@ -237,7 +239,7 @@ class Monitor extends PureComponent {
             </Card>
           </Col>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-          <Card
+            <Card
               title="BANDWIDTH"
               style={{ marginBottom: 30 }}
               bordered={false}
@@ -293,24 +295,24 @@ class Monitor extends PureComponent {
                       />
                       <div>
                         <Button
-                          type="danger"
-                          size="small"
-                          ghost
-                          icon="close"
-                          shape="circle"
-                          onClick={() => this.setState({ unFreezeModalVisible: true })}
-                          disabled={balance === 0}
-                        />
+                            type="danger"
+                            size="small"
+                            ghost
+                            icon="close"
+                            shape="circle"
+                            onClick={() => this.setState({ unFreezeModalVisible: true })}
+                            disabled={balance === 0}
+                          />
                         {'  '}
                         <Button
-                          type="primary"
-                          size="small"
-                          icon="check"
-                          shape="circle"
-                          ghost
-                          onClick={() => this.setState({ freezeModalVisible: true })}
-                          disabled={balance === 0}
-                        />
+                            type="primary"
+                            size="small"
+                            icon="check"
+                            shape="circle"
+                            ghost
+                            onClick={() => this.setState({ freezeModalVisible: true })}
+                            disabled={balance === 0}
+                          />
                       </div>
                     </div>
                     )
@@ -353,7 +355,7 @@ class Monitor extends PureComponent {
         <Row gutter={24}>
 
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-          <Card
+            <Card
               title="BALANCE"
               style={{ marginBottom: 30 }}
               bordered={false}
@@ -369,7 +371,7 @@ class Monitor extends PureComponent {
                 contentHeight={46}
               />
             </Card>
-            
+
             <Card
               title="TOKENS"
               style={{ marginBottom: 16 }}
