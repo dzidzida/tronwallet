@@ -27,6 +27,9 @@ export default {
         payload: response,
       });
     },
+    *clearCurrent(_, { put }) {
+      yield put({ type: 'clearCurrentUser' });
+    },
     *fetchCurrent(_, { call, put }) {
       const response = yield call(queryCurrent);
       yield put({
@@ -115,6 +118,23 @@ export default {
         userWalletData: action.payload,
         loadingWallet: action.loadingWallet,
         walletError: action.walletError,
+      };
+    },
+    clearCurrentUser(state) {
+      return {
+        ...state,
+        list: [],
+        currentUser: {},
+        loadingWallet: false,
+        walletError: null,
+        userWalletData: {
+          balance: null,
+          balances: [],
+          tronAccount: null,
+          transactionsData: null,
+          totalFreeze: {},
+          bandwidth: 0,
+        },
       };
     },
   },
