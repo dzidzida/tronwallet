@@ -429,6 +429,7 @@ class Monitor extends PureComponent {
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}
           onOk={this.handleFreeze}
+          balance={(balance / ONE_TRX)}
         />
         <UnfreezeModal
           freezeBalance={totalFreeze.balances}
