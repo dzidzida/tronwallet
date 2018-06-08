@@ -348,7 +348,7 @@ class Monitor extends PureComponent {
                   />
                   {'    '}
                   <Button
-                    type="danger"
+                    type="primary"
                     size="default"
                     ghost
                     icon="edit"
