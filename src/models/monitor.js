@@ -8,6 +8,7 @@ export default {
     isResultVisible: false,
     isPkVisible: false,
     transaction: {},
+    pkFromQrCode: null,
   },
 
   effects: {
@@ -29,6 +30,7 @@ export default {
       yield put({
         type: 'setPkVibible',
         visible: payload.visible,
+        pk: payload.pk || null,
       });
     },
   },
@@ -51,6 +53,7 @@ export default {
       return {
         ...state,
         isPkVisible: action.visible,
+        pkFromQrCode: action.pk || '',
       };
     },
   },

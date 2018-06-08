@@ -21,6 +21,10 @@ class TransactionQRCode extends Component {
     this.loadUserPk();
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({ newPk: nextProps.pkFromQrCode });
+  }
+
   onCloseModal = () => {
     const { currentPk } = this.state;
     if (!currentPk) {
@@ -29,7 +33,7 @@ class TransactionQRCode extends Component {
     }
     this.props.dispatch({
       type: 'monitor/changeModalPk',
-      payload: { visible: false },
+      payload: { visible: false, pk: null },
     });
   }
 
@@ -59,6 +63,7 @@ class TransactionQRCode extends Component {
 
   render() {
     const { visible } = this.props;
+    const { newPk } = this.state;
     const footerButton = (
       <button className={styles.button} onClick={this.putUser}>
         {'Ok'}
@@ -75,6 +80,7 @@ class TransactionQRCode extends Component {
           type="text"
           name="pk"
           id="pk"
+          value={newPk}
           placeholder="Paste your public key here"
         />
         <h3 style={{ fontWeight: '700', color: 'red' }}>{this.state.error}</h3>
@@ -93,4 +99,6 @@ class TransactionQRCode extends Component {
   }
 }
 
-export default connect()(TransactionQRCode);
+export default connect(({ monitor }) => ({
+  pkFromQrCode: monitor.pkFromQrCode,
+}))(TransactionQRCode);

@@ -13,6 +13,7 @@ import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
+import PublicKeyModal from '../../components/PublicKeyModal/PublicKeyModal';
 import Contract from '../../components/Contract/Contract';
 import FreezeInfo from '../../components/InfoModal/FreezeInfo';
 import BandwidthInfo from '../../components/InfoModal/BandwidthInfo';
@@ -28,6 +29,7 @@ class Monitor extends PureComponent {
     unFreezeModalVisible: false,
     freezeTransaction: '',
     qrcodeVisible: false,
+    publicKeyModalVisible: false,
     loading: true,
     loadDataError: false,
     freezeInfo: false,
@@ -45,6 +47,14 @@ class Monitor extends PureComponent {
       payload: { visible: true },
     });
   }
+
+  onOpenPkModalFromQRCode = (pk) => {
+    this.props.dispatch({
+      type: 'monitor/changeModalPk',
+      payload: { visible: true, pk },
+    });
+  }
+
   // This  close function from TransactionModal needs to close every modal
   onCloseQRmodal = () => {
     this.setState({
@@ -196,6 +206,7 @@ class Monitor extends PureComponent {
       freezeInfo,
       bandwidthInfo,
       createTokenInfo,
+      publicKeyModalVisible,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
@@ -295,24 +306,24 @@ class Monitor extends PureComponent {
                       />
                       <div>
                         <Button
-                            type="danger"
-                            size="small"
-                            ghost
-                            icon="close"
-                            shape="circle"
-                            onClick={() => this.setState({ unFreezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="danger"
+                          size="small"
+                          ghost
+                          icon="close"
+                          shape="circle"
+                          onClick={() => this.setState({ unFreezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                         {'  '}
                         <Button
-                            type="primary"
-                            size="small"
-                            icon="check"
-                            shape="circle"
-                            ghost
-                            onClick={() => this.setState({ freezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="primary"
+                          size="small"
+                          icon="check"
+                          shape="circle"
+                          ghost
+                          onClick={() => this.setState({ freezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                       </div>
                     </div>
                     )
@@ -327,6 +338,15 @@ class Monitor extends PureComponent {
               bordered={false}
               extra={
                 <Fragment>
+                  <Button
+                    type="primary"
+                    size="default"
+                    ghost
+                    icon="qrcode"
+                    shape="circle"
+                    onClick={() => this.setState({ publicKeyModalVisible: true })}
+                  />
+                  {'    '}
                   <Button
                     type="danger"
                     size="default"
@@ -425,6 +445,12 @@ class Monitor extends PureComponent {
           visible={qrcodeVisible}
           onClose={this.onCloseQRmodal}
         />
+        <PublicKeyModal
+          title="Public key"
+          visible={publicKeyModalVisible}
+          onClose={() => this.setState({ publicKeyModalVisible: false })}
+          onScan={data => this.onOpenPkModalFromQRCode(data)}
+        />
         <FreezeInfo
           visible={freezeInfo}
           onClose={() => this.setState({ freezeInfo: false })}
@@ -442,7 +468,8 @@ class Monitor extends PureComponent {
   }
 }
 
-export default connect(({ user }) => ({
+export default connect(({ user, monitor }) => ({
   user,
   userWallet: user.userWalletData,
+  pkFromQrCode: monitor.pkFromQrCode,
 }))(Monitor);
