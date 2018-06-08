@@ -34,20 +34,20 @@ class PublicKeyModal extends PureComponent {
       >
         <div className={styles.transaction}>
           <Fragment>
+            <p className={styles.messageFail}>{error}</p>
+            <Alert
+              message="Notice"
+              description="Please, show your receive qrcode to the camera."
+              type="info"
+              showIcon
+            />
+            <br />
             <QrReader
               delay={300}
               onError={() => this.setState({ error: 'Error while reading QRCode' })}
               onScan={this.handleScanTransaction}
               style={{ width: '110%', alignSelf: 'center' }}
             />
-            <p className={styles.messageFail}>{error}</p>
-            <Alert
-              message="Notice"
-              description="Some users have reported problems to show the qrcode to the pc or notebook camera. Please, show the signed qrcode in TronVault with your phone in landscape mode."
-              type="info"
-              showIcon
-            />
-            <br />
           </Fragment>
         </div>
       </Modal>

@@ -13,7 +13,6 @@ import FreezeModal from '../../components/Freeze/FreezeModal';
 import UnfreezeModal from '../../components/Freeze/UnfreezeModal';
 import styles from './Monitor.less';
 import ModalTransaction from '../../components/ModalTransaction/ModalTransaction';
-import PublicKeyModal from '../../components/PublicKeyModal/PublicKeyModal';
 import Contract from '../../components/Contract/Contract';
 import FreezeInfo from '../../components/InfoModal/FreezeInfo';
 import BandwidthInfo from '../../components/InfoModal/BandwidthInfo';
@@ -29,7 +28,6 @@ class Monitor extends PureComponent {
     unFreezeModalVisible: false,
     freezeTransaction: '',
     qrcodeVisible: false,
-    publicKeyModalVisible: false,
     loading: true,
     loadDataError: false,
     freezeInfo: false,
@@ -45,13 +43,6 @@ class Monitor extends PureComponent {
     this.props.dispatch({
       type: 'monitor/changeModalPk',
       payload: { visible: true },
-    });
-  }
-
-  onOpenPkModalFromQRCode = (pk) => {
-    this.props.dispatch({
-      type: 'monitor/changeModalPk',
-      payload: { visible: true, pk },
     });
   }
 
@@ -206,14 +197,12 @@ class Monitor extends PureComponent {
       freezeInfo,
       bandwidthInfo,
       createTokenInfo,
-      publicKeyModalVisible,
     } = this.state;
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
-    // console.log('totalFreeze',totalFreeze)
-    // If user doesnt have a PK yet
 
+    // If user doesnt have a PK yet
     if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
@@ -342,15 +331,6 @@ class Monitor extends PureComponent {
                     type="primary"
                     size="default"
                     ghost
-                    icon="qrcode"
-                    shape="circle"
-                    onClick={() => this.setState({ publicKeyModalVisible: true })}
-                  />
-                  {'    '}
-                  <Button
-                    type="primary"
-                    size="default"
-                    ghost
                     icon="edit"
                     shape="circle"
                     onClick={this.onOpenPkModal}
@@ -445,12 +425,6 @@ class Monitor extends PureComponent {
           txDetails={transactionDetail}
           visible={qrcodeVisible}
           onClose={this.onCloseQRmodal}
-        />
-        <PublicKeyModal
-          title="Public key"
-          visible={publicKeyModalVisible}
-          onClose={() => this.setState({ publicKeyModalVisible: false })}
-          onScan={data => this.onOpenPkModalFromQRCode(data)}
         />
         <FreezeInfo
           visible={freezeInfo}
