@@ -45,6 +45,7 @@ class Monitor extends PureComponent {
       payload: { visible: true },
     });
   }
+
   // This  close function from TransactionModal needs to close every modal
   onCloseQRmodal = () => {
     this.setState({
@@ -200,9 +201,8 @@ class Monitor extends PureComponent {
 
     const { balance, tronAccount, totalFreeze, bandwidth } = this.props.userWallet;
     const { loadingWallet, walletError } = this.props.user;
-    // console.log('totalFreeze',totalFreeze)
-    // If user doesnt have a PK yet
 
+    // If user doesnt have a PK yet
     if (loading || loadingWallet) {
       return (
         <div className={styles.loading}>
@@ -295,24 +295,24 @@ class Monitor extends PureComponent {
                       />
                       <div>
                         <Button
-                            type="danger"
-                            size="small"
-                            ghost
-                            icon="close"
-                            shape="circle"
-                            onClick={() => this.setState({ unFreezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="danger"
+                          size="small"
+                          ghost
+                          icon="close"
+                          shape="circle"
+                          onClick={() => this.setState({ unFreezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                         {'  '}
                         <Button
-                            type="primary"
-                            size="small"
-                            icon="check"
-                            shape="circle"
-                            ghost
-                            onClick={() => this.setState({ freezeModalVisible: true })}
-                            disabled={balance === 0}
-                          />
+                          type="primary"
+                          size="small"
+                          icon="check"
+                          shape="circle"
+                          ghost
+                          onClick={() => this.setState({ freezeModalVisible: true })}
+                          disabled={balance === 0}
+                        />
                       </div>
                     </div>
                     )
@@ -328,7 +328,7 @@ class Monitor extends PureComponent {
               extra={
                 <Fragment>
                   <Button
-                    type="danger"
+                    type="primary"
                     size="default"
                     ghost
                     icon="edit"
@@ -409,6 +409,7 @@ class Monitor extends PureComponent {
           visible={freezeModalVisible}
           onClose={() => this.setState({ freezeModalVisible: false })}
           onOk={this.handleFreeze}
+          balance={(balance / ONE_TRX)}
         />
         <UnfreezeModal
           freezeBalance={totalFreeze.balances}
@@ -442,7 +443,8 @@ class Monitor extends PureComponent {
   }
 }
 
-export default connect(({ user }) => ({
+export default connect(({ user, monitor }) => ({
   user,
   userWallet: user.userWalletData,
+  pkFromQrCode: monitor.pkFromQrCode,
 }))(Monitor);

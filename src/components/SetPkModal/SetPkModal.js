@@ -7,14 +7,16 @@ import styles from './SetPkModal.less';
 import { setUserPk } from '../../services/api';
 import { isAddressValid } from '../../utils/wallet-api-v2/utils/address';
 import Client from '../../utils/wallet-service/client';
+import PublicKeyModal from '../PublicKeyModal/PublicKeyModal';
 
 const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.tronmobile';
 const IOS_URL = 'https://itunes.apple.com/us/app/tronvault/id1380161153?ls=1&mt=8';
 class TransactionQRCode extends Component {
   state = {
-    newPk: null,
+    newPk: '',
     error: null,
     currentPk: null,
+    publicKeyModalVisible: false,
   };
 
   componentDidMount() {
@@ -59,10 +61,19 @@ class TransactionQRCode extends Component {
 
   render() {
     const { visible } = this.props;
+    const { newPk, publicKeyModalVisible } = this.state;
     const footerButton = (
-      <button className={styles.button} onClick={this.putUser}>
-        {'Ok'}
-      </button>
+      <div className={styles.footerContainer}>
+        <button
+          className={styles.button}
+          onClick={() => this.setState({ publicKeyModalVisible: true })}
+        >
+          {'Scan Public Key'}
+        </button>
+        <button className={styles.button} onClick={this.putUser}>
+          {'Ok'}
+        </button>
+      </div>
     );
 
     return (
@@ -75,6 +86,7 @@ class TransactionQRCode extends Component {
           type="text"
           name="pk"
           id="pk"
+          value={newPk}
           placeholder="Paste your public key here"
         />
         <h3 style={{ fontWeight: '700', color: 'red' }}>{this.state.error}</h3>
@@ -88,6 +100,12 @@ class TransactionQRCode extends Component {
         </div>
         <br />
         <p className={styles.footerModal}>Available only for TRON Testnet.</p>
+        <PublicKeyModal
+          title="Public key"
+          visible={publicKeyModalVisible}
+          onClose={() => this.setState({ publicKeyModalVisible: false })}
+          onScan={data => this.setState({ newPk: data })}
+        />
       </Modal>
     );
   }
