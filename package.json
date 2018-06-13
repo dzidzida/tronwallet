@@ -1,7 +1,7 @@
 {
   "name": "tronwallet",
   "version": "1.6.44",
-  "description": "An out-of-box UI solution for enterprise applications",
+  "description": "The open source dapp crypto wallet for TRON that never will ask for your secrets keys",
   "private": true,
   "scripts": {
     "precommit": "npm run lint-staged",
